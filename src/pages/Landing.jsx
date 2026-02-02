@@ -56,34 +56,39 @@ const Landing = () => {
       </nav>
 
       {/* ================= HERO ================= */}
-      <section className="max-w-7xl mx-auto px-6 pt-32 pb-20 grid md:grid-cols-2 gap-14 items-center">
-        {/* Left */}
-        <div>
-          <p className="text-lg font-semibold mb-2">Your Parcels,</p>
-          <h1 className="text-5xl font-bold leading-tight mb-6">
+      <section className="w-full min-h-screen flex flex-col justify-center items-center bg-brand-white px-6 py-32">
+        {/* Hero Content */}
+        <div className="text-center max-w-5xl">
+          <p className="text-lg font-semibold mb-2 text-brand-grayDark">
+            Your Parcels,
+          </p>
+
+          <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6">
             Delivered <span className="text-brand-orange">Fast</span>
           </h1>
-          <p className="text-lg mb-8 max-w-xl">
+
+          <p className="text-lg md:text-xl mb-10 text-gray-700">
             Send and receive parcels across the city with real-time tracking,
             professional couriers, and guaranteed delivery times.
           </p>
 
-          <div className="flex gap-4 flex-wrap">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-16">
             <Link to="/register?role=USER">
-              <button className="bg-brand-orange text-white px-6 py-3 rounded-lg font-semibold">
+              <button className="bg-brand-orange text-white px-8 py-4 rounded-lg font-semibold hover:bg-orange-600 transition">
                 Get Started Free
               </button>
             </Link>
             <Link to="/register?role=COURIER">
-              <button className="border border-brand-grayDark px-6 py-3 rounded-lg font-semibold">
+              <button className="border border-brand-grayDark px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition">
                 Become a Courier
               </button>
             </Link>
           </div>
         </div>
 
-        {/* Right Stats */}
-        <div className="grid grid-cols-2 gap-6">
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 w-full max-w-5xl mt-10">
           <Stat value="50K+" label="Deliveries" />
           <Stat value="10K+" label="Active Users" />
           <Stat value="500+" label="Couriers" />
