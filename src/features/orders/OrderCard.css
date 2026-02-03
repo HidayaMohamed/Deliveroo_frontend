@@ -1,0 +1,80 @@
+.order-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.order-number {
+  font-weight: bold;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.status-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.status-pill.pending { background: #fef3c7; color: #d97706; }
+.status-pill.delivered { background: #dcfce7; color: #16a34a; }
+
+.card-middle {
+  margin-bottom: 1.5rem;
+}
+
+.location-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.pickup { background: #00ccbc; }
+.destination { background: #ef4444; }
+
+.location-connector {
+  width: 2px;
+  height: 15px;
+  background: #e2e8f0;
+  margin-left: 3px;
+}
+
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 1rem;
+}
+
+.details-btn {
+  background: transparent;
+  border: 1px solid #00ccbc;
+  color: #00ccbc;
+  padding: 6px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.details-btn:hover {
+  background: #00ccbc;
+  color: white;
+}

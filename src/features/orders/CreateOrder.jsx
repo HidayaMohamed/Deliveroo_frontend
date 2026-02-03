@@ -1,42 +1,99 @@
 import { useState } from "react";
 import { createOrder } from "./ordersAPI";
-import GoogleMap from "../../components/maps/GoogleMap";
-import PriceSummary from "../../components/orders/PriceSummary";
+import PriceSummary from "./PriceSummary.jsx"; 
+import "./CreateOrder.css"; 
 
 export default function CreateOrder() {
-  const [pickup, setPickup] = useState(null);
-  const [destination, setDestination] = useState(null);
   const [weight, setWeight] = useState("");
   const [price, setPrice] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const weightPrices = { LIGHT: 500, MEDIUM: 1000, HEAVY: 2000 };
+
+  const handleWeightChange = (e) => {
+    const selectedWeight = e.target.value;
+    setWeight(selectedWeight);
+    setPrice(weightPrices[selectedWeight] || null);
+  };
 
   const handleSubmit = async () => {
-    await createOrder({
-      pickup_location: pickup,
-      destination,
-      weight_category: weight,
-    });
-    alert("Order created!");
+    if (!weight) return alert("Please choose a weight category.");
+    setLoading(true);
+    try {
+      await createOrder({
+        pickup_location: "Nairobi Central",
+        destination: "Westlands",
+        weight_category: weight,
+      });
+      alert("Order created successfully! 🚚");
+    } catch (error) {
+      alert("Error: Check if your Flask backend is running.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div>
-      <h2>Create Delivery</h2>
+    <div className="create-order-page">
+      <div className="order-container">
+        <header className="order-header">
+          <span className="badge">Premium Logistics</span>
+          <h1>Request a Delivery</h1>
+          <p>Classy, swift, and secure transport for your valuables.</p>
+        </header>
 
-      <GoogleMap
-        onPickupSelect={setPickup}
-        onDestinationSelect={setDestination}
-      />
+        <main className="order-content">
+          {/* Magnificent Map Placeholder */}
+          <section className="map-wrapper-magnificent">
+            <div className="glass-overlay">
+              <div className="location-pulse"></div>
+              <h3>Route Optimization</h3>
+              <p>GPS Engine connecting...</p>
+            </div>
+          </section>
 
-      <select onChange={(e) => setWeight(e.target.value)}>
-        <option value="">Select Weight</option>
-        <option value="LIGHT">Light</option>
-        <option value="MEDIUM">Medium</option>
-        <option value="HEAVY">Heavy</option>
-      </select>
+          {/* Elegant Form Side */}
+          <section className="form-wrapper">
+            <div className="form-card">
+              <div className="step-indicator">Step 1 of 2: Parcel Details</div>
+              
+              <div className="input-group">
+                <label className="input-label">Select Parcel Size</label>
+                <div className="select-wrapper">
+                  <select
+                    className="magnificent-select"
+                    value={weight}
+                    onChange={handleWeightChange}
+                  >
+                    <option value="">Choose category</option>
+                    <option value="LIGHT">Light — Documents & Small Parcels</option>
+                    <option value="MEDIUM">Medium — Boxes & Electronics</option>
+                    <option value="HEAVY">Heavy — Furniture & Large Cargo</option>
+                  </select>
+                </div>
+              </div>
 
-      {price && <PriceSummary price={price} />}
+              {price && (
+                <div className="summary-reveal">
+                  <PriceSummary price={price} />
+                </div>
+              )}
 
-      <button onClick={handleSubmit}>Create Order</button>
+              <button 
+                className="magnificent-button" 
+                onClick={handleSubmit}
+                disabled={!price || loading}
+              >
+                {loading ? (
+                  <span className="loader-text">Securing Courier...</span>
+                ) : (
+                  "Confirm Delivery Order"
+                )}
+              </button>
+            </div>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }
