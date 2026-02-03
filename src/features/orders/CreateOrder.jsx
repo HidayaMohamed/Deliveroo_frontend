@@ -1,23 +1,18 @@
 import { useState } from "react";
 import { createOrder } from "./ordersAPI";
-import PriceSummary from "./PriceSummary.jsx"; 
-import "./CreateOrder.css"; 
+import "./CreateOrder.css";
 
 export default function CreateOrder() {
   const [weight, setWeight] = useState("");
-  const [price, setPrice] = useState(null);
+  const [isOrdered, setIsOrdered] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const weightPrices = { LIGHT: 500, MEDIUM: 1000, HEAVY: 2000 };
+  const pricing = { LIGHT: 500, MEDIUM: 1000, HEAVY: 2000 };
+  const vehicles = { LIGHT: "🏍️", MEDIUM: "🚗", HEAVY: "🚛" };
+  const courierName = "John Doe"; // Mock courier assigned for UX
 
-  const handleWeightChange = (e) => {
-    const selectedWeight = e.target.value;
-    setWeight(selectedWeight);
-    setPrice(weightPrices[selectedWeight] || null);
-  };
-
-  const handleSubmit = async () => {
-    if (!weight) return alert("Please choose a weight category.");
+  const handleOrder = async () => {
+    if (!weight) return;
     setLoading(true);
     try {
       await createOrder({
@@ -25,7 +20,7 @@ export default function CreateOrder() {
         destination: "Westlands",
         weight_category: weight,
       });
-      alert("Order created successfully! 🚚");
+      setIsOrdered(true);
     } catch (error) {
       alert("Error: Check if your Flask backend is running.");
     } finally {
@@ -33,66 +28,82 @@ export default function CreateOrder() {
     }
   };
 
+  const resetForm = () => {
+    setWeight("");
+    setIsOrdered(false);
+  };
+
+  // SUCCESS STATE: Notification of receipt
+  if (isOrdered) {
+    return (
+      <div className="success-view-container">
+        <div className="success-glass-card">
+          <div className="success-check">✅</div>
+          <h2>Request Received!</h2>
+          <p>Your luxury shipment is being handled by <strong>{courierName}</strong>.</p>
+          <div className="status-badge-blue">Order received and being worked on...</div>
+          <button onClick={resetForm} className="btn-return">New Shipment</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="create-order-page">
-      <div className="order-container">
-        <header className="order-header">
-          <span className="badge">Premium Logistics</span>
-          <h1>Request a Delivery</h1>
-          <p>Classy, swift, and secure transport for your valuables.</p>
-        </header>
+    <div className="create-order-page luxury-theme">
+      {/* 1. Personalized Greeting */}
+      <header className="user-greeting">
+        <span className="eyebrow">Excellence in Motion</span>
+        <h1>Welcome, <span className="gold-text">Sharon Njoroge</span></h1>
+        <p>Select your parcel details to get started.</p>
+      </header>
 
-        <main className="order-content">
-          {/* Magnificent Map Placeholder */}
-          <section className="map-wrapper-magnificent">
-            <div className="glass-overlay">
-              <div className="location-pulse"></div>
-              <h3>Route Optimization</h3>
-              <p>GPS Engine connecting...</p>
-            </div>
-          </section>
+      <div className="order-main-grid">
+        {/* 2. Visual Vehicle Selection */}
+        <section className="selection-card">
+          <h3 className="section-title">Select Package Weight</h3>
+          <div className="weight-grid">
+            {Object.keys(pricing).map((cat) => (
+              <div 
+                key={cat} 
+                className={`vehicle-card ${weight === cat ? 'active' : ''}`}
+                onClick={() => setWeight(cat)}
+              >
+                <div className="vehicle-circle">{vehicles[cat]}</div>
+                <span className="cat-name">{cat}</span>
+                <span className="cat-price">KSh {pricing[cat]}</span>
+              </div>
+            ))}
+          </div>
+        </section>
 
-          {/* Elegant Form Side */}
-          <section className="form-wrapper">
-            <div className="form-card">
-              <div className="step-indicator">Step 1 of 2: Parcel Details</div>
-              
-              <div className="input-group">
-                <label className="input-label">Select Parcel Size</label>
-                <div className="select-wrapper">
-                  <select
-                    className="magnificent-select"
-                    value={weight}
-                    onChange={handleWeightChange}
-                  >
-                    <option value="">Choose category</option>
-                    <option value="LIGHT">Light — Documents & Small Parcels</option>
-                    <option value="MEDIUM">Medium — Boxes & Electronics</option>
-                    <option value="HEAVY">Heavy — Furniture & Large Cargo</option>
-                  </select>
-                </div>
+        {/* 3. Interactive Receipt & Actions */}
+        {weight && (
+          <section className="receipt-container fade-in">
+            <div className="luxury-receipt">
+              <div className="receipt-header">Shipment Summary</div>
+              <div className="receipt-line">
+                <span>Weight Category</span>
+                <span>{weight}</span>
+              </div>
+              <div className="receipt-line">
+                <span>Carrier Type</span>
+                <span>{weight === 'HEAVY' ? 'Lorry' : 'Biker'}</span>
+              </div>
+              <hr className="receipt-divider" />
+              <div className="receipt-total">
+                <span>TOTAL PRICE</span>
+                <span className="green-text">KSh {pricing[weight]}</span>
               </div>
 
-              {price && (
-                <div className="summary-reveal">
-                  <PriceSummary price={price} />
-                </div>
-              )}
-
-              <button 
-                className="magnificent-button" 
-                onClick={handleSubmit}
-                disabled={!price || loading}
-              >
-                {loading ? (
-                  <span className="loader-text">Securing Courier...</span>
-                ) : (
-                  "Confirm Delivery Order"
-                )}
-              </button>
+              <div className="action-row">
+                <button className="btn-deny" onClick={() => setWeight("")}>Deny Order</button>
+                <button className="btn-accept" onClick={handleOrder} disabled={loading}>
+                  {loading ? "Processing..." : "Accept & Make Order"}
+                </button>
+              </div>
             </div>
           </section>
-        </main>
+        )}
       </div>
     </div>
   );

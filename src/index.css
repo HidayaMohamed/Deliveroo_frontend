@@ -1,0 +1,23 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+:root {
+  --bg-light-brown: #dfcfb8;   /* Magnificent Sand/Leather base */
+  --deep-luxury: #1a1512;      /* Near-black brown for text & nav */
+  --cyber-gold: #d4af37;       /* Metallic Gold */
+  --soft-cream: #fdf5e6;       /* For cards to pop off the brown */
+  --royal-blue: #003366;       
+  --glass-dark: rgba(0, 0, 0, 0.08);
+  --border-rich: rgba(26, 21, 18, 0.15);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-light-brown);
+  color: var(--deep-luxury); /* Deep black-brown text */
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+h1, h2, .logo {
+  font-family: 'Playfair Display', serif;
+}
