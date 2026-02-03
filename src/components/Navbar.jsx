@@ -1,21 +1,40 @@
 import { Link } from "react-router-dom";
-import "./Navbar.css"; // Ensure you create this CSS file in the same folder
+import "./Navbar.css";
 
 export default function Navbar() {
   return (
     <nav className="luxury-nav">
       <div className="nav-container">
-        <Link to="/" className="nav-logo">DELIVEROO<span className="gold">.</span></Link>
+        {/* Brand Identity */}
+        <Link to="/" className="nav-logo">
+          DELIVEROO<span className="gold">.</span>
+        </Link>
         
         <div className="nav-links">
-          {/* User Links */}
-          <Link to="/orders/new">Ship Parcel</Link>
-          <Link to="/orders">My Deliveries</Link>
+          {/* Main Navigation */}
+          <Link to="/orders/new" className="nav-item">Ship Parcel</Link>
+          <Link to="/orders" className="nav-item">My Deliveries</Link>
           
-          {/* Courier/Rider Link */}
-          <Link to="/courier/assigned" className="rider-portal">Rider Portal</Link>
+          {/* Action Button */}
+          <Link to="/rider-portal" className="rider-btn">
+            Rider Portal
+          </Link>
           
-          <div className="user-profile-circle">SN</div>
+          {/* Admin Toggle */}
+          <div className="admin-shortcut">
+            <Link to="/admin/dashboard" title="Admin View">My Account</Link>
+          </div>
+
+          {/* New Text-Based User Identity */}
+          <div className="nav-profile-group">
+            <div className="profile-text-wrapper">
+              <span className="user-label">Premium.</span>
+            
+            </div>
+            <div className="status-indicator">
+              <div className="status-dot"></div>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
