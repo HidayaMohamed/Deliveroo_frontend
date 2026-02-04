@@ -1,0 +1,56 @@
+.assigned-orders-container {
+  padding: 40px 5%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.badge-gold {
+  color: var(--cyber-yellow);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.luxury-card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 25px;
+  transition: transform 0.3s ease;
+}
+
+.luxury-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--cyber-yellow);
+}
+
+.status-pill {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-pill.in-transit { background: var(--royal-blue); color: white; }
+.status-pill.pending { background: var(--luxury-brown); color: white; }
+
+.action-btn {
+  width: 100%;
+  margin-top: 20px;
+  background: transparent;
+  color: var(--cyber-yellow);
+  border: 1px solid var(--cyber-yellow);
+  padding: 12px;
+  border-radius: 4px;
+  font-weight: 700;
+  cursor: pointer;
+}

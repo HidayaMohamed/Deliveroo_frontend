@@ -1,0 +1,25 @@
+.my-orders-page {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.orders-header h1 {
+  color: #00ccbc;
+  margin-bottom: 0.5rem;
+}
+
+.orders-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+  background: #f8fafc;
+  border-radius: 12px;
+  margin-top: 2rem;
+}

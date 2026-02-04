@@ -1,0 +1,61 @@
+/* src/components/Footer.css */
+.magnificent-footer {
+  background-color:rgba(250, 223, 189, 0.692);
+  border-top: 1px solid var(--border);
+  padding: 60px 5% 30px;
+  margin-top: 100px;
+  color: var(--stark-white);
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.footer-brand h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  margin: 0 0 10px 0;
+  letter-spacing: 2px;
+}
+
+.footer-brand h3 span {
+  color: var(--cyber-yellow);
+}
+
+.footer-brand p {
+  color: var(--luxury-brown);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 40px;
+}
+
+.footer-links span {
+  font-size: 0.85rem;
+  color: #888;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.footer-links span:hover {
+  color: var(--cyber-yellow);
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 60px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.75rem;
+  color: #555;
+  letter-spacing: 1px;
+}
