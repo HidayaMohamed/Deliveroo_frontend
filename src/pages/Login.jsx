@@ -25,7 +25,7 @@ const Login = () => {
     else if (user.role === "COURIER") navigate("/courier");
     else navigate("/user");
   }, [user, navigate]);
-
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-brand-cream px-4">
       <div className="max-w-md w-full bg-brand-white rounded-xl shadow-lg p-8">

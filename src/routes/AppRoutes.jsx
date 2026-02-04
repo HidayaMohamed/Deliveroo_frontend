@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Landing from "../pages/Landing";
+import Dashboard from "../features/admin/Dashboard";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Unauthorized from "../pages/Unauthorized";
@@ -62,7 +63,7 @@ const AppRoutes = () => {
         path="/admin"
         element={
           <ProtectedRoute role="ADMIN">
-            <h1>Admin Dashboard</h1>
+            <Dashboard />
           </ProtectedRoute>
         }
       />
