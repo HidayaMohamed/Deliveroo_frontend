@@ -16,11 +16,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (data) => {
-    const res = await api.post("/auth/register", data);
-    setToken(res.data.access_token);
-    setUser(res.data.user);
-    return res.data.user; 
+    try {
+      const res = await api.post("/api/auth/register", data);
+      setToken(res.data.access_token);
+      setUser(res.data.user);
+      return res.data.user;
+    } catch (err) {
+      console.error("REGISTER ERROR:", err.response?.data); // log backend error
+      throw err;
+    }
   };
+
 
   const logout = () => {
     removeToken();

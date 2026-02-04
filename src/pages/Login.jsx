@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../features/auth/useAuth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login, user } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,11 +18,13 @@ const Login = () => {
     }
   };
 
-  if (user) {
-    if (user.role === "ADMIN") window.location.href = "/admin";
-    else if (user.role === "COURIER") window.location.href = "/courier";
-    else window.location.href = "/user";
-  }
+  useEffect(() => {
+    if (!user) return;
+
+    if (user.role === "ADMIN") navigate("/admin");
+    else if (user.role === "COURIER") navigate("/courier");
+    else navigate("/user");
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-brand-cream px-4">
@@ -39,10 +42,9 @@ const Login = () => {
             <label className="block mb-1 font-semibold">Email</label>
             <input
               type="email"
-              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange"
+              className="w-full border px-4 py-2 rounded-lg"
               required
             />
           </div>
@@ -51,28 +53,21 @@ const Login = () => {
             <label className="block mb-1 font-semibold">Password</label>
             <input
               type="password"
-              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange"
+              className="w-full border px-4 py-2 rounded-lg"
               required
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-brand-orange text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition"
-          >
+          <button className="w-full bg-brand-orange text-white py-3 rounded-lg font-semibold">
             Login
           </button>
         </form>
 
         <p className="text-center mt-4 text-sm">
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            className="text-brand-orange font-semibold hover:underline"
-          >
+          Don&apos;t have an account?{" "}
+          <Link to="/register" className="text-brand-orange font-semibold">
             Create one
           </Link>
         </p>
