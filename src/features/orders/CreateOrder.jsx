@@ -10,19 +10,10 @@ export default function CreateOrder() {
 
   const pricing = { LIGHT: 1000, MEDIUM: 2000, HEAVY: 3000 };
   
-  // High-End Pexels Image Mapping (Sleek Obsidian/White Fleet)
   const vehicles = { 
     LIGHT: "https://images.pexels.com/photos/4391469/pexels-photo-4391469.jpeg", 
     MEDIUM: "https://images.pexels.com/photos/13033926/pexels-photo-13033926.jpeg", 
     HEAVY: "https://images.pexels.com/photos/29057942/pexels-photo-29057942.jpeg"   
-  };
-
-  // Mock User Oversight Data
-  const userStats = {
-    deliveries: 24,
-    rating: 4.98,
-    investment: "48,500",
-    points: 1250
   };
 
   const handleLocationChange = (e) => {
@@ -71,37 +62,10 @@ export default function CreateOrder() {
         <p className="membership-status">Premium Logistics Member since 2026</p>
       </header>
 
-      {/* 2. System Oversight Strip */}
-      <section className="client-oversight-strip">
-        <div className="stat-box">
-          <span className="stat-label">Total Shipments</span>
-          <span className="stat-value">{userStats.deliveries}</span>
-        </div>
-        
-        <div className="stat-box">
-          <span className="stat-label">Client Rating</span>
-          <span className="stat-value gold-text">{userStats.rating} ★</span>
-        </div>
-
-        <div className="stat-box">
-          <span className="stat-label">Total Investment</span>
-          <span className="stat-value">KSh {userStats.investment}</span>
-        </div>
-
-        <div className="stat-box bonus-highlight">
-          <span className="stat-label">Loyalty Points</span>
-          <div className="points-row">
-             <span className="stat-value">{userStats.points}</span>
-             <small>PTS</small>
-          </div>
-          <div className="progress-mini">
-            <div className="progress-fill" style={{width: '75%'}}></div>
-          </div>
-        </div>
-      </section>
+      {/* The Stats Strip is now GONE - Logic jumps straight to the Grid */}
 
       <div className="order-main-grid">
-        {/* 3. Route Intelligence */}
+        {/* 2. Route Intelligence (Now the first section) */}
         <section className="route-section card-elevated">
           <h3 className="section-title">1. Route Intelligence</h3>
           <div className="location-inputs">
@@ -131,7 +95,7 @@ export default function CreateOrder() {
           </div>
         </section>
 
-        {/* 4. Package Selection */}
+        {/* 3. Package Category */}
         <section className="selection-card">
           <h3 className="section-title">2. Package Category</h3>
           <div className="weight-grid">
@@ -151,7 +115,7 @@ export default function CreateOrder() {
           </div>
         </section>
 
-        {/* 5. Dynamic Consignment Note */}
+        {/* 4. Dynamic Consignment Note */}
         {weight && (
           <section className="receipt-container fade-in">
             <div className="luxury-receipt">

@@ -11,30 +11,27 @@ export default function Navbar() {
         </Link>
         
         <div className="nav-links">
-          {/* Main Navigation */}
+          {/* 1. Customer Navigation */}
           <Link to="/orders/new" className="nav-item">Ship Parcel</Link>
           <Link to="/orders" className="nav-item">My Deliveries</Link>
           
-          {/* Action Button */}
+          {/* 2. Rider Portal Link */}
           <Link to="/rider-portal" className="rider-btn">
             Rider Portal
           </Link>
           
-          {/* Admin Toggle */}
-          <div className="admin-shortcut">
-            <Link to="/admin/dashboard" title="Admin View">My Account</Link>
-          </div>
-
-          {/* New Text-Based User Identity */}
-          <div className="nav-profile-group">
-            <div className="profile-text-wrapper">
-              <span className="user-label">Premium.</span>
-            
+          {/* 3. Account Settings (Replaces Admin) */}
+          <Link to="/profile" className="nav-profile-link" title="Account Settings">
+            <div className="nav-profile-group">
+              <div className="profile-text-wrapper">
+                <span className="user-label">MY ACCOUNT</span>
+                
+              </div>
+              <div className="status-indicator">
+                <div className="status-dot"></div>
+              </div>
             </div>
-            <div className="status-indicator">
-              <div className="status-dot"></div>
-            </div>
-          </div>
+          </Link>
         </div>
       </div>
     </nav>
