@@ -13,10 +13,12 @@ import UserProfile from "./features/user/UserProfile"; // <--- Added for Sharon'
 // Rider/Courier Features
 import AssignedOrders from "./features/courier/AssignedOrders";
 import RiderPortal from "./features/courier/RiderPortal";
+import AppRoutes from "./routes/AppRoutes";
 
 function App() {
   return (
     <Router>
+    <AppRoutes />
       <div className="app-container">
         {/* The high-end Obsidian & Gold Navbar */}
         <Navbar />
@@ -51,6 +53,14 @@ function App() {
         <Footer />
       </div>
     </Router>
+  );
+}
+
+
+function App() {
+  return (
+    <div>
+    </div>
   );
 }
 
