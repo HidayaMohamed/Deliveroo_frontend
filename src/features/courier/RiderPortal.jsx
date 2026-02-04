@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./RiderPortal.css";
 
 export default function RiderPortal() {
@@ -12,57 +13,68 @@ export default function RiderPortal() {
   };
 
   return (
-    <div className="rider-portal-container luxury-theme">
-      {/* 1. Identity & Status */}
-      <header className="rider-header">
-        <div className="rider-info">
-          <div className="rider-avatar">JD</div>
-          <div>
-            <h1>{rider.name}</h1>
-            <span className="badge-online">● {rider.status}</span>
-          </div>
-        </div>
-        <div className="earnings-card">
-          <small>Today's Revenue</small>
-          <h2>KSh {rider.todayEarnings}</h2>
-        </div>
-      </header>
-
-      <div className="portal-grid">
-        {/* 2. My Mean of Transport (The Picture Section) */}
-        <section className="portal-card vehicle-specs">
-          <h3>Assigned Transport</h3>
-          <div className="vehicle-display">
-            <img src="https://images.pexels.com/photos/16100083/pexels-photo-16100083.jpeg" alt="Vehicle" />
-          </div>
-          <div className="spec-row">
-            <span>Type: <strong>{rider.vehicle}</strong></span>
-            <span>Reg: <strong>{rider.vehicleReg}</strong></span>
-          </div>
-        </section>
-
-        {/* 3. Live Order / Task */}
-        <section className="portal-card active-task">
-          <h3>Active Assignment</h3>
-          <div className="task-content">
-            <div className="route-info">
-              <p><strong>From:</strong> {rider.activeOrder.from}</p>
-              <p><strong>To:</strong> {rider.activeOrder.to}</p>
+    <div className="rider-portal-page luxury-theme">
+      <div className="rider-portal-container">
+        
+        {/* 1. Slim Header */}
+        <header className="rider-header-slim">
+          <div className="rider-profile-mini">
+            <div className="mini-avatar">JD</div>
+            <div className="name-meta">
+              <h1>{rider.name}</h1>
+              <span className="status-indicator">● {rider.status}</span>
             </div>
-            <div className="timer-blob">ETA: {rider.activeOrder.deadline}</div>
-            <button className="btn-update">Update Location</button>
           </div>
-        </section>
+          <div className="revenue-pill">
+            <small>Today</small>
+            <span>KSh {rider.todayEarnings}</span>
+          </div>
+        </header>
 
-        {/* 4. Quick Actions */}
-        <section className="portal-card stats-card">
-          <h3>Performance</h3>
-          <div className="stats-circle">
-            <span>{rider.rating}</span>
-            <small>Rating</small>
-          </div>
-          <button className="btn-history">View Trip History</button>
-        </section>
+        <div className="portal-main-grid">
+          {/* 2. Compact Vehicle Section */}
+          <section className="portal-card-compact">
+            <div className="card-inner-header">
+              <h3>Fleet Status</h3>
+              <span className="reg-tag">{rider.vehicleReg}</span>
+            </div>
+            <div className="vehicle-frame">
+              <img src="https://images.pexels.com/photos/16100083/pexels-photo-16100083.jpeg" alt="Vehicle" />
+            </div>
+            <p className="vehicle-desc">{rider.vehicle}</p>
+          </section>
+
+          {/* 3. Tactical Map Section */}
+          <section className="portal-card-compact active-highlight">
+            <div className="card-inner-header">
+              <h3>Active Route</h3>
+              <span className="eta-tag">{rider.activeOrder.deadline}</span>
+            </div>
+            <div className="map-frame">
+              <img src="https://images.pexels.com/photos/2800119/pexels-photo-2800119.jpeg" alt="Map" />
+              <div className="map-pins">
+                <div className="dot-pin start"></div>
+                <div className="dot-pin end"></div>
+              </div>
+            </div>
+            <div className="route-text-mini">
+              <span>{rider.activeOrder.from}</span>
+              <span className="separator">→</span>
+              <span>{rider.activeOrder.to}</span>
+            </div>
+            <Link to="/courier/tasks" className="btn-manifest">Open Tasks</Link>
+          </section>
+
+          {/* 4. Score Card */}
+          <section className="portal-card-compact score-card">
+            <h3>Rating</h3>
+            <div className="score-display">
+              <span className="big-num">{rider.rating}</span>
+              <span className="star-icon">★</span>
+            </div>
+            <button className="btn-history-slim">Trip History</button>
+          </section>
+        </div>
       </div>
     </div>
   );

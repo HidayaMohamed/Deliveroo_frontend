@@ -1,63 +1,92 @@
-.rider-portal-container { padding: 40px 5%; }
+/* Layout Container */
+.rider-portal-page {
+  padding: 40px 20px;
+  
+  min-height: 100vh;
+  color: white;
+}
 
-.rider-header {
+.rider-portal-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Slim Header */
+.rider-header-slim {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--deep-obsidian);
-  color: white;
-  padding: 30px;
-  border-radius: 20px;
-  border-left: 5px solid var(--metallic-gold);
+  margin-bottom: 30px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 20px;
 }
 
-.rider-avatar {
-  width: 60px; height: 60px;
-  background: var(--metallic-gold);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 900; color: black; margin-right: 20px;
+.rider-profile-mini { display: flex; align-items: center; gap: 15px; }
+.mini-avatar { 
+  width: 50px; height: 50px; background: var(--metallic-gold); 
+  border-radius: 50%; color: black; display: flex; 
+  align-items: center; justify-content: center; font-weight: 900;
 }
 
-.portal-grid {
+.revenue-pill { 
+  background: rgba(255,215,0,0.1); border: 1px solid var(--metallic-gold);
+  padding: 8px 16px; border-radius: 50px; text-align: right;
+}
+
+/* Grid System */
+.portal-main-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 0.8fr;
-  gap: 25px;
-  margin-top: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
 }
 
-.portal-card {
-  background: white;
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+.portal-card-compact {
+  background: #141414;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
-.vehicle-display img {
-  width: 100%; height: 180px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin: 15px 0;
-  border: 1px solid var(--bg-light-brown);
-}
-
-.btn-update {
+/* IMAGE FRAMING - The Fix for "Too Big" */
+.vehicle-frame, .map-frame {
   width: 100%;
-  padding: 15px;
-  background: var(--royal-blue);
-  color: white;
-  border: none;
+  height: 140px; /* Locked height */
   border-radius: 10px;
-  font-weight: 800;
-  cursor: pointer;
-  margin-top: 20px;
+  overflow: hidden;
+  margin: 15px 0;
+  position: relative;
 }
 
-.stats-circle {
-  width: 100px; height: 100px;
-  border: 4px solid var(--metallic-gold);
-  border-radius: 50%;
-  margin: 20px auto;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 1.5rem;
+.vehicle-frame img, .map-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Keeps image from stretching */
+  filter: brightness(0.7);
+}
+
+/* Map specific styling */
+.map-pins {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  display: flex; justify-content: space-around; align-items: center;
+}
+.dot-pin { width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; }
+.dot-pin.start { background: var(--metallic-gold); }
+.dot-pin.end { background: #3498db; }
+
+/* Mini UI elements */
+.reg-tag, .eta-tag {
+  font-size: 0.7rem; padding: 4px 8px; 
+  background: rgba(255,255,255,0.1); border-radius: 4px;
+}
+
+.route-text-mini {
+  display: flex; justify-content: space-between; 
+  font-size: 0.85rem; margin-bottom: 15px; font-weight: 600;
+}
+
+.btn-manifest {
+  display: block; width: 100%; text-align: center;
+  padding: 10px; background: var(--metallic-gold); color: black;
+  text-decoration: none; border-radius: 8px; font-weight: 700;
 }

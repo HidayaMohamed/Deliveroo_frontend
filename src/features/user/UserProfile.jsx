@@ -5,11 +5,11 @@ export default function UserProfile() {
     name: "Sharon Njoroge",
     age: 24,
     idNumber: "38920110",
-    email: "sharon.n@luxury.com",
+    email: "lucykamau@gmail.com",
     memberSince: "February 2026",
     rating: 4.98,
     points: 1250,
-    img: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg" // High-end portrait
+    img: "https://i.pinimg.com/1200x/7b/12/d2/7b12d287221c0adf5b4efcdf326c178f.jpg" // High-end portrait
   };
 
   return (

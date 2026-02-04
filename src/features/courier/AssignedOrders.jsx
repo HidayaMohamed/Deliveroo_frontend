@@ -11,6 +11,7 @@ export default function AssignedOrders() {
     <div className="assigned-orders-container">
       <header className="page-header">
         <span className="badge-gold">Courier Workspace</span>
+        
         <h1>Assigned Deliveries</h1>
       </header>
 
