@@ -1,52 +1,39 @@
 import { useEffect, useState } from "react";
-import { getMyOrders } from "./ordersAPI";
-import OrderCard from "./OrderCard";
+import { getMyOrders } from "./ordersAPI"; 
+import { Link } from "react-router-dom";
 
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getMyOrders()
-      .then((res) => {
-        setOrders(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        setLoading(false);
-      });
+    getMyOrders().then(res => setOrders(res.data));
   }, []);
 
   return (
-    // .my-orders-page
-    <div className="p-8 max-w-[900px] mx-auto min-h-screen">
+    <div className="max-w-[1100px] mx-auto px-8 py-20 min-h-screen">
+      <h1 className="text-5xl font-black tracking-tighter mb-16">Active Logistics.</h1>
       
-      {/* .orders-header */}
-      <header className="mb-8">
-        <h1 className="text-[#00ccbc] text-3xl font-bold mb-2">My Deliveries</h1>
-        <p className="text-slate-600">View the status of your current parcel requests.</p>
-      </header>
-
-      {loading ? (
-        // .loading-state
-        <div className="text-center p-12 text-slate-500 bg-slate-50 rounded-xl mt-8 border border-dashed border-slate-200">
-          <div className="animate-pulse">Loading your parcels...</div>
-        </div>
-      ) : orders.length > 0 ? (
-        // .orders-grid
-        <div className="grid gap-6 mt-8">
-          {orders.map((order) => (
-            <OrderCard key={order.id} order={order} />
-          ))}
-        </div>
-      ) : (
-        // .empty-state
-        <div className="text-center p-12 text-slate-500 bg-slate-50 rounded-xl mt-8 border border-slate-100">
-          <h3 className="text-xl font-semibold text-slate-800 mb-2">No active orders</h3>
-          <p>Your delivery history will appear here once you place an order.</p>
-        </div>
-      )}
+      <div className="grid gap-10">
+        {orders.map((order) => (
+          <div key={order.id} className="flex bg-gray-50 rounded-[40px] overflow-hidden border border-gray-100 hover:border-yellow-500 transition-all duration-500">
+            <div className="w-1/3 bg-zinc-200 h-64">
+               <img src="https://images.pexels.com/photos/13033926/pexels-photo-13033926.jpeg" className="w-full h-full object-cover grayscale" />
+            </div>
+            <div className="p-10 flex-1 flex flex-col justify-between">
+              <div className="flex justify-between">
+                <h2 className="text-2xl font-black tracking-tighter uppercase">{order.pickup_location} → {order.destination}</h2>
+                <span className="text-yellow-600 font-black italic">KES {order.price}</span>
+              </div>
+              <div className="flex items-center gap-4">
+                 <Link to={`/orders/${order.id}`} className="px-10 py-4 bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-yellow-500 transition-colors">
+                    Track Journey
+                 </Link>
+                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{order.status}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

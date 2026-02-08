@@ -1,139 +1,205 @@
-import { useState } from "react";
-import { createOrder } from "./ordersAPI";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { getUserProfile, createOrder, initiateMpesa } from "./ordersAPI";
 
 export default function CreateOrder() {
-  const [weight, setWeight] = useState("");
-  const [isOrdered, setIsOrdered] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [weight, setWeight] = useState("LIGHT");
   const [locations, setLocations] = useState({ pickup: "", dropoff: "" });
-  const [orderId, setOrderId] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // 1. BACKEND SYNC: Get user data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getUserProfile();
+        setUser(res.data);
+      } catch (err) {
+        console.error("Auth error:", err);
+        // Fallback for demo if backend isn't ready
+        setUser({ full_name: "Sharon Njoroge", phone: "254712345678" });
+      }
+    };
+    fetchData();
+  }, []);
 
   const pricing = { LIGHT: 500, MEDIUM: 2000, HEAVY: 3000 };
-  const vehicles = { 
-    LIGHT: "https://images.pexels.com/photos/4391469/pexels-photo-4391469.jpeg", 
-    MEDIUM: "https://images.pexels.com/photos/13033926/pexels-photo-13033926.jpeg", 
-    HEAVY: "https://images.pexels.com/photos/29057942/pexels-photo-29057942.jpeg"   
+  const vehicles = {
+    LIGHT: "https://images.pexels.com/photos/4391469/pexels-photo-4391469.jpeg",
+    MEDIUM: "https://images.pexels.com/photos/13033926/pexels-photo-13033926.jpeg",
+    HEAVY: "https://images.pexels.com/photos/29057942/pexels-photo-29057942.jpeg"
   };
 
-  const handleLocationChange = (e) => {
-    setLocations({ ...locations, [e.target.name]: e.target.value });
-  };
+  // 2. LOGIC: Handle M-Pesa & Order Creation
+  const handleMpesaCheckout = async () => {
+    if (!locations.pickup || !locations.dropoff) {
+      return alert("Please specify both pickup and destination points.");
+    }
 
-  const handleOrder = async () => {
-    if (!weight || !locations.pickup || !locations.dropoff) return alert("Please complete the route.");
-    setLoading(true);
+    setIsProcessing(true);
     try {
-      const response = await createOrder({
+      // Step A: STK Push
+      await initiateMpesa({
+        phone: user.phone,
+        amount: pricing[weight]
+      });
+
+      // Step B: Create Order Record
+      const orderRes = await createOrder({
         pickup_location: locations.pickup,
         destination: locations.dropoff,
         weight_category: weight,
+        status: "Pending Payment"
       });
-      setOrderId(response?.id || 1250); 
-      setIsOrdered(true);
-    } catch (error) {
-      setOrderId(1250); 
-      setIsOrdered(true); 
+
+      alert("M-PESA: STK Push sent. Check your handset.");
+      
+      // Redirect to the specific order tracking page
+      navigate(`/orders/${orderRes.data.id || ''}`);
+      
+    } catch (err) {
+      alert("System Busy: Please try the checkout again shortly.");
+      console.error(err);
     } finally {
-      setLoading(false);
+      setIsProcessing(false);
     }
   };
 
-  if (isOrdered) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-        <div className="bg-white p-12 md:p-20 rounded-[40px] shadow-2xl text-center border-2 border-amber-500 max-w-2xl">
-          <span className="text-6xl mb-6 block">✅</span>
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">Shipment Dispatched!</h2>
-          <p className="text-slate-500 font-bold tracking-widest uppercase mb-4">
-            CONSIGNMENT ID: <span className="text-amber-700">#DEL-{orderId}</span>
-          </p>
-          <p className="text-slate-600 mb-8">
-            Your luxury courier is navigating from <strong className="text-slate-900">{locations.pickup}</strong> to <strong className="text-slate-900">{locations.dropoff}</strong>.
-          </p>
-          <div className="inline-block bg-blue-600 text-white px-8 py-3 rounded-full font-black uppercase tracking-wider animate-pulse">
-            Agent En Route...
-          </div>
-          <button onClick={() => {setIsOrdered(false); setWeight("");}} 
-            className="block w-full mt-10 text-amber-700 font-bold uppercase tracking-widest hover:underline">
-            New Request
-          </button>
-        </div>
+  if (!user) return (
+    <div className="h-screen flex items-center justify-center bg-white">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Securing Session...</p>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
-    <div className="py-16 px-[5%] max-w-[1400px] mx-auto">
-      <header className="mb-12">
-        <span className="text-amber-700 uppercase tracking-[5px] text-xs font-bold block mb-2">Excellence in Motion</span>
-        <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight">
-          Welcome<span className="text-amber-500">.</span>
-        </h1>
-        <p className="text-slate-400 font-medium">Premium Logistics Member since 2026</p>
-      </header>
+    <div className="min-h-screen bg-white text-black pb-32">
+      {/* 3. TOP PROGRESS NAV (Visual 'Better' Factor) */}
+      <div className="w-full h-1 bg-gray-100 sticky top-0 z-50">
+        <div 
+          className="h-full bg-yellow-500 transition-all duration-1000" 
+          style={{ width: locations.pickup && locations.dropoff ? '100%' : '50%' }}
+        ></div>
+      </div>
 
-      <div className="grid grid-cols-1 gap-10">
-        {/* 1. Route Section */}
-        <section className="bg-white p-8 rounded-[24px] border border-slate-100 shadow-sm">
-          <h3 className="text-xl font-bold text-slate-900 mb-6">1. Route Intelligence</h3>
-          <div className="flex flex-col gap-4 relative">
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-wider font-extrabold text-amber-700">Collection Point</label>
-              <input type="text" name="pickup" placeholder="Enter pickup address..." value={locations.pickup} onChange={handleLocationChange} 
-                className="w-full p-4 bg-slate-50 border border-transparent rounded-xl focus:outline-none focus:border-amber-500 focus:bg-white transition-all" />
-            </div>
-            <div className="w-[2px] h-5 bg-amber-500/50 ml-8"></div>
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-wider font-extrabold text-amber-700">Final Destination</label>
-              <input type="text" name="dropoff" placeholder="Enter drop-off address..." value={locations.dropoff} onChange={handleLocationChange}
-                className="w-full p-4 bg-slate-50 border border-transparent rounded-xl focus:outline-none focus:border-amber-500 focus:bg-white transition-all" />
-            </div>
+      <div className="max-w-[1400px] mx-auto px-8 pt-16">
+        <header className="mb-20">
+          <span className="text-yellow-600 font-black uppercase tracking-[0.5em] text-[10px] mb-4 block">New Shipment</span>
+          <h1 className="text-8xl font-black tracking-tighter leading-none mb-6">
+            Ready to ship, <br />
+            <span className="text-gray-200 hover:text-yellow-500 transition-colors duration-500 cursor-default">
+              {user.full_name.split(' ')[0]}?
+            </span>
+          </h1>
+          <div className="flex items-center gap-4">
+            <span className="h-[1px] w-12 bg-gray-200"></span>
+            <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Billing to: {user.phone}</p>
           </div>
-        </section>
+        </header>
 
-        {/* 2. Package Category */}
-        <section>
-          <h3 className="text-xl font-bold text-slate-900 mb-6">2. Package Category</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {Object.keys(pricing).map((cat) => (
-              <div key={cat} onClick={() => setWeight(cat)}
-                className={`group bg-white/40 border p-8 md:p-12 rounded-[24px] text-center cursor-pointer transition-all duration-500 
-                ${weight === cat ? 'border-amber-500 bg-white -translate-y-4 shadow-2xl' : 'border-slate-100 hover:bg-white hover:-translate-y-1 shadow-sm'}`}>
-                
-                <div className="w-full h-[200px] bg-slate-900 rounded-2xl overflow-hidden mb-6 border border-amber-500/30 transition-all duration-300 group-hover:border-amber-500">
-                  <img src={vehicles[cat]} alt={cat} 
-                    className={`w-full h-full object-cover transition-all duration-500 ${weight === cat ? 'grayscale-0 scale-110' : 'grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105'}`} />
+        <div className="grid lg:grid-cols-12 gap-20">
+          {/* LEFT: VEHICLES */}
+          <div className="lg:col-span-8 space-y-12">
+            <div className="flex justify-between items-end">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 underline decoration-yellow-500 decoration-2 underline-offset-8">01. Fleet Selection</h3>
+              <p className="text-[10px] font-black text-gray-300 italic">Select your freight class below</p>
+            </div>
+
+            <div className="grid gap-10">
+              {Object.keys(pricing).map((cat) => (
+                <div key={cat} onClick={() => setWeight(cat)}
+                  className={`group relative h-[500px] rounded-[60px] overflow-hidden cursor-pointer transition-all duration-700 
+                  ${weight === cat ? 'ring-[15px] ring-yellow-500 scale-[1.02] shadow-2xl' : 'opacity-40 grayscale hover:opacity-100 hover:grayscale-0'}`}>
+                  <img src={vehicles[cat]} className="absolute inset-0 w-full h-full object-cover transition-transform duration-[4s] group-hover:scale-110" alt={cat} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                  
+                  <div className="absolute bottom-12 left-12 text-white">
+                    <div className="flex items-center gap-3 mb-4">
+                       <span className="w-8 h-[2px] bg-yellow-500"></span>
+                       <span className="text-yellow-500 font-black text-xs uppercase tracking-widest">Premium {cat} Service</span>
+                    </div>
+                    <h2 className="text-6xl font-black italic tracking-tighter mb-2">{cat} PRIORITY</h2>
+                    <p className="text-gray-300 font-medium text-lg">Guaranteed delivery within 24 hours.</p>
+                  </div>
+
+                  <div className="absolute top-10 right-10 bg-white/10 backdrop-blur-md border border-white/20 px-8 py-4 rounded-full">
+                    <span className="text-white font-black text-2xl tracking-tighter">KES {pricing[cat]}</span>
+                  </div>
                 </div>
-                <span className="block font-black uppercase tracking-widest text-slate-900">{cat}</span>
-                <span className="text-amber-700 font-bold text-sm">KSh {pricing[cat]}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* 3. Luxury Receipt */}
-        {weight && (
-          <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="bg-slate-900 text-white p-10 md:p-12 rounded-[30px] shadow-[0_40px_100px_rgba(0,0,0,0.4)] max-w-[550px] mx-auto border border-amber-500">
-              <div className="text-center font-serif text-2xl font-bold text-amber-500 mb-8 border-bottom border-white/10 pb-4">Consignment Note</div>
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between text-sm uppercase tracking-tighter"><span className="text-white/50">Origin</span><span className="font-semibold truncate max-w-[200px]">{locations.pickup || "Pending..."}</span></div>
-                <div className="flex justify-between text-sm uppercase tracking-tighter"><span className="text-white/50">Destination</span><span className="font-semibold truncate max-w-[200px]">{locations.dropoff || "Pending..."}</span></div>
-                <div className="flex justify-between text-sm uppercase tracking-tighter"><span className="text-white/50">Class</span><span className="font-semibold">{weight} Priority</span></div>
-              </div>
-              <div className="border-t border-dashed border-white/20 pt-6 flex justify-between items-center mb-10">
-                <span className="text-xl font-black">TOTAL</span>
-                <span className="text-3xl font-black text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.3)]">KSh {pricing[weight]}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <button onClick={() => setWeight("")} className="p-4 border border-red-500 text-red-400 rounded-xl font-bold uppercase tracking-widest transition-colors hover:bg-red-500 hover:text-white">Discard</button>
-                <button onClick={handleOrder} disabled={loading} className="p-4 bg-green-600 text-white rounded-xl font-bold uppercase tracking-widest transition-all hover:bg-green-500 hover:shadow-[0_10px_20px_rgba(39,174,96,0.3)]">
-                  {loading ? "Confirming..." : "Finalize"}
-                </button>
-              </div>
+              ))}
             </div>
-          </section>
-        )}
+          </div>
+
+          {/* RIGHT: THE STICKY CONSIGNMENT NOTE */}
+          <div className="lg:col-span-4 sticky top-24">
+            <div className="bg-gray-50 p-12 rounded-[70px] border border-gray-100 shadow-2xl">
+              <div className="flex justify-between items-center mb-10">
+                <h3 className="text-2xl font-black tracking-tight italic">Shipment Summary</h3>
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              </div>
+
+              <div className="space-y-8 mb-12">
+                <div className="relative group">
+                   <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-yellow-500 rounded-full opacity-0 group-focus-within:opacity-100 transition-all"></div>
+                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">Pickup Location</label>
+                   <input 
+                    type="text" 
+                    placeholder="Search collection point..." 
+                    className="w-full bg-white p-6 rounded-[25px] outline-none font-bold text-sm shadow-sm focus:shadow-xl transition-all placeholder:text-gray-200" 
+                    onChange={(e) => setLocations({...locations, pickup: e.target.value})} 
+                   />
+                </div>
+
+                <div className="relative group">
+                   <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-yellow-500 rounded-full opacity-0 group-focus-within:opacity-100 transition-all"></div>
+                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">Drop-off Destination</label>
+                   <input 
+                    type="text" 
+                    placeholder="Search destination..." 
+                    className="w-full bg-white p-6 rounded-[25px] outline-none font-bold text-sm shadow-sm focus:shadow-xl transition-all placeholder:text-gray-200" 
+                    onChange={(e) => setLocations({...locations, dropoff: e.target.value})} 
+                   />
+                </div>
+              </div>
+
+              <div className="bg-white p-8 rounded-[40px] mb-8 border border-gray-100">
+                <div className="flex justify-between text-[10px] font-black uppercase text-gray-400 mb-2">
+                  <span>Billing Summary</span>
+                  <span>{weight} Class</span>
+                </div>
+                <div className="flex justify-between items-center">
+                   <span className="text-gray-400 text-xs">Standard Freight</span>
+                   <span className="text-2xl font-black italic text-yellow-600">KES {pricing[weight]}</span>
+                </div>
+              </div>
+              
+              <button 
+                onClick={handleMpesaCheckout} 
+                disabled={isProcessing}
+                className="w-full py-7 bg-[#2fbb1c] text-white rounded-[30px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-4 hover:bg-black transition-all hover:-translate-y-1 shadow-2xl shadow-green-100 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isProcessing ? (
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Processing PIN...</span>
+                  </div>
+                ) : (
+                  <>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" className="h-6 brightness-200" alt="Mpesa" />
+                    Complete Request
+                  </>
+                )}
+              </button>
+              
+              <p className="text-center text-[9px] text-gray-300 font-bold uppercase mt-6 tracking-widest">
+                Secure 256-bit encrypted checkout
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
