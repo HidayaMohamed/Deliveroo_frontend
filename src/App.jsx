@@ -5,35 +5,26 @@ import "leaflet/dist/leaflet.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
-// Customer Features
+// Features
 import CreateOrder from "./features/orders/CreateOrder";
 import MyOrders from "./features/orders/MyOrders";
 import OrderDetails from "./features/orders/OrderDetails";
 import UserProfile from "./features/user/UserProfile";
 
-// NOTE: Rider/Courier imports have been removed to focus on Customer Experience
-
 function App() {
   return (
-    <div className="app-container">
-      {/* High-end Navbar stays constant across all pages */}
+    <div className="flex flex-col min-h-screen bg-white selection:bg-yellow-200">
       <Navbar />
-
-      <main className="content-area" style={{ minHeight: '80vh' }}>
+      
+      {/* The main content area where all the magic happens */}
+      <main className="flex-grow">
         <Routes>
-          {/* 1. ENTRY POINT */}
-          <Route path="/" element={<Navigate to="/orders/new" />} />
-          
-          {/* 2. CUSTOMER FLOW */}
+          <Route path="/" element={<Navigate to="/orders" />} />
           <Route path="/orders/new" element={<CreateOrder />} />
           <Route path="/orders" element={<MyOrders />} />
           <Route path="/orders/:id" element={<OrderDetails />} />
-          
-          {/* 3. PROFILE */}
           <Route path="/profile" element={<UserProfile />} />
-          
-          {/* 4. CATCH-ALL SAFETY */}
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/orders" />} />
         </Routes>
       </main>
 
