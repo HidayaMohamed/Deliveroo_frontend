@@ -59,14 +59,7 @@ const AppRoutes = () => {
         }
       />
 
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute role="ADMIN">
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/admin" element={<Dashboard />} />
     </Routes>
   );
 };

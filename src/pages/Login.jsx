@@ -9,22 +9,35 @@ const Login = () => {
   const { login, user } = useAuth();
   const navigate = useNavigate();
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     await login(email, password);
+  //   } catch {
+  //     setError("Invalid credentials");
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       await login(email, password);
+
+      // 🚀 FORCE redirect to admin dashboard
+      navigate("/admin");
     } catch {
       setError("Invalid credentials");
     }
   };
 
-  useEffect(() => {
-    if (!user) return;
 
-    if (user.role === "ADMIN") navigate("/admin");
-    else if (user.role === "COURIER") navigate("/courier");
-    else navigate("/user");
-  }, [user, navigate]);
+  // useEffect(() => {
+  //   if (!user) return;
+
+  //   if (user.role === "ADMIN") navigate("/admin");
+  //   else if (user.role === "COURIER") navigate("/courier");
+  //   else navigate("/user");
+  // }, [user, navigate]);
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-brand-cream px-4">
