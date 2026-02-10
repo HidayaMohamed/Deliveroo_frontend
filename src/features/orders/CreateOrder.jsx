@@ -89,10 +89,8 @@ export default function CreateOrder() {
         <header className="mb-20">
           <span className="text-yellow-600 font-black uppercase tracking-[0.5em] text-[10px] mb-4 block">New Shipment</span>
           <h1 className="text-8xl font-black tracking-tighter leading-none mb-6">
-            Ready to ship, <br />
-            <span className="text-gray-200 hover:text-yellow-500 transition-colors duration-500 cursor-default">
-              {user.full_name.split(' ')[0]}?
-            </span>
+           Are you ready to ship? <br />
+            
           </h1>
           <div className="flex items-center gap-4">
             <span className="h-[1px] w-12 bg-gray-200"></span>
