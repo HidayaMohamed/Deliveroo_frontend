@@ -71,22 +71,27 @@ export default function OrderDetails() {
         </MapContainer>
 
         {/* COMMUNICATION HUB */}
-        <motion.div 
-          initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-          className="absolute bottom-10 left-10 z-[1000] bg-white/90 backdrop-blur-2xl p-6 rounded-[40px] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] border border-white flex items-center gap-6 min-w-[450px]"
-        >
-          <div className="w-16 h-16 bg-yellow-500 rounded-full border-4 border-white overflow-hidden shadow-xl relative">
-            <img src="https://i.pravatar.cc/150?u=rider" alt="rider" className="w-full h-full object-cover" />
-            <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-          </div>
-          
-          <div className="flex-1">
-            <h4 className="font-black text-xl tracking-tighter uppercase">{order.rider.name}</h4>
-            <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest">
-              <Navigation size={14} className="text-yellow-600" /> {order.rider.bike}
-            </div>
-          </div>
-
+       <motion.div 
+  initial={{ y: 50, opacity: 0 }} 
+  animate={{ y: 0, opacity: 1 }}
+  className="absolute bottom-10 left-10 z-[1000] bg-white/90 backdrop-blur-2xl p-6 rounded-[40px] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] border border-white flex items-center gap-6 min-w-[450px]"
+>
+  {/* Rider Avatar - Updated to a Guy's Pic */}
+  <div className="w-16 h-16 bg-yellow-500 rounded-full border-4 border-white overflow-hidden shadow-xl relative">
+    <img 
+      src="https://images.unsplash.com/photo-1653463207246-1dc03899dfe0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8bW90b3JiaWtlJTIwcmlkZXIlMjBpbWFnZXxlbnwwfHwwfHx8MA%3D%3D" 
+      alt="rider" 
+      className="w-full h-full object-cover" 
+    />
+    <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+  </div>
+  
+  <div className="flex-1">
+    <h4 className="font-black text-xl tracking-tighter uppercase">{order.rider.name}</h4>
+    <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest">
+      <Navigation size={14} className="text-yellow-600" /> {order.rider.bike}
+    </div>
+  </div>
           <div className="flex gap-3">
             <a href={`https://wa.me/${order.rider.phone}`} target="_blank" rel="noreferrer"
               className="w-12 h-12 bg-[#25D366] text-white rounded-full flex items-center justify-center hover:scale-110 transition-all shadow-lg"

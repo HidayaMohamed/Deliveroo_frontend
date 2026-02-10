@@ -17,14 +17,14 @@ export default function MyOrders() {
             id: "8842", 
             pickup_location: "Westlands, Nairobi", 
             destination: "Kilimani, Nairobi", 
-            price: "450", 
+            price: "500", 
             status: "In Transit" 
           },
           { 
             id: "9021", 
             pickup_location: "CBD, City Hall", 
             destination: "Karen, Nairobi", 
-            price: "1,200", 
+            price: "2000", 
             status: "Pending" 
           }
         ]);
