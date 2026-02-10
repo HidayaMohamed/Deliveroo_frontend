@@ -4,14 +4,14 @@ import { useSearchParams } from "react-router-dom";
 
 const Register = () => {
   const [searchParams] = useSearchParams();
-  const defaultRole = searchParams.get("role") || "USER";
+  const defaultRole = searchParams.get("role") || "customer";
 
   const [form, setForm] = useState({
-    name: "",
+    full_name: "",
     email: "",
     phone: "",
     password: "",
-    role: defaultRole,
+    role: defaultRole.toLowerCase(),
     vehicle_type: "",
     plate_number: "",
   });
@@ -24,7 +24,15 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await register(form);
+    const submitData = { ...form };
+
+    // Only include courier fields if role is courier
+    if (form.role !== "courier") {
+      delete submitData.vehicle_type;
+      delete submitData.plate_number;
+    }
+
+    await register(submitData);
   };
 
   // Redirect if logged in
@@ -46,15 +54,15 @@ const Register = () => {
           onChange={handleChange}
           className="w-full border px-3 py-2 rounded-lg"
         >
-          <option value="USER">User</option>
-          <option value="COURIER">Courier</option>
+          <option value="customer">User</option>
+          <option value="courier">Courier</option>
         </select>
       </div>
 
       <input
-        name="name"
+        name="full_name"
         placeholder="Name"
-        value={form.name}
+        value={form.full_name}
         onChange={handleChange}
         className="w-full border px-3 py-2 rounded-lg mb-4"
       />
@@ -84,8 +92,8 @@ const Register = () => {
         className="w-full border px-3 py-2 rounded-lg mb-4"
       />
 
-      {/* Show courier fields only if role is COURIER */}
-      {form.role === "COURIER" && (
+      {/* Show courier fields only if role is courier */}
+      {form.role === "courier" && (
         <>
           <input
             name="vehicle_type"
