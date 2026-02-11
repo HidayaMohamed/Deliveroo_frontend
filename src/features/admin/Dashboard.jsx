@@ -1,204 +1,232 @@
-import { useState, useEffect } from 'react';
-// import '../../styles/AdminDashboardComponent.css';
+import { useState, useEffect } from "react";
 
 const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
-  const [chartData, setChartData] = useState({
-    daily: [],
-    weekly: [],
-    performance: []
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [performanceData, setPerformanceData] = useState({
+    deliverySuccess: 98.5,
+    customerSatisfaction: 4.8,
+    avgResponseTime: 12,
+    peakHours: "12:00 PM - 2:00 PM"
   });
-  const [timeRange, setTimeRange] = useState('daily'); // daily, weekly, monthly
 
   useEffect(() => {
-    fetchChartData();
-  }, [timeRange]);
+    // Simulated recent activity data
+    setRecentActivity([
+      { id: 1, type: "delivery", message: "Order #1234 delivered successfully", time: "2 mins ago", status: "success" },
+      { id: 2, type: "courier", message: "New courier John Doe joined", time: "15 mins ago", status: "info" },
+      { id: 3, type: "order", message: "Order #1235 picked up", time: "23 mins ago", status: "progress" },
+      { id: 4, type: "payment", message: "Payment received for Order #1233", time: "45 mins ago", status: "success" },
+      { id: 5, type: "alert", message: "Courier reported traffic delay", time: "1 hr ago", status: "warning" },
+    ]);
+  }, []);
 
-  const fetchChartData = async () => {
-    try {
-      const response = await fetch(`/api/admin/analytics?range=${timeRange}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setChartData(data);
-    } catch (error) {
-      console.error('Error fetching chart data:', error);
-    }
+  const getStatusColor = (status) => {
+    const colors = {
+      success: "bg-green-500",
+      info: "bg-blue-500",
+      progress: "bg-yellow-500",
+      warning: "bg-orange-500",
+      error: "bg-red-500"
+    };
+    return colors[status] || "bg-gray-500";
   };
 
-  const renderSimpleChart = (data, label) => {
-    if (!data || data.length === 0) return null;
-    
-    const maxValue = Math.max(...data.map(d => d.value));
-    
+  const getStatusIcon = (type) => {
+    const icons = {
+      delivery: "🚚",
+      courier: "👤",
+      order: "📦",
+      payment: "💰",
+      alert: "⚠️"
+    };
+    return icons[type] || "📌";
+  };
+
+  if (!showDetailedAnalytics) {
     return (
-      <div className="simple-chart">
-        <h4>{label}</h4>
-        <div className="chart-bars">
-          {data.map((item, index) => (
-            <div key={index} className="bar-container">
-              <div className="bar-label">{item.label}</div>
-              <div className="bar-wrapper">
-                <div 
-                  className="bar" 
-                  style={{ height: `${(item.value / maxValue) * 100}%` }}
-                >
-                  <span className="bar-value">{item.value}</span>
+      <div className="space-y-10">
+        {/* Quick Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-[30px] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">Success Rate</span>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            </div>
+            <h4 className="text-4xl font-black italic text-green-600 mb-2">{performanceData.deliverySuccess}%</h4>
+            <p className="text-[9px] font-bold uppercase text-gray-300 tracking-widest">Delivery Success</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-[30px] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">Rating</span>
+              <span className="text-yellow-500">⭐</span>
+            </div>
+            <h4 className="text-4xl font-black italic text-yellow-600 mb-2">{performanceData.customerSatisfaction}</h4>
+            <p className="text-[9px] font-bold uppercase text-gray-300 tracking-widest">Customer Satisfaction</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-[30px] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">Response</span>
+              <span className="text-blue-500">⚡</span>
+            </div>
+            <h4 className="text-4xl font-black italic text-blue-600 mb-2">{performanceData.avgResponseTime}m</h4>
+            <p className="text-[9px] font-bold uppercase text-gray-300 tracking-widest">Avg Response Time</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-[30px] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">Peak Hours</span>
+              <span className="text-orange-500">🔥</span>
+            </div>
+            <h4 className="text-xl font-black italic text-orange-600 mb-2">{performanceData.peakHours}</h4>
+            <p className="text-[9px] font-bold uppercase text-gray-300 tracking-widest">Busiest Period</p>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-2xl font-black tracking-tight italic">Recent Activity</h3>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">Live Updates</span>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {recentActivity.map((activity) => (
+              <div key={activity.id} className="group flex items-start gap-4 p-4 rounded-[25px] hover:bg-gray-50 transition-all duration-300">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    {getStatusIcon(activity.type)}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm text-gray-800 mb-1">{activity.message}</p>
+                  <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">{activity.time}</p>
+                </div>
+                <div className={`w-2 h-2 rounded-full ${getStatusColor(activity.status)} flex-shrink-0 mt-2`}></div>
+              </div>
+            ))}
+          </div>
+
+          <button className="w-full mt-6 py-4 bg-gray-50 rounded-[20px] text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 hover:bg-gray-100 transition-all">
+            View All Activity
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Detailed Analytics View
+  return (
+    <div className="space-y-10">
+      {/* Performance Metrics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm">
+          <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6 underline decoration-yellow-500 decoration-2 underline-offset-8">
+            Delivery Performance
+          </h3>
+          <div className="space-y-6">
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-bold text-gray-700">On-Time Deliveries</span>
+                <span className="text-2xl font-black italic text-green-600">94%</span>
+              </div>
+              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-green-500 rounded-full" style={{ width: '94%' }}></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-bold text-gray-700">Same-Day Completion</span>
+                <span className="text-2xl font-black italic text-yellow-600">87%</span>
+              </div>
+              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-yellow-500 rounded-full" style={{ width: '87%' }}></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-bold text-gray-700">Customer Satisfaction</span>
+                <span className="text-2xl font-black italic text-blue-600">4.8/5</span>
+              </div>
+              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-blue-500 rounded-full" style={{ width: '96%' }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm">
+          <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6 underline decoration-yellow-500 decoration-2 underline-offset-8">
+            Revenue Breakdown
+          </h3>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-4 bg-gray-50 rounded-[20px]">
+              <div>
+                <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Light Deliveries</p>
+                <p className="text-xl font-black italic">KES 45,000</p>
+              </div>
+              <div className="text-3xl">📦</div>
+            </div>
+
+            <div className="flex justify-between items-center p-4 bg-gray-50 rounded-[20px]">
+              <div>
+                <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Medium Deliveries</p>
+                <p className="text-xl font-black italic">KES 82,000</p>
+              </div>
+              <div className="text-3xl">📦</div>
+            </div>
+
+            <div className="flex justify-between items-center p-4 bg-gray-50 rounded-[20px]">
+              <div>
+                <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Heavy Deliveries</p>
+                <p className="text-xl font-black italic">KES 156,000</p>
+              </div>
+              <div className="text-3xl">📦</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Top Couriers */}
+      <div className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-sm">
+        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6 underline decoration-yellow-500 decoration-2 underline-offset-8">
+          Top Performing Couriers
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((rank) => (
+            <div key={rank} className="group relative p-6 bg-gray-50 rounded-[30px] hover:bg-yellow-50 transition-all hover:-translate-y-1 hover:shadow-xl">
+              <div className="absolute top-4 right-4">
+                <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center font-black text-white">
+                  #{rank}
+                </div>
+              </div>
+              <div className="mb-4">
+                <div className="w-16 h-16 rounded-full bg-gray-200 mb-3 flex items-center justify-center text-3xl">
+                  👤
+                </div>
+                <h4 className="font-black text-lg mb-1">Courier Name {rank}</h4>
+                <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">ID: CR00{rank}</p>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Deliveries</span>
+                  <span className="font-black">{150 - rank * 10}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Rating</span>
+                  <span className="font-black text-yellow-600">4.{9 - rank}/5 ⭐</span>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-    );
-  };
-
-  return (
-    <div className="dashboard-analytics">
-      {!showDetailedAnalytics ? (
-        /* Overview Mode */
-        <div className="overview-grid">
-          <div className="overview-section">
-            <h3>Recent Activity</h3>
-            <div className="activity-summary">
-              <div className="activity-item">
-                <span className="activity-icon">📦</span>
-                <div className="activity-content">
-                  <p className="activity-title">New Orders</p>
-                  <p className="activity-value">{stats.totalOrders} today</p>
-                </div>
-              </div>
-              <div className="activity-item">
-                <span className="activity-icon">🚚</span>
-                <div className="activity-content">
-                  <p className="activity-title">In Delivery</p>
-                  <p className="activity-value">{stats.activeDeliveries} active</p>
-                </div>
-              </div>
-              <div className="activity-item">
-                <span className="activity-icon">✅</span>
-                <div className="activity-content">
-                  <p className="activity-title">Completed</p>
-                  <p className="activity-value">{stats.completedOrders || 0} orders</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="overview-section">
-            <h3>Courier Status</h3>
-            <div className="courier-summary">
-              <div className="courier-stat">
-                <div className="stat-circle active">
-                  {stats.activeCouriers}
-                </div>
-                <p>Active</p>
-              </div>
-              <div className="courier-stat">
-                <div className="stat-circle inactive">
-                  {stats.totalCouriers - stats.activeCouriers}
-                </div>
-                <p>Offline</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="overview-section full-width">
-            <h3>Quick Stats</h3>
-            <div className="quick-stats">
-              <div className="quick-stat-item">
-                <span className="stat-label">Avg Delivery Time</span>
-                <span className="stat-value">{stats.avgDeliveryTime} min</span>
-              </div>
-              <div className="quick-stat-item">
-                <span className="stat-label">Success Rate</span>
-                <span className="stat-value">{stats.successRate || 95}%</span>
-              </div>
-              <div className="quick-stat-item">
-                <span className="stat-label">Customer Satisfaction</span>
-                <span className="stat-value">{stats.satisfaction || 4.5}/5</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* Analytics Mode */
-        <div className="analytics-detailed">
-          <div className="analytics-header">
-            <h3>Detailed Analytics</h3>
-            <div className="time-range-selector">
-              <button
-                className={timeRange === 'daily' ? 'active' : ''}
-                onClick={() => setTimeRange('daily')}
-              >
-                Daily
-              </button>
-              <button
-                className={timeRange === 'weekly' ? 'active' : ''}
-                onClick={() => setTimeRange('weekly')}
-              >
-                Weekly
-              </button>
-              <button
-                className={timeRange === 'monthly' ? 'active' : ''}
-                onClick={() => setTimeRange('monthly')}
-              >
-                Monthly
-              </button>
-            </div>
-          </div>
-
-          <div className="charts-grid">
-            <div className="chart-section">
-              {renderSimpleChart(
-                chartData.daily,
-                `${timeRange === 'daily' ? 'Today\'s' : timeRange === 'weekly' ? 'This Week\'s' : 'This Month\'s'} Orders`
-              )}
-            </div>
-
-            <div className="chart-section">
-              {renderSimpleChart(
-                chartData.weekly,
-                'Revenue Trend'
-              )}
-            </div>
-          </div>
-
-          {/* Performance Metrics */}
-          <div className="performance-section">
-            <h3>Courier Performance</h3>
-            <div className="performance-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Courier</th>
-                    <th>Deliveries</th>
-                    <th>Avg Time</th>
-                    <th>Rating</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {chartData.performance && chartData.performance.map((courier, index) => (
-                    <tr key={index}>
-                      <td>{courier.name}</td>
-                      <td>{courier.deliveries}</td>
-                      <td>{courier.avgTime} min</td>
-                      <td>{courier.rating}/5</td>
-                      <td>
-                        <span className={`status-badge ${courier.isActive ? 'active' : 'inactive'}`}>
-                          {courier.isActive ? 'Active' : 'Offline'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
