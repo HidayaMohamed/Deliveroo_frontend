@@ -42,6 +42,28 @@ const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
     return icons[type] || "📌";
   };
 
+  // Top couriers data with real names
+  const topCouriers = [
+    {
+      id: "CR001",
+      name: "Peter Omondi",
+      deliveries: 156,
+      rating: 4.9
+    },
+    {
+      id: "CR002",
+      name: "James Mwangi",
+      deliveries: 142,
+      rating: 4.8
+    },
+    {
+      id: "CR003",
+      name: "Sarah Akinyi",
+      deliveries: 135,
+      rating: 4.7
+    }
+  ];
+
   if (!showDetailedAnalytics) {
     return (
       <div className="space-y-10">
@@ -199,28 +221,28 @@ const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
           Top Performing Couriers
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map((rank) => (
-            <div key={rank} className="group relative p-6 bg-gray-50 rounded-[30px] hover:bg-yellow-50 transition-all hover:-translate-y-1 hover:shadow-xl">
+          {topCouriers.map((courier, index) => (
+            <div key={courier.id} className="group relative p-6 bg-gray-50 rounded-[30px] hover:bg-yellow-50 transition-all hover:-translate-y-1 hover:shadow-xl">
               <div className="absolute top-4 right-4">
                 <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center font-black text-white">
-                  #{rank}
+                  #{index + 1}
                 </div>
               </div>
               <div className="mb-4">
                 <div className="w-16 h-16 rounded-full bg-gray-200 mb-3 flex items-center justify-center text-3xl">
                   👤
                 </div>
-                <h4 className="font-black text-lg mb-1">Courier Name {rank}</h4>
-                <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">ID: CR00{rank}</p>
+                <h4 className="font-black text-lg mb-1">{courier.name}</h4>
+                <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">ID: {courier.id}</p>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Deliveries</span>
-                  <span className="font-black">{150 - rank * 10}</span>
+                  <span className="font-black">{courier.deliveries}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Rating</span>
-                  <span className="font-black text-yellow-600">4.{9 - rank}/5 ⭐</span>
+                  <span className="font-black text-yellow-600">{courier.rating}/5 ⭐</span>
                 </div>
               </div>
             </div>
