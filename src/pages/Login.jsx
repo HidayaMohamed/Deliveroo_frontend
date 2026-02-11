@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../features/auth/useAuth";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -10,6 +10,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     try {
       await login(email, password);
     } catch {
@@ -18,9 +19,9 @@ const Login = () => {
   };
 
   if (user) {
-    if (user.role === "ADMIN") window.location.href = "/admin";
-    else if (user.role === "COURIER") window.location.href = "/courier";
-    else window.location.href = "/user";
+    if (user.role === "admin") return <Navigate to="/admin" replace />;
+    if (user.role === "courier") return <Navigate to="/courier" replace />;
+    return <Navigate to="/orders/new" replace />;
   }
 
   return (
