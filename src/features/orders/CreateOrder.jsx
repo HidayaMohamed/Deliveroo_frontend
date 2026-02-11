@@ -1,329 +1,227 @@
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { getUserProfile, createOrder, initiateMpesa } from "./ordersAPI";
+import Footer from "../components/Footer";
 
-export default function CreateOrder() {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  // Form state
-  const [pickupAddress, setPickupAddress] = useState("");
-  const [pickupLat, setPickupLat] = useState(null);
-  const [pickupLng, setPickupLng] = useState(null);
-  const [destAddress, setDestAddress] = useState("");
-  const [destLat, setDestLat] = useState(null);
-  const [destLng, setDestLng] = useState(null);
-  const [weightKg, setWeightKg] = useState(5);
-  const [parcelDesc, setParcelDesc] = useState("");
-  const [isFragile, setIsFragile] = useState(false);
-  const [needsInsurance, setNeedsInsurance] = useState(false);
-  const [isExpress, setIsExpress] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [priceEstimate, setPriceEstimate] = useState(null);
-
-  // Weight categories matching backend
-  const weightCategories = [
-    { value: "SMALL", label: "Small (< 5kg)", basePrice: 150 },
-    { value: "MEDIUM", label: "Medium (5-20kg)", basePrice: 300 },
-    { value: "LARGE", label: "Large (20-50kg)", basePrice: 500 },
-    { value: "XLARGE", label: "Extra Large (>50kg)", basePrice: 1000 },
-  ];
+const Landing = () => {
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getUserProfile();
-        setUser(res.data);
-      } catch (err) {
-        console.error("Auth error:", err);
-        setUser({ full_name: "Demo User", phone: "+254712345678" });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Calculate price estimate when form changes
-  useEffect(() => {
-    if (pickupLat && destLat && weightKg) {
-      calculateEstimate();
-    }
-  }, [pickupLat, destLat, weightKg, isFragile, needsInsurance, isExpress]);
-
-  const calculateEstimate = async () => {
-    try {
-      // For demo, calculate locally (would call backend in production)
-      const distance = 5 + Math.random() * 20; // Mock distance
-      const basePrice = weightCategories.find(c => {
-        const w = parseFloat(weightKg);
-        if (c.value === "SMALL" && w < 5) return true;
-        if (c.value === "MEDIUM" && w >= 5 && w < 20) return true;
-        if (c.value === "LARGE" && w >= 20 && w < 50) return true;
-        if (c.value === "XLARGE" && w >= 50) return true;
-        return false;
-      })?.basePrice || 200;
-
-      const distancePrice = distance * 50;
-      let total = 150 + distancePrice + basePrice;
-
-      if (isFragile) total += total * 0.15;
-      if (needsInsurance) total += total * 0.10;
-      if (isExpress) total += total * 0.25;
-
-      setPriceEstimate({
-        distance: distance.toFixed(1),
-        breakdown: { base: 150, distance: distancePrice, weight: basePrice },
-        total: Math.round(total)
-      });
-    } catch (err) {
-      console.error("Estimate error:", err);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!pickupAddress || !destAddress || !pickupLat || !destLat) {
-      alert("Please select valid pickup and destination locations");
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      // Create order
-      const orderRes = await createOrder({
-        pickup_address: pickupAddress,
-        pickup_lat: pickupLat,
-        pickup_lng: pickupLng,
-        destination_address: destAddress,
-        destination_lat: destLat,
-        destination_lng: destLng,
-        weight_kg: parseFloat(weightKg),
-        parcel_description: parcelDesc,
-        fragile: isFragile,
-        insurance_required: needsInsurance,
-        is_express: isExpress,
-      });
-
-      // Initiate M-Pesa payment
-      await initiateMpesa({
-        phone: user.phone,
-        amount: priceEstimate?.total || 500
-      });
-
-      alert("M-PESA STK Push sent! Check your phone.");
-      navigate(`/orders/${orderRes.data.id}`);
-    } catch (err) {
-      console.error("Order error:", err);
-      alert("Failed to create order. Please try again.");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-brand-orange border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-500">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-brand-grayDark mb-8">
-          📦 Create New Order
-        </h1>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Left Column - Form */}
-          <div className="space-y-6">
-            {/* Pickup */}
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Pickup Location
-              </label>
-              <input
-                type="text"
-                value={pickupAddress}
-                onChange={(e) => setPickupAddress(e.target.value)}
-                placeholder="Enter pickup address"
-                className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-brand-orange focus:outline-none"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                💡 In production: Google Places Autocomplete
-              </p>
+    <div className="bg-[#F8FAFC] text-slate-900 selection:bg-orange-500 selection:text-white font-sans">
+      {/* ================= NAVBAR ================= */}
+      <nav
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? "bg-white/70 backdrop-blur-2xl py-4 shadow-sm border-b border-slate-200/50"
+            : "bg-transparent py-8"
+        }`}
+      >
+        <div className="max-w-[1440px] mx-auto px-[6%] flex items-center justify-between">
+          <Link to="/" className="group flex items-center gap-2">
+            <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-600/20">
+              <span className="font-black text-xl">D</span>
             </div>
+            <h1 className="font-black text-2xl tracking-tighter transition-colors text-slate-800">
+              DELIVEROO<span className="text-orange-500">.</span>
+            </h1>
+          </Link>
 
-            {/* Destination */}
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Destination
-              </label>
-              <input
-                type="text"
-                value={destAddress}
-                onChange={(e) => setDestAddress(e.target.value)}
-                placeholder="Enter destination address"
-                className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-brand-orange focus:outline-none"
-              />
-            </div>
+          <div className="hidden md:flex items-center gap-8 text-[12px] font-bold text-slate-500">
+            {["Intelligence", "Process", "Tariffs"].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="hover:text-orange-600 transition-colors uppercase tracking-widest"
+              >
+                {item}
+              </a>
+            ))}
+            <div className="h-4 w-[1px] bg-slate-200 mx-2" />
+            <Link
+              to="/login"
+              className="hover:text-slate-900 uppercase tracking-widest"
+            >
+              Login
+            </Link>
+            <Link
+              to="/register?role=USER"
+              className="rounded-2xl bg-slate-900 px-6 py-3 text-white transition-all hover:bg-orange-600 hover:shadow-lg active:scale-95"
+            >
+              Get Started
+            </Link>
+          </div>
+        </div>
+      </nav>
 
-            {/* Weight */}
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Parcel Weight (kg)
-              </label>
-              <input
-                type="number"
-                value={weightKg}
-                onChange={(e) => setWeightKg(e.target.value)}
-                min="0.1"
-                step="0.1"
-                className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-brand-orange focus:outline-none"
-              />
-              <div className="flex flex-wrap gap-2 mt-3">
-                {weightCategories.map((cat) => (
-                  <button
-                    key={cat.value}
-                    onClick={() => setWeightKg(cat.value === "SMALL" ? 2 : cat.value === "MEDIUM" ? 10 : cat.value === "LARGE" ? 30 : 60)}
-                    className="px-3 py-1 text-xs rounded-full bg-gray-100 hover:bg-brand-orange hover:text-white transition"
-                  >
-                    {cat.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+      {/* ================= HERO ================= */}
+      <section className="relative min-h-screen flex items-center px-[6%] pt-20 overflow-hidden">
+        {/* Soft Background Accents */}
+        <div className="absolute top-20 right-[-10%] w-[500px] h-[500px] bg-slate-200 rounded-full blur-[120px] opacity-50" />
+        <div className="absolute bottom-10 left-[-5%] w-[400px] h-[400px] bg-orange-100 rounded-full blur-[100px] opacity-30" />
 
-            {/* Options */}
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h3 className="font-semibold mb-4">Delivery Options</h3>
-              <div className="space-y-3">
-                <label className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={isFragile}
-                    onChange={(e) => setIsFragile(e.target.checked)}
-                    className="w-5 h-5 text-brand-orange rounded"
-                  />
-                  <span>Fragile Item (+15%)</span>
-                </label>
-                <label className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={needsInsurance}
-                    onChange={(e) => setNeedsInsurance(e.target.checked)}
-                    className="w-5 h-5 text-brand-orange rounded"
-                  />
-                  <span>Insurance (+10%)</span>
-                </label>
-                <label className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={isExpress}
-                    onChange={(e) => setIsExpress(e.target.checked)}
-                    className="w-5 h-5 text-brand-orange rounded"
-                  />
-                  <span>Express Delivery (+25%)</span>
-                </label>
-              </div>
+        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-[1400px] mx-auto w-full relative z-10">
+          <div>
+            <span className="inline-block mb-6 px-4 py-1.5 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-[3px] text-slate-500 border border-slate-200">
+              Reliable Logistics
+            </span>
+
+            <h1 className="text-6xl md:text-7xl xl:text-8xl font-black leading-[0.9] tracking-tight mb-8 text-slate-900">
+              Global Motion <br />
+              <span className="text-slate-400">Redefined.</span>
+            </h1>
+
+            <p className="max-w-lg text-lg text-slate-500 font-medium mb-10 leading-relaxed">
+              Precision delivery for the modern era. Real-time telemetry, secure
+              custody, and instant M-Pesa integration.
+            </p>
+
+            <div className="flex flex-wrap gap-4">
+              <Link to="/register?role=customer" className="w-full sm:w-auto">
+                <button className="w-full rounded-2xl bg-orange-600 px-10 py-5 font-bold text-white transition-all hover:bg-orange-700 hover:-translate-y-1 hover:shadow-2xl active:translate-y-0">
+                  Create Shipment
+                </button>
+              </Link>
+              <Link to="/register?role=courier" className="w-full sm:w-auto">
+                <button className="w-full rounded-2xl border-2 border-slate-200 bg-white/50 backdrop-blur-sm px-10 py-5 font-bold text-slate-700 transition-all hover:border-slate-400 hover:bg-white active:scale-95">
+                  Join the Fleet
+                </button>
+              </Link>
             </div>
           </div>
 
-          {/* Right Column - Summary & Map */}
-          <div className="space-y-6">
-            {/* Price Estimate */}
-            {priceEstimate && (
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <h3 className="font-bold text-lg mb-4">💰 Price Estimate</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Base Price</span>
-                    <span>KES {priceEstimate.breakdown.base}</span>
+          <div className="hidden lg:block relative">
+            <div className="aspect-square bg-slate-200/50 rounded-[60px] relative overflow-hidden group border border-slate-300/50">
+              <div className="absolute inset-0 bg-gradient-to-tr from-slate-200 to-transparent opacity-60"></div>
+              {/* Visual Placeholder for Image */}
+              <div className="absolute inset-0 flex items-center justify-center italic text-slate-400 font-medium">
+                [Interactive Delivery Visualization]
+              </div>
+              {/* Floating Micro-Card */}
+              <div className="absolute bottom-8 left-8 right-8 bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-white animate-bounce-slow">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white">
+                    ✓
                   </div>
-                  <div className="flex justify-between">
-                    <span>Distance ({priceEstimate.distance} km)</span>
-                    <span>KES {priceEstimate.breakdown.distance}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Weight Category</span>
-                    <span>KES {priceEstimate.breakdown.weight}</span>
-                  </div>
-                  {isFragile && (
-                    <div className="flex justify-between text-orange-600">
-                      <span>Fragile (+15%)</span>
-                      <span>+KES {Math.round(priceEstimate.total * 0.15)}</span>
-                    </div>
-                  )}
-                  {needsInsurance && (
-                    <div className="flex justify-between text-orange-600">
-                      <span>Insurance (+10%)</span>
-                      <span>+KES {Math.round(priceEstimate.total * 0.10)}</span>
-                    </div>
-                  )}
-                  {isExpress && (
-                    <div className="flex justify-between text-orange-600">
-                      <span>Express (+25%)</span>
-                      <span>+KES {Math.round(priceEstimate.total * 0.25)}</span>
-                    </div>
-                  )}
-                  <div className="border-t pt-2 mt-2">
-                    <div className="flex justify-between font-bold text-lg">
-                      <span>Total</span>
-                      <span className="text-brand-orange">KES {priceEstimate.total}</span>
-                    </div>
+                  <div>
+                    <p className="font-bold text-slate-800 tracking-tight">
+                      Package Delivered
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      Mombasa, Kenya • 2m ago
+                    </p>
                   </div>
                 </div>
               </div>
-            )}
-
-            {/* Map Placeholder */}
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <h3 className="font-semibold mb-4">🗺️ Route Preview</h3>
-              <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                {pickupAddress && destAddress ? (
-                  <div className="text-center">
-                    <p className="text-2xl mb-2">📍 → 📍</p>
-                    <p className="text-sm text-gray-500">
-                      {pickupAddress} → {destAddress}
-                    </p>
-                    {priceEstimate && (
-                      <p className="text-sm text-brand-orange mt-2">
-                        {priceEstimate.distance} km
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-gray-400">Enter addresses to see route</p>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Google Maps integration requires API key
-              </p>
             </div>
-
-            {/* Submit */}
-            <button
-              onClick={handleSubmit}
-              disabled={isProcessing || !pickupAddress || !destAddress}
-              className="w-full py-4 bg-brand-orange text-white rounded-xl font-bold text-lg hover:bg-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isProcessing ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Processing...
-                </span>
-              ) : (
-                "🚗 Create Order & Pay with M-Pesa"
-              )}
-            </button>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* ================= FEATURES ================= */}
+      <section id="intelligence" className="py-32 px-[6%] relative">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div>
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight">
+                Core Intelligence
+              </h2>
+              <p className="text-slate-500 mt-2 font-medium">
+                Engineered for reliability and scale.
+              </p>
+            </div>
+            <div className="h-[2px] flex-grow mx-8 bg-slate-200 hidden md:block mb-4" />
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <Feature
+              icon="⚡"
+              title="Priority Velocity"
+              description="Immediate dispatch with optimized express routing algorithms."
+            />
+            <Feature
+              icon="🛡️"
+              title="Secure Custody"
+              description="Insurance-backed, encrypted chain-of-custody handling for every parcel."
+            />
+            <Feature
+              icon="📡"
+              title="Live Telemetry"
+              description="Minute-by-minute GPS tracking with live courier updates and SMS."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ================= PRICING ================= */}
+      <section id="tariffs" className="py-24 px-[6%]">
+        <div className="max-w-5xl mx-auto rounded-[48px] bg-slate-900 p-12 md:p-20 text-white relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-600/10 rounded-full blur-[80px]" />
+
+          <div className="relative z-10 grid md:grid-cols-2 gap-16 items-center">
+            <div>
+              <span className="text-orange-500 font-bold uppercase tracking-widest text-sm">
+                Transparent Tariffs
+              </span>
+              <h2 className="text-5xl font-black mt-4 mb-6 leading-tight">
+                Simple Rates. <br /> No Hidden Fees.
+              </h2>
+              <p className="text-slate-400 text-lg mb-8">
+                We believe in fair pricing. Calculate your costs upfront with
+                our integrated M-Pesa payment gateway.
+              </p>
+              <button className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-bold hover:bg-orange-500 hover:text-white transition-colors">
+                View Detailed Pricing
+              </button>
+            </div>
+
+            <div className="space-y-2 bg-white/5 backdrop-blur-lg p-8 rounded-[32px] border border-white/10">
+              <PriceRow label="Base Dispatch" value="KSh 150" />
+              <PriceRow label="Distance (per km)" value="KSh 50" />
+              <PriceRow label="Weight (per kg)" value="KSh 30" />
+              <div className="pt-6 mt-4 flex justify-between items-center">
+                <span className="font-bold text-slate-400 italic">
+                  Starting Total
+                </span>
+                <span className="text-4xl font-black text-orange-500">
+                  KSh 150
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
-}
+};
+
+/* ================= SUB-COMPONENTS ================= */
+
+const Feature = ({ icon, title, description }) => (
+  <div className="group bg-white p-10 rounded-[40px] border border-slate-200 transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] hover:-translate-y-2">
+    <div className="mb-8 w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-3xl group-hover:bg-orange-50 group-hover:scale-110 transition-all duration-500">
+      {icon}
+    </div>
+    <h3 className="font-black text-2xl mb-4 text-slate-800 tracking-tight">
+      {title}
+    </h3>
+    <p className="text-slate-500 font-medium leading-relaxed">{description}</p>
+  </div>
+);
+
+const PriceRow = ({ label, value }) => (
+  <div className="flex justify-between py-5 border-b border-white/5 group">
+    <span className="text-slate-400 group-hover:text-white transition-colors uppercase tracking-widest text-[11px] font-bold">
+      {label}
+    </span>
+    <span className="font-bold text-xl">{value}</span>
+  </div>
+);
+
+export default Landing;

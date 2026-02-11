@@ -1,8 +1,8 @@
-import "leaflet/dist/leaflet.css";
+
 import { Toaster } from "react-hot-toast";
 import Footer from "./components/Footer";
 // Global Components
-import NotificationToast from "./components/NoificationToast";
+import NotificationToast from "./components/NotificationToast";
 
 // Import AppRoutes for routing logic
 import AppRoutes from "./routes/AppRoutes";

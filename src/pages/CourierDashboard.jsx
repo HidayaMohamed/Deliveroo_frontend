@@ -1,88 +1,69 @@
-import { useState } from "react";
-import { useAuth } from "../features/auth/useAuth";
-import Navbar from "../components/Navbar";
-import OrdersList from "../components/orders/OrdersList";
-import UserProfile from "../features/user/UserProfile";
+import { useEffect, useState } from "react";
+import axios from "../../api/axios";
+import StatsCard from "../../components/courier/StatsCard";
 
-export default function CourierDashboard() {
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("orders");
+const CourierDashboard = () => {
+  const [stats, setStats] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchStats = async () => {
+    try {
+      const res = await axios.get("/api/courier/stats");
+      setStats(res.data.summary);
+      setError(null);
+    } catch (err) {
+      console.error(err);
+      // Set default stats if the endpoint returns 422 or other errors
+      setStats({
+        total_deliveries: 0,
+        completed_deliveries: 0,
+        active_deliveries: 0,
+        todays_deliveries: 0,
+        success_rate: 0,
+      });
+      setError(err?.response?.data?.message || "Failed to load stats");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <p className="text-center mt-10">Loading stats...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-brand-grayDark">
-            Hey {user?.full_name || "Rider"} 🚴
-          </h1>
-          <p className="text-gray-600">Deliver parcels and earn money</p>
+    <div className="p-6">
+      {error && (
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+          <strong>Warning: </strong> {error}
         </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <p className="text-sm text-gray-500 mb-1">Today's Deliveries</p>
-            <p className="text-3xl font-bold text-brand-orange">5</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <p className="text-sm text-gray-500 mb-1">Available Orders</p>
-            <p className="text-3xl font-bold text-blue-600">8</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <p className="text-sm text-gray-500 mb-1">Completed</p>
-            <p className="text-3xl font-bold text-green-600">47</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <p className="text-sm text-gray-500 mb-1">Earnings Today</p>
-            <p className="text-3xl font-bold text-brand-grayDark">KES 2,500</p>
-          </div>
-        </div>
-
-        {/* Action Tabs */}
-        <div className="flex gap-4 mb-6">
-          <button
-            onClick={() => setActiveTab("orders")}
-            className={`px-6 py-3 rounded-lg font-semibold transition ${
-              activeTab === "orders"
-                ? "bg-brand-orange text-white"
-                : "bg-white text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            📦 Available Orders
-          </button>
-          <button
-            onClick={() => setActiveTab("my")}
-            className={`px-6 py-3 rounded-lg font-semibold transition ${
-              activeTab === "my"
-                ? "bg-brand-orange text-white"
-                : "bg-white text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            🚴 My Deliveries
-          </button>
-          <button
-            onClick={() => setActiveTab("profile")}
-            className={`px-6 py-3 rounded-lg font-semibold transition ${
-              activeTab === "profile"
-                ? "bg-brand-orange text-white"
-                : "bg-white text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            👤 Profile
-          </button>
-        </div>
-
-        {/* Content Area */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          {activeTab === "orders" && <OrdersList role="courier" />}
-          {activeTab === "my" && (
-            <OrdersList role="courier" filter="ASSIGNED" />
-          )}
-          {activeTab === "profile" && <UserProfile />}
-        </div>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <StatsCard
+          title="Total Deliveries"
+          value={stats?.total_deliveries || 0}
+        />
+        <StatsCard title="Completed" value={stats?.completed_deliveries || 0} />
+        <StatsCard
+          title="Active Deliveries"
+          value={stats?.active_deliveries || 0}
+        />
+        <StatsCard
+          title="Today's Deliveries"
+          value={stats?.todays_deliveries || 0}
+        />
       </div>
     </div>
   );
-}
+};
+
+export default CourierDashboard;
