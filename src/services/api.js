@@ -1,8 +1,36 @@
 import axios from "axios";
+import { getToken, removeToken } from "../utils/token";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000", // Update to match your Flask port
+  baseURL: "http://127.0.0.1:5000",
   withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
+
+// Request interceptor to add auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
+// Response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      removeToken();
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  },
+);
 
 export default api;

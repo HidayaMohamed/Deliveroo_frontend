@@ -1,16 +1,22 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Landing from "../pages/Landing";
-import Dashboard from "../features/admin/Dashboard";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Unauthorized from "../pages/Unauthorized";
 import ProtectedRoute from "../components/ProtectedRoute";
 import PublicRoute from "../components/PublicRoute";
 
+// Dashboard pages
+import AdminDashboard from "../pages/AdminDashboard";
+import CourierDashboard from "../pages/CourierDashboard";
+import CustomerDashboard from "../pages/CustomerDashboard";
+
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public-only pages */}
+      {/* ================= PUBLIC ROUTES ================= */}
+
+      {/* Landing Page - Default entry */}
       <Route
         path="/"
         element={
@@ -20,6 +26,7 @@ const AppRoutes = () => {
         }
       />
 
+      {/* Login - All roles can access */}
       <Route
         path="/login"
         element={
@@ -29,6 +36,7 @@ const AppRoutes = () => {
         }
       />
 
+      {/* Register - Only customers and couriers */}
       <Route
         path="/register"
         element={
@@ -38,28 +46,69 @@ const AppRoutes = () => {
         }
       />
 
+      {/* Unauthorized page */}
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* Protected pages */}
+      {/* ================= PROTECTED ROUTES ================= */}
+
+      {/* Customer Dashboard */}
+      <Route
+        path="/customer/dashboard"
+        element={
+          <ProtectedRoute role="customer">
+            <CustomerDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Customer Orders */}
+      <Route
+        path="/customer/orders"
+        element={
+          <ProtectedRoute role="customer">
+            <CustomerDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Courier Dashboard */}
+      <Route
+        path="/courier/dashboard"
+        element={
+          <ProtectedRoute role="courier">
+            <CourierDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin Dashboard */}
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute role="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ================= REDIRECTS ================= */}
+
+      {/* Legacy route redirects */}
       <Route
         path="/user"
-        element={
-          <ProtectedRoute role="USER">
-            <h1>User Dashboard</h1>
-          </ProtectedRoute>
-        }
+        element={<Navigate to="/customer/dashboard" replace />}
       />
-
       <Route
         path="/courier"
-        element={
-          <ProtectedRoute role="COURIER">
-            <h1>Courier Dashboard</h1>
-          </ProtectedRoute>
-        }
+        element={<Navigate to="/courier/dashboard" replace />}
+      />
+      <Route
+        path="/admin"
+        element={<Navigate to="/admin/dashboard" replace />}
       />
 
-      <Route path="/admin" element={<Dashboard />} />
+      {/* Catch all - redirect to landing */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

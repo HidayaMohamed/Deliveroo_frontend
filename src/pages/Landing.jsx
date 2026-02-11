@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 const Landing = () => {
   const [scrolled, setScrolled] = useState(false);
 
-  // Add shadow to navbar when scrolled
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -27,29 +26,17 @@ const Landing = () => {
 
           {/* Nav Links */}
           <div className="space-x-6 hidden md:flex font-semibold">
-            <a href="#why" className="hover:text-brand-orange">
-              Why Choose
-            </a>
-            <a href="#how" className="hover:text-brand-orange">
-              How it Works
-            </a>
-            <a href="#testimonials" className="hover:text-brand-orange">
-              Testimonials
-            </a>
-            <a href="#pricing" className="hover:text-brand-orange">
-              Pricing
-            </a>
             <Link
-              to="/register?role=USER"
-              className="bg-brand-orange text-white px-4 py-2 rounded-lg font-semibold"
+              to="/login?role=customer"
+              className="border border-brand-grayDark px-4 py-2 rounded-lg hover:bg-brand-grayDark hover:text-white transition"
             >
-              Get Started
+              Customer Login
             </Link>
             <Link
-              to="/login"
-              className="border border-brand-grayDark px-4 py-2 rounded-lg font-semibold hover:bg-brand-grayDark hover:text-white transition"
+              to="/register?role=customer"
+              className="bg-brand-orange text-white px-4 py-2 rounded-lg font-semibold"
             >
-              Login
+              Register
             </Link>
           </div>
         </div>
@@ -57,32 +44,51 @@ const Landing = () => {
 
       {/* ================= HERO ================= */}
       <section className="w-full min-h-screen flex flex-col justify-center items-center bg-brand-white px-6 py-32">
-        {/* Hero Content */}
         <div className="text-center max-w-5xl">
           <p className="text-lg font-semibold mb-2 text-brand-grayDark">
             Your Parcels,
           </p>
-
           <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6">
             Delivered <span className="text-brand-orange">Fast</span>
           </h1>
-
           <p className="text-lg md:text-xl mb-10 text-gray-700">
             Send and receive parcels across the city with real-time tracking,
             professional couriers, and guaranteed delivery times.
           </p>
 
-          {/* CTA Buttons */}
+          {/* Auth CTAs */}
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-16">
-            <Link to="/register?role=USER">
-              <button className="bg-brand-orange text-white px-8 py-4 rounded-lg font-semibold hover:bg-orange-600 transition">
-                Get Started Free
+            <Link to="/register?role=customer">
+              <button className="bg-brand-orange text-white px-8 py-4 rounded-lg font-semibold hover:bg-orange-600 transition w-full sm:w-auto">
+                Customer Register
               </button>
             </Link>
-            <Link to="/register?role=COURIER">
-              <button className="border border-brand-grayDark px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition">
+            <Link to="/register?role=courier">
+              <button className="border border-brand-grayDark px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition w-full sm:w-auto">
                 Become a Courier
               </button>
+            </Link>
+          </div>
+
+          {/* Login Options */}
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <Link
+              to="/login?role=customer"
+              className="text-brand-orange font-semibold hover:underline px-4 py-2"
+            >
+              Customer Login
+            </Link>
+            <Link
+              to="/login?role=courier"
+              className="text-brand-orange font-semibold hover:underline px-4 py-2"
+            >
+              Courier Login
+            </Link>
+            <Link
+              to="/login?role=admin"
+              className="text-brand-orange font-semibold hover:underline px-4 py-2"
+            >
+              Admin Login
             </Link>
           </div>
         </div>
@@ -159,48 +165,11 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ================= TESTIMONIALS ================= */}
-      <section
-        id="testimonials"
-        className="bg-brand-cream py-20 text-center max-w-7xl mx-auto px-6"
-      >
-        <h2 className="text-3xl font-bold mb-14">What our Users Say</h2>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          <Testimonial
-            text="Same-day delivery increased my customer satisfaction massively."
-            name="Sarah J."
-          />
-          <Testimonial
-            text="I earn on my schedule. Best courier platform I've used."
-            name="Michael C."
-          />
-          <Testimonial
-            text="Live tracking gives me peace of mind every time."
-            name="Grace W."
-          />
-        </div>
-      </section>
-
-      {/* ================= PRICING ================= */}
-      <section
-        id="pricing"
-        className="py-20 text-center max-w-4xl mx-auto px-6"
-      >
-        <h2 className="text-3xl font-bold mb-10">Transparent Pricing</h2>
-
-        <div className="bg-brand-cream rounded-xl p-10 shadow space-y-4 text-left">
-          <PriceRow label="Base Fare" value="KES 150" />
-          <PriceRow label="Distance (km)" value="× 50" />
-          <PriceRow label="Weight (kg)" value="× 30" />
-        </div>
-      </section>
-
       {/* ================= CTA ================= */}
       <section className="bg-brand-gold py-20 text-center">
         <h2 className="text-3xl font-bold mb-4">Ready to get Started?</h2>
         <p className="mb-8">Join thousands of users who trust Deliveroo.</p>
-        <Link to="/register">
+        <Link to="/register?role=customer">
           <button className="bg-brand-black text-white px-10 py-4 rounded-lg font-semibold">
             Create Free Account
           </button>
@@ -233,20 +202,6 @@ const Step = ({ number, title, description }) => (
     </div>
     <p className="font-semibold">{title}</p>
     {description && <p className="text-sm">{description}</p>}
-  </div>
-);
-
-const Testimonial = ({ text, name }) => (
-  <div className="bg-brand-gold p-8 rounded-xl shadow hover:scale-105 transition-transform">
-    <p className="italic mb-4">“{text}”</p>
-    <p className="font-semibold">{name}</p>
-  </div>
-);
-
-const PriceRow = ({ label, value }) => (
-  <div className="flex justify-between border-b border-brand-grayDark pb-3">
-    <span>{label}</span>
-    <strong>{value}</strong>
   </div>
 );
 

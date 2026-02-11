@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import api from "../../api/axios";
+import api from "../../services/api";
 import { setToken, getToken, removeToken } from "../../utils/token";
 
 export const AuthContext = createContext(null);
@@ -9,10 +9,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const login = async (email, password) => {
-    const res = await api.post("/auth/login", { email, password });
+    const res = await api.post("/api/auth/login", { email, password });
     setToken(res.data.access_token);
     setUser(res.data.user);
-    return res.data.user; 
+    return res.data.user;
   };
 
   const register = async (data) => {
@@ -27,7 +27,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-
   const logout = () => {
     removeToken();
     setUser(null);
@@ -35,17 +34,23 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    const initAuth = async () => {
+      const token = getToken();
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
-    api
-      .get("/auth/me")
-      .then((res) => setUser(res.data))
-      .catch(() => removeToken())
-      .finally(() => setLoading(false));
+      try {
+        const res = await api.get("/api/auth/me");
+        setUser(res.data);
+      } catch {
+        removeToken();
+      } finally {
+        setLoading(false);
+      }
+    };
+    initAuth();
   }, []);
 
   return (
