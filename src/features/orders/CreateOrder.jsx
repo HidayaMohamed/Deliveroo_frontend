@@ -1,227 +1,261 @@
-import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
+import { getUserProfile, createOrder, initiateMpesa } from "./ordersAPI";
+import { X, ShieldCheck } from "lucide-react"; // Fancy icons for a professional look
 
-const Landing = () => {
-  const [scrolled, setScrolled] = useState(false);
+const CreateOrder = () => {
+  const navigate = useNavigate();
+  const [weight, setWeight] = useState("LIGHT");
+  const [locations, setLocations] = useState({ pickup: "", dropoff: "" });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    getUserProfile()
+      .then((res) => setUser(res.data))
+      .catch(() => setUser({ phone: "254700000000" }));
   }, []);
 
-  return (
-    <div className="bg-[#F8FAFC] text-slate-900 selection:bg-orange-500 selection:text-white font-sans">
-      {/* ================= NAVBAR ================= */}
-      <nav
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-white/70 backdrop-blur-2xl py-4 shadow-sm border-b border-slate-200/50"
-            : "bg-transparent py-8"
-        }`}
-      >
-        <div className="max-w-[1440px] mx-auto px-[6%] flex items-center justify-between">
-          <Link to="/" className="group flex items-center gap-2">
-            <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-600/20">
-              <span className="font-black text-xl">D</span>
-            </div>
-            <h1 className="font-black text-2xl tracking-tighter transition-colors text-slate-800">
-              DELIVEROO<span className="text-orange-500">.</span>
-            </h1>
-          </Link>
+  const pricing = { LIGHT: 500, MEDIUM: 2000, HEAVY: 3000 };
+  const vehicles = {
+    LIGHT: "https://images.pexels.com/photos/4391469/pexels-photo-4391469.jpeg",
+    MEDIUM:
+      "https://images.pexels.com/photos/13033926/pexels-photo-13033926.jpeg",
+    HEAVY:
+      "https://images.pexels.com/photos/29057942/pexels-photo-29057942.jpeg",
+  };
 
-          <div className="hidden md:flex items-center gap-8 text-[12px] font-bold text-slate-500">
-            {["Intelligence", "Process", "Tariffs"].map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="hover:text-orange-600 transition-colors uppercase tracking-widest"
-              >
-                {item}
-              </a>
-            ))}
-            <div className="h-4 w-[1px] bg-slate-200 mx-2" />
-            <Link
-              to="/login"
-              className="hover:text-slate-900 uppercase tracking-widest"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register?role=USER"
-              className="rounded-2xl bg-slate-900 px-6 py-3 text-white transition-all hover:bg-orange-600 hover:shadow-lg active:scale-95"
-            >
-              Get Started
-            </Link>
-          </div>
+  // 2. LOGIC: Handle M-Pesa & Order Creation
+  const handleMpesaCheckout = async () => {
+    if (!locations.pickup || !locations.dropoff) {
+      return alert("Please specify both pickup and destination points.");
+    }
+
+    setIsProcessing(true);
+    try {
+      // Step A: STK Push
+      await initiateMpesa({
+        phone: user.phone,
+        amount: pricing[weight],
+      });
+
+      // Step B: Create Order Record
+      const orderRes = await createOrder({
+        pickup_location: locations.pickup,
+        destination: locations.dropoff,
+        weight_category: weight,
+        status: "Pending Payment",
+      });
+
+      alert("M-PESA: STK Push sent. Check your handset.");
+      navigate(`/orders/${orderRes.data.id || ""}`);
+    } catch (err) {
+      alert("System Busy: Please try the checkout again shortly.");
+      console.error(err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  if (!user)
+    return (
+      <div className="h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+            Securing Session...
+          </p>
         </div>
-      </nav>
+      </div>
+    );
 
-      {/* ================= HERO ================= */}
-      <section className="relative min-h-screen flex items-center px-[6%] pt-20 overflow-hidden">
-        {/* Soft Background Accents */}
-        <div className="absolute top-20 right-[-10%] w-[500px] h-[500px] bg-slate-200 rounded-full blur-[120px] opacity-50" />
-        <div className="absolute bottom-10 left-[-5%] w-[400px] h-[400px] bg-orange-100 rounded-full blur-[100px] opacity-30" />
+  return (
+    <div className="min-h-screen bg-white text-black pb-32">
+      {/* TOP PROGRESS NAV */}
+      <div className="w-full h-1 bg-gray-100 sticky top-0 z-50">
+        <div
+          className="h-full bg-yellow-500 transition-all duration-1000"
+          style={{
+            width: locations.pickup && locations.dropoff ? "100%" : "50%",
+          }}
+        ></div>
+      </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-[1400px] mx-auto w-full relative z-10">
-          <div>
-            <span className="inline-block mb-6 px-4 py-1.5 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-[3px] text-slate-500 border border-slate-200">
-              Reliable Logistics
-            </span>
-
-            <h1 className="text-6xl md:text-7xl xl:text-8xl font-black leading-[0.9] tracking-tight mb-8 text-slate-900">
-              Global Motion <br />
-              <span className="text-slate-400">Redefined.</span>
-            </h1>
-
-            <p className="max-w-lg text-lg text-slate-500 font-medium mb-10 leading-relaxed">
-              Precision delivery for the modern era. Real-time telemetry, secure
-              custody, and instant M-Pesa integration.
+      <div className="max-w-[1400px] mx-auto px-8 pt-16">
+        <header className="mb-20">
+          <span className="text-yellow-600 font-black uppercase tracking-[0.5em] text-[10px] mb-4 block">
+            New Shipment
+          </span>
+          <h1 className="text-8xl font-black tracking-tighter leading-none mb-6">
+            Are you ready to ship?
+          </h1>
+          <div className="flex items-center gap-4">
+            <span className="h-[1px] w-12 bg-gray-200"></span>
+            <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">
+              Billing to: {user.phone}
             </p>
-
-            <div className="flex flex-wrap gap-4">
-              <Link to="/register?role=customer" className="w-full sm:w-auto">
-                <button className="w-full rounded-2xl bg-orange-600 px-10 py-5 font-bold text-white transition-all hover:bg-orange-700 hover:-translate-y-1 hover:shadow-2xl active:translate-y-0">
-                  Create Shipment
-                </button>
-              </Link>
-              <Link to="/register?role=courier" className="w-full sm:w-auto">
-                <button className="w-full rounded-2xl border-2 border-slate-200 bg-white/50 backdrop-blur-sm px-10 py-5 font-bold text-slate-700 transition-all hover:border-slate-400 hover:bg-white active:scale-95">
-                  Join the Fleet
-                </button>
-              </Link>
-            </div>
           </div>
+        </header>
 
-          <div className="hidden lg:block relative">
-            <div className="aspect-square bg-slate-200/50 rounded-[60px] relative overflow-hidden group border border-slate-300/50">
-              <div className="absolute inset-0 bg-gradient-to-tr from-slate-200 to-transparent opacity-60"></div>
-              {/* Visual Placeholder for Image */}
-              <div className="absolute inset-0 flex items-center justify-center italic text-slate-400 font-medium">
-                [Interactive Delivery Visualization]
-              </div>
-              {/* Floating Micro-Card */}
-              <div className="absolute bottom-8 left-8 right-8 bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-white animate-bounce-slow">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white">
-                    ✓
+        <div className="grid lg:grid-cols-12 gap-20">
+          {/* LEFT: FLEET SELECTION */}
+          <div className="lg:col-span-8 space-y-12">
+            <div className="flex justify-between items-end">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 underline decoration-yellow-500 decoration-2 underline-offset-8">
+                01. Fleet Selection
+              </h3>
+              <p className="text-[10px] font-black text-gray-300 italic">
+                Select your freight class below
+              </p>
+            </div>
+            <div className="grid gap-10">
+              {Object.keys(pricing).map((cat) => (
+                <div
+                  key={cat}
+                  onClick={() => setWeight(cat)}
+                  className={`group relative h-[500px] rounded-[60px] overflow-hidden cursor-pointer transition-all duration-700 
+                  ${weight === cat ? "ring-[15px] ring-yellow-500 scale-[1.02] shadow-2xl" : "opacity-40 grayscale hover:opacity-100 hover:grayscale-0"}`}
+                >
+                  <img
+                    src={vehicles[cat]}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-[4s] group-hover:scale-110"
+                    alt={cat}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+
+                  <div className="absolute bottom-12 left-12 text-white">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="w-8 h-[2px] bg-yellow-500"></span>
+                      <span className="text-yellow-500 font-black text-xs uppercase tracking-widest">
+                        Premium {cat} Service
+                      </span>
+                    </div>
+                    <h2 className="text-6xl font-black italic tracking-tighter mb-2">
+                      {cat} PRIORITY
+                    </h2>
+                    <p className="text-gray-300 font-medium text-lg">
+                      Guaranteed delivery within 24 hours.
+                    </p>
                   </div>
-                  <div>
-                    <p className="font-bold text-slate-800 tracking-tight">
-                      Package Delivered
-                    </p>
-                    <p className="text-sm text-slate-500">
-                      Mombasa, Kenya • 2m ago
-                    </p>
+
+                  <div className="absolute top-10 right-10 bg-white/10 backdrop-blur-md border border-white/20 px-8 py-4 rounded-full">
+                    <span className="text-white font-black text-2xl tracking-tighter">
+                      KES {pricing[cat]}
+                    </span>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT: THE STICKY CONSIGNMENT NOTE */}
+          <div className="lg:col-span-4 relative">
+            <div className="lg:sticky lg:top-24 bg-gray-50 p-12 rounded-[70px] border border-gray-100 shadow-2xl">
+              <div className="flex justify-between items-center mb-10">
+                <h3 className="text-2xl font-black tracking-tight italic">
+                  Shipment Summary
+                </h3>
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              </div>
+
+              <div className="space-y-8 mb-12">
+                <div className="relative group">
+                  <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-yellow-500 rounded-full opacity-0 group-focus-within:opacity-100 transition-all"></div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">
+                    Pickup Location
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Search collection point..."
+                    className="w-full bg-white p-6 rounded-[25px] outline-none font-bold text-sm shadow-sm focus:shadow-xl transition-all placeholder:text-gray-200"
+                    onChange={(e) =>
+                      setLocations({ ...locations, pickup: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="relative group">
+                  <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-yellow-500 rounded-full opacity-0 group-focus-within:opacity-100 transition-all"></div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">
+                    Drop-off Destination
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Search destination..."
+                    className="w-full bg-white p-6 rounded-[25px] outline-none font-bold text-sm shadow-sm focus:shadow-xl transition-all placeholder:text-gray-200"
+                    onChange={(e) =>
+                      setLocations({ ...locations, dropoff: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="bg-white p-8 rounded-[40px] mb-8 border border-gray-100">
+                <div className="flex justify-between text-[10px] font-black uppercase text-gray-400 mb-2">
+                  <span>Billing Summary</span>
+                  <span>{weight} Class</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 text-xs">
+                    Standard Freight
+                  </span>
+                  <span className="text-2xl font-black italic text-yellow-600">
+                    KES {pricing[weight]}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <button
+                  onClick={handleMpesaCheckout}
+                  disabled={isProcessing}
+                  className="w-full py-7 bg-[#2fbb1c] text-white rounded-[30px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-4 hover:bg-black transition-all hover:-translate-y-1 shadow-2xl shadow-green-100 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isProcessing ? (
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Processing PIN...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg"
+                        className="h-6 brightness-200"
+                        alt="Mpesa"
+                      />
+                      Complete Request
+                    </>
+                  )}
+                </button>
+
+                {/* THE PROFESSIONAL DISCARD BUTTON */}
+                <button
+                  onClick={() => {
+                    if (window.confirm("Discard this shipment and start over?"))
+                      navigate("/orders");
+                  }}
+                  className="w-full py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-red-500 transition-colors flex items-center justify-center gap-2 group"
+                >
+                  <X
+                    size={14}
+                    className="group-hover:rotate-90 transition-transform"
+                  />
+                  Discard Shipment
+                </button>
+              </div>
+
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <ShieldCheck size={12} className="text-gray-300" />
+                <p className="text-[9px] text-gray-300 font-bold uppercase tracking-widest">
+                  Secure 256-bit encrypted checkout
+                </p>
               </div>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* ================= FEATURES ================= */}
-      <section id="intelligence" className="py-32 px-[6%] relative">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-            <div>
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight">
-                Core Intelligence
-              </h2>
-              <p className="text-slate-500 mt-2 font-medium">
-                Engineered for reliability and scale.
-              </p>
-            </div>
-            <div className="h-[2px] flex-grow mx-8 bg-slate-200 hidden md:block mb-4" />
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <Feature
-              icon="⚡"
-              title="Priority Velocity"
-              description="Immediate dispatch with optimized express routing algorithms."
-            />
-            <Feature
-              icon="🛡️"
-              title="Secure Custody"
-              description="Insurance-backed, encrypted chain-of-custody handling for every parcel."
-            />
-            <Feature
-              icon="📡"
-              title="Live Telemetry"
-              description="Minute-by-minute GPS tracking with live courier updates and SMS."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ================= PRICING ================= */}
-      <section id="tariffs" className="py-24 px-[6%]">
-        <div className="max-w-5xl mx-auto rounded-[48px] bg-slate-900 p-12 md:p-20 text-white relative overflow-hidden shadow-2xl">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-600/10 rounded-full blur-[80px]" />
-
-          <div className="relative z-10 grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <span className="text-orange-500 font-bold uppercase tracking-widest text-sm">
-                Transparent Tariffs
-              </span>
-              <h2 className="text-5xl font-black mt-4 mb-6 leading-tight">
-                Simple Rates. <br /> No Hidden Fees.
-              </h2>
-              <p className="text-slate-400 text-lg mb-8">
-                We believe in fair pricing. Calculate your costs upfront with
-                our integrated M-Pesa payment gateway.
-              </p>
-              <button className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-bold hover:bg-orange-500 hover:text-white transition-colors">
-                View Detailed Pricing
-              </button>
-            </div>
-
-            <div className="space-y-2 bg-white/5 backdrop-blur-lg p-8 rounded-[32px] border border-white/10">
-              <PriceRow label="Base Dispatch" value="KSh 150" />
-              <PriceRow label="Distance (per km)" value="KSh 50" />
-              <PriceRow label="Weight (per kg)" value="KSh 30" />
-              <div className="pt-6 mt-4 flex justify-between items-center">
-                <span className="font-bold text-slate-400 italic">
-                  Starting Total
-                </span>
-                <span className="text-4xl font-black text-orange-500">
-                  KSh 150
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Footer />
+      </div>
     </div>
   );
 };
 
-/* ================= SUB-COMPONENTS ================= */
-
-const Feature = ({ icon, title, description }) => (
-  <div className="group bg-white p-10 rounded-[40px] border border-slate-200 transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] hover:-translate-y-2">
-    <div className="mb-8 w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-3xl group-hover:bg-orange-50 group-hover:scale-110 transition-all duration-500">
-      {icon}
-    </div>
-    <h3 className="font-black text-2xl mb-4 text-slate-800 tracking-tight">
-      {title}
-    </h3>
-    <p className="text-slate-500 font-medium leading-relaxed">{description}</p>
-  </div>
-);
-
-const PriceRow = ({ label, value }) => (
-  <div className="flex justify-between py-5 border-b border-white/5 group">
-    <span className="text-slate-400 group-hover:text-white transition-colors uppercase tracking-widest text-[11px] font-bold">
-      {label}
-    </span>
-    <span className="font-bold text-xl">{value}</span>
-  </div>
-);
-
-export default Landing;
+export default CreateOrder;
