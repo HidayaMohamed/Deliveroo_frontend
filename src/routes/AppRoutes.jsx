@@ -1,22 +1,40 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import ProtectedRoute from "../components/ProtectedRoute";
+import PublicRoute from "../components/PublicRoute";
+
+// Public pages
 import Landing from "../pages/Landing";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Unauthorized from "../pages/Unauthorized";
-import ProtectedRoute from "../components/ProtectedRoute";
-import PublicRoute from "../components/PublicRoute";
 
-// Dashboard pages
-import AdminDashboard from "../pages/AdminDashboard";
-import CourierDashboard from "../pages/CourierDashboard";
-import CustomerDashboard from "../pages/CustomerDashboard";
+// Customer pages
+import CustomerDashboard from "../pages/customer/CustomerDashboard";
+import CreateOrder from "../pages/customer/CreateOrder";
+import MyOrders from "../pages/customer/MyOrders";
+import TrackOrder from "../pages/customer/TrackOrder";
+
+// Courier pages
+import CourierDashboard from "../pages/courier/CourierDashboard";
+import AssignedTasks from "../pages/courier/AssignedTasks";
+import DeliveryMap from "../pages/courier/DeliveryMap";
+
+// Admin pages
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import UserManagement from "../pages/admin/UserManagement";
+import OrderControl from "../pages/admin/OrderControl";
 
 const AppRoutes = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return null;
+  }
+
   return (
     <Routes>
-      {/* ================= PUBLIC ROUTES ================= */}
-
-      {/* Landing Page - Default entry */}
+      {/* Public routes - Landing page is accessible to everyone */}
       <Route
         path="/"
         element={
@@ -26,7 +44,6 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Login - All roles can access */}
       <Route
         path="/login"
         element={
@@ -36,7 +53,6 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Register - Only customers and couriers */}
       <Route
         path="/register"
         element={
@@ -46,14 +62,11 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Unauthorized page */}
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* ================= PROTECTED ROUTES ================= */}
-
-      {/* Customer Dashboard */}
+      {/* Customer routes */}
       <Route
-        path="/customer/dashboard"
+        path="/customer"
         element={
           <ProtectedRoute role="customer">
             <CustomerDashboard />
@@ -61,19 +74,45 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Customer Orders */}
+      <Route
+        path="/customer/create-order"
+        element={
+          <ProtectedRoute role="customer">
+            <CreateOrder />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/customer/orders"
         element={
           <ProtectedRoute role="customer">
-            <CustomerDashboard />
+            <MyOrders />
           </ProtectedRoute>
         }
       />
 
-      {/* Courier Dashboard */}
       <Route
-        path="/courier/dashboard"
+        path="/customer/track-order"
+        element={
+          <ProtectedRoute role="customer">
+            <TrackOrder />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/customer/track-order/:id"
+        element={
+          <ProtectedRoute role="customer">
+            <TrackOrder />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Courier routes */}
+      <Route
+        path="/courier"
         element={
           <ProtectedRoute role="courier">
             <CourierDashboard />
@@ -81,9 +120,27 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Admin Dashboard */}
       <Route
-        path="/admin/dashboard"
+        path="/courier/tasks"
+        element={
+          <ProtectedRoute role="courier">
+            <AssignedTasks />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/courier/map"
+        element={
+          <ProtectedRoute role="courier">
+            <DeliveryMap />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin routes */}
+      <Route
+        path="/admin"
         element={
           <ProtectedRoute role="admin">
             <AdminDashboard />
@@ -91,24 +148,56 @@ const AppRoutes = () => {
         }
       />
 
-      {/* ================= REDIRECTS ================= */}
-
-      {/* Legacy route redirects */}
       <Route
-        path="/user"
-        element={<Navigate to="/customer/dashboard" replace />}
-      />
-      <Route
-        path="/courier"
-        element={<Navigate to="/courier/dashboard" replace />}
-      />
-      <Route
-        path="/admin"
-        element={<Navigate to="/admin/dashboard" replace />}
+        path="/admin/users"
+        element={
+          <ProtectedRoute role="admin">
+            <UserManagement />
+          </ProtectedRoute>
+        }
       />
 
-      {/* Catch all - redirect to landing */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route
+        path="/admin/orders"
+        element={
+          <ProtectedRoute role="admin">
+            <OrderControl />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* User profile - accessible to all authenticated users */}
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <div className="p-6">
+              <h1 className="text-2xl font-bold mb-4">User Profile</h1>
+              <p>Welcome, {user?.full_name || user?.email}</p>
+              <p className="mt-2">Role: {user?.role}</p>
+              <p className="mt-2">Email: {user?.email}</p>
+            </div>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Catch-all - redirect to home or appropriate dashboard based on role */}
+      <Route
+        path="*"
+        element={
+          user ? (
+            user.role === "admin" ? (
+              <Navigate to="/admin" replace />
+            ) : user.role === "courier" ? (
+              <Navigate to="/courier" replace />
+            ) : (
+              <Navigate to="/customer" replace />
+            )
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
     </Routes>
   );
 };
