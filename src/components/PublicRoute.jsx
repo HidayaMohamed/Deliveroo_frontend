@@ -1,27 +1,16 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../features/auth/useAuth";
+import { useAuth } from "../context/AuthContext";
 
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-brand-orange border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  if (loading) return <p>Loading...</p>;
 
   if (user) {
-    // Already logged in - redirect to appropriate dashboard
-    if (user.role === "admin") {
-      return <Navigate to="/admin/dashboard" replace />;
-    }
-    if (user.role === "courier") {
-      return <Navigate to="/courier/dashboard" replace />;
-    }
-    // Default to customer dashboard
-    return <Navigate to="/customer/dashboard" replace />;
+    // Redirect to appropriate dashboard based on role (using lowercase to match User model)
+    if (user.role === "admin") return <Navigate to="/admin" replace />;
+    if (user.role === "courier") return <Navigate to="/courier" replace />;
+    return <Navigate to="/customer" replace />;
   }
 
   return children;
