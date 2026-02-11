@@ -65,14 +65,14 @@ const CourierDashboard = () => {
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">🚚</div>
+          <div className="stat-icon"></div>
           <div className="stat-content">
             <h3>{stats.pendingDeliveries}</h3>
             <p>Pending</p>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">💰</div>
+          <div className="stat-icon"></div>
           <div className="stat-content">
             <h3>${stats.earnings.toFixed(2)}</h3>
             <p>Today's Earnings</p>
