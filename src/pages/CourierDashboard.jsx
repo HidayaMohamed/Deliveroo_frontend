@@ -1,103 +1,66 @@
-import { useState, useEffect } from 'react';
-import AssignedOrders from '../features/courier/AssignedOrders';
-import UpdateLocation from '../features/courier/UpdateLocation';
-import LocationTracker from '../components/courier/LocationTracker';
-import '../styles/CourierDashboard.css';
+import { useEffect, useState } from "react";
+import axios from "../api/axios";
+import StatsCard from "../features/courier/StatsCard";
 
 const CourierDashboard = () => {
-  const [courier, setCourier] = useState(null);
-  const [stats, setStats] = useState({
-    totalDeliveries: 0,
-    completedToday: 0,
-    pendingDeliveries: 0,
-    earnings: 0
-  });
+  const [stats, setStats] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Fetch courier data
-    fetchCourierData();
-    // Set up real-time updates
-    const interval = setInterval(fetchCourierData, 30000); // Update every 30 seconds
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchCourierData = async () => {
+  const fetchStats = async () => {
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch('/api/courier/me', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+      const res = await axios.get("/api/courier/stats");
+      setStats(res.data.summary);
+      setError(null);
+    } catch (err) {
+      console.error(err);
+      // Set default stats if the endpoint returns 422 or other errors
+      setStats({
+        total_deliveries: 0,
+        completed_deliveries: 0,
+        active_deliveries: 0,
+        todays_deliveries: 0,
+        success_rate: 0,
       });
-      const data = await response.json();
-      setCourier(data.courier);
-      setStats(data.stats);
-    } catch (error) {
-      console.error('Error fetching courier data:', error);
+      setError(err?.response?.data?.message || "Failed to load stats");
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <p className="text-center mt-10">Loading stats...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="courier-dashboard">
-      <div className="dashboard-header">
-        <h1>Courier Dashboard</h1>
-        <div className="courier-status">
-          <span className={`status-badge ${courier?.isActive ? 'active' : 'inactive'}`}>
-            {courier?.isActive ? 'Active' : 'Offline'}
-          </span>
+    <div className="p-6">
+      {error && (
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+          <strong>Warning: </strong> {error}
         </div>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon">📦</div>
-          <div className="stat-content">
-            <h3>{stats.totalDeliveries}</h3>
-            <p>Total Deliveries</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">✅</div>
-          <div className="stat-content">
-            <h3>{stats.completedToday}</h3>
-            <p>Completed Today</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🚚</div>
-          <div className="stat-content">
-            <h3>{stats.pendingDeliveries}</h3>
-            <p>Pending</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">💰</div>
-          <div className="stat-content">
-            <h3>${stats.earnings.toFixed(2)}</h3>
-            <p>Today's Earnings</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="dashboard-content">
-        {/* Left Column - Assigned Orders */}
-        <div className="content-section">
-          <AssignedOrders onStatusUpdate={fetchCourierData} />
-        </div>
-
-        {/* Right Column - Location & Tools */}
-        <div className="content-sidebar">
-          <div className="sidebar-section">
-            <h3>Location Tracker</h3>
-            <LocationTracker />
-          </div>
-          
-          <div className="sidebar-section">
-            <UpdateLocation onLocationUpdate={fetchCourierData} />
-          </div>
-        </div>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <StatsCard
+          title="Total Deliveries"
+          value={stats?.total_deliveries || 0}
+        />
+        <StatsCard title="Completed" value={stats?.completed_deliveries || 0} />
+        <StatsCard
+          title="Active Deliveries"
+          value={stats?.active_deliveries || 0}
+        />
+        <StatsCard
+          title="Today's Deliveries"
+          value={stats?.todays_deliveries || 0}
+        />
       </div>
     </div>
   );

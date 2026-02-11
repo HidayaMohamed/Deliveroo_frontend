@@ -57,7 +57,7 @@ export default function OrderCard({ order }) {
       {/* .card-bottom */}
       <div className="flex justify-between items-center border-t border-slate-100 pt-4">
         <span className="text-[0.85rem] text-slate-500 font-medium">
-          📦 {order.weight_category}
+           {order.weight_category}
         </span>
         <button className="bg-transparent border border-[#00ccbc] text-[#00ccbc] px-4 py-2 rounded-lg cursor-pointer font-semibold transition-all duration-200 hover:bg-[#00ccbc] hover:text-white">
           View Full Logistics
