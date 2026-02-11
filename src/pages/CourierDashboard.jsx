@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "../../api/axios";
-import StatsCard from "../../components/courier/StatsCard";
+import axios from "../api/axios";
+import StatsCard from "../features/courier/StatsCard";
 
 const CourierDashboard = () => {
   const [stats, setStats] = useState(null);

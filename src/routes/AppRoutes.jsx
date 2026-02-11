@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../features/auth/useAuth";
 import ProtectedRoute from "../components/ProtectedRoute";
 import PublicRoute from "../components/PublicRoute";
 
@@ -10,20 +10,20 @@ import Register from "../pages/Register";
 import Unauthorized from "../pages/Unauthorized";
 
 // Customer pages
-import CustomerDashboard from "../pages/customer/CustomerDashboard";
-import CreateOrder from "../pages/customer/CreateOrder";
-import MyOrders from "../pages/customer/MyOrders";
-import TrackOrder from "../pages/customer/TrackOrder";
+import CustomerDashboard from "../pages/CustomerDashboard";
+import CreateOrder from "../features/orders/CreateOrder";
+import OrdersList from "../components/orders/OrdersList";
+import LiveTrackingMap from "../components/maps/LiveTrackingMap";
 
 // Courier pages
-import CourierDashboard from "../pages/courier/CourierDashboard";
-import AssignedTasks from "../pages/courier/AssignedTasks";
-import DeliveryMap from "../pages/courier/DeliveryMap";
+import CourierDashboard from "../pages/CourierDashboard";
+import AssignedOrders from "../features/courier/AssignedOrders";
+import GoogleMaps from "../components/maps/GoogleMaps";
 
 // Admin pages
-import AdminDashboard from "../pages/admin/AdminDashboard";
-import UserManagement from "../pages/admin/UserManagement";
-import OrderControl from "../pages/admin/OrderControl";
+import AdminDashboard from "../pages/AdminDashboard";
+// import UserManagement from "../pages/admin/UserManagement";
+import AllOrders from "../features/admin/AllOrders";
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
@@ -87,7 +87,7 @@ const AppRoutes = () => {
         path="/customer/orders"
         element={
           <ProtectedRoute role="customer">
-            <MyOrders />
+            <OrdersList />
           </ProtectedRoute>
         }
       />
@@ -96,7 +96,7 @@ const AppRoutes = () => {
         path="/customer/track-order"
         element={
           <ProtectedRoute role="customer">
-            <TrackOrder />
+            <LiveTrackingMap />
           </ProtectedRoute>
         }
       />
@@ -124,7 +124,7 @@ const AppRoutes = () => {
         path="/courier/tasks"
         element={
           <ProtectedRoute role="courier">
-            <AssignedTasks />
+            <AssignedOrders />
           </ProtectedRoute>
         }
       />
@@ -133,7 +133,7 @@ const AppRoutes = () => {
         path="/courier/map"
         element={
           <ProtectedRoute role="courier">
-            <DeliveryMap />
+            <GoogleMaps />
           </ProtectedRoute>
         }
       />
@@ -148,20 +148,20 @@ const AppRoutes = () => {
         }
       />
 
-      <Route
+      {/* <Route
         path="/admin/users"
         element={
           <ProtectedRoute role="admin">
             <UserManagement />
           </ProtectedRoute>
         }
-      />
+      /> */}
 
       <Route
         path="/admin/orders"
         element={
           <ProtectedRoute role="admin">
-            <OrderControl />
+            <AllOrders />
           </ProtectedRoute>
         }
       />

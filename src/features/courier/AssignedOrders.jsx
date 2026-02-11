@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import '../../styles/AssignedOrders.css';
+
 
 const AssignedOrders = ({ onStatusUpdate }) => {
   const [orders, setOrders] = useState([]);

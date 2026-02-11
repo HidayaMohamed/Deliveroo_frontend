@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import api from "../api/axios";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../features/auth/useAuth";
 
 const NotificationToast = () => {
   const { user, loading } = useAuth();
