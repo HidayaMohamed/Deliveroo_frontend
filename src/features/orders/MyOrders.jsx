@@ -15,24 +15,20 @@ export default function MyOrders() {
         console.warn("Backend offline: Showing Demo Fleet");
         // Demo data
         setOrders([
-          {
-            id: "8842",
-            tracking_number: "DLV8842",
-            pickup_address: "Westlands, Nairobi",
-            destination_address: "Kilimani, Nairobi",
-            total_price: 450,
-            status: "IN_TRANSIT",
-            created_at: new Date().toISOString(),
+          { 
+            id: "8842", 
+            pickup_location: "Westlands, Nairobi", 
+            destination: "Kilimani, Nairobi", 
+            price: "500", 
+            status: "In Transit" 
           },
-          {
-            id: "9021",
-            tracking_number: "DLV9021",
-            pickup_address: "CBD, City Hall",
-            destination_address: "Karen, Nairobi",
-            total_price: 1200,
-            status: "PENDING",
-            created_at: new Date().toISOString(),
-          },
+          { 
+            id: "9021", 
+            pickup_location: "CBD, City Hall", 
+            destination: "Karen, Nairobi", 
+            price: "2000", 
+            status: "Pending" 
+          }
         ]);
       })
       .finally(() => {

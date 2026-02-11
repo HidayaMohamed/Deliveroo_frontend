@@ -66,30 +66,68 @@ export default function OrderDetails() {
   );
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <Link to="/orders" className="text-brand-orange font-semibold hover:underline">
-            ← Back to Orders
-          </Link>
-          <button onClick={handleShare} className="text-gray-500 hover:text-brand-orange">
-            Share Tracking
-          </button>
-        </div>
+    <motion.div 
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+      className="flex flex-col lg:flex-row h-[calc(100vh-70px)] bg-white overflow-hidden"
+    >
+      {/* LEFT: THE MAP */}
+      <div className="flex-1 relative border-r border-gray-100">
+        <MapContainer center={order.rider.pos} zoom={14} className="h-full w-full grayscale-[0.8] contrast-[1.2]">
+          <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+          <Polyline positions={order.route} color="black" weight={4} dashArray="10, 10" />
+          <Marker position={order.rider.pos}>
+            <Popup className="font-black uppercase text-xs text-center">Courier: <br/>{order.rider.name}</Popup>
+          </Marker>
+        </MapContainer>
 
-        {/* Order Info */}
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <p className="text-sm text-gray-500">Tracking Number</p>
-              <h1 className="text-2xl font-bold text-brand-grayDark">
-                #{order.tracking_number || order.id}
-              </h1>
-            </div>
-            <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
-              {order.status}
-            </span>
+        {/* COMMUNICATION HUB */}
+       <motion.div 
+  initial={{ y: 50, opacity: 0 }} 
+  animate={{ y: 0, opacity: 1 }}
+  className="absolute bottom-10 left-10 z-[1000] bg-white/90 backdrop-blur-2xl p-6 rounded-[40px] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] border border-white flex items-center gap-6 min-w-[450px]"
+>
+  {/* Rider Avatar - Updated to a Guy's Pic */}
+  <div className="w-16 h-16 bg-yellow-500 rounded-full border-4 border-white overflow-hidden shadow-xl relative">
+    <img 
+      src="https://images.unsplash.com/photo-1653463207246-1dc03899dfe0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8bW90b3JiaWtlJTIwcmlkZXIlMjBpbWFnZXxlbnwwfHwwfHx8MA%3D%3D" 
+      alt="rider" 
+      className="w-full h-full object-cover" 
+    />
+    <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+  </div>
+  
+  <div className="flex-1">
+    <h4 className="font-black text-xl tracking-tighter uppercase">{order.rider.name}</h4>
+    <div className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest">
+      <Navigation size={14} className="text-yellow-600" /> {order.rider.bike}
+    </div>
+  </div>
+          <div className="flex gap-3">
+            <a href={`https://wa.me/${order.rider.phone}`} target="_blank" rel="noreferrer"
+              className="w-12 h-12 bg-[#25D366] text-white rounded-full flex items-center justify-center hover:scale-110 transition-all shadow-lg"
+            >
+              <MessageSquare size={20} />
+            </a>
+            <a href={`tel:${order.rider.phone}`}
+              className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center hover:bg-yellow-500 transition-all shadow-lg hover:scale-110"
+            >
+              <Phone size={20} />
+            </a>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* RIGHT: THE CONTROL PANEL */}
+      <aside className="w-full lg:w-[500px] p-12 flex flex-col justify-between border-l border-gray-100 bg-white overflow-y-auto custom-scrollbar">
+        <div>
+          {/* TOP NAV: HIGH VISIBILITY */}
+          <div className="flex justify-between items-center mb-10">
+            <Link to="/orders" className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all shadow-lg shadow-black/10">
+              <ArrowLeft size={16} /> Back to Fleet
+            </Link>
+            <button onClick={handleShare} className="text-gray-400 hover:text-black transition-colors p-2">
+              <Share2 size={22} />
+            </button>
           </div>
 
           {/* Addresses */}
