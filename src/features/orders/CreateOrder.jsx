@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserProfile, createOrder, initiateMpesa } from "./ordersAPI";
+import { X, ShieldCheck } from "lucide-react"; // Fancy icons for a professional look
 
 export default function CreateOrder() {
   const navigate = useNavigate();
@@ -54,8 +55,6 @@ export default function CreateOrder() {
       });
 
       alert("M-PESA: STK Push sent. Check your handset.");
-      
-      // Redirect to the specific order tracking page
       navigate(`/orders/${orderRes.data.id || ''}`);
       
     } catch (err) {
@@ -77,7 +76,7 @@ export default function CreateOrder() {
 
   return (
     <div className="min-h-screen bg-white text-black pb-32">
-      {/* 3. TOP PROGRESS NAV (Visual 'Better' Factor) */}
+      {/* TOP PROGRESS NAV */}
       <div className="w-full h-1 bg-gray-100 sticky top-0 z-50">
         <div 
           className="h-full bg-yellow-500 transition-all duration-1000" 
@@ -89,8 +88,7 @@ export default function CreateOrder() {
         <header className="mb-20">
           <span className="text-yellow-600 font-black uppercase tracking-[0.5em] text-[10px] mb-4 block">New Shipment</span>
           <h1 className="text-8xl font-black tracking-tighter leading-none mb-6">
-           Are you ready to ship? <br />
-            
+           Are you ready to ship?
           </h1>
           <div className="flex items-center gap-4">
             <span className="h-[1px] w-12 bg-gray-200"></span>
@@ -99,7 +97,7 @@ export default function CreateOrder() {
         </header>
 
         <div className="grid lg:grid-cols-12 gap-20">
-          {/* LEFT: VEHICLES */}
+          {/* LEFT: FLEET SELECTION */}
           <div className="lg:col-span-8 space-y-12">
             <div className="flex justify-between items-end">
               <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 underline decoration-yellow-500 decoration-2 underline-offset-8">01. Fleet Selection</h3>
@@ -132,8 +130,8 @@ export default function CreateOrder() {
           </div>
 
           {/* RIGHT: THE STICKY CONSIGNMENT NOTE */}
-          <div className="lg:col-span-4 sticky top-24">
-            <div className="bg-gray-50 p-12 rounded-[70px] border border-gray-100 shadow-2xl">
+          <div className="lg:col-span-4 relative">
+            <div className="lg:sticky lg:top-24 bg-gray-50 p-12 rounded-[70px] border border-gray-100 shadow-2xl">
               <div className="flex justify-between items-center mb-10">
                 <h3 className="text-2xl font-black tracking-tight italic">Shipment Summary</h3>
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
@@ -174,27 +172,41 @@ export default function CreateOrder() {
                 </div>
               </div>
               
-              <button 
-                onClick={handleMpesaCheckout} 
-                disabled={isProcessing}
-                className="w-full py-7 bg-[#2fbb1c] text-white rounded-[30px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-4 hover:bg-black transition-all hover:-translate-y-1 shadow-2xl shadow-green-100 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isProcessing ? (
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Processing PIN...</span>
-                  </div>
-                ) : (
-                  <>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" className="h-6 brightness-200" alt="Mpesa" />
-                    Complete Request
-                  </>
-                )}
-              </button>
+              <div className="space-y-4">
+                <button 
+                  onClick={handleMpesaCheckout} 
+                  disabled={isProcessing}
+                  className="w-full py-7 bg-[#2fbb1c] text-white rounded-[30px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-4 hover:bg-black transition-all hover:-translate-y-1 shadow-2xl shadow-green-100 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isProcessing ? (
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Processing PIN...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" className="h-6 brightness-200" alt="Mpesa" />
+                      Complete Request
+                    </>
+                  )}
+                </button>
+
+                {/* THE PROFESSIONAL DISCARD BUTTON */}
+                <button 
+                  onClick={() => { if(window.confirm("Discard this shipment and start over?")) navigate("/orders"); }}
+                  className="w-full py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-red-500 transition-colors flex items-center justify-center gap-2 group"
+                >
+                  <X size={14} className="group-hover:rotate-90 transition-transform" />
+                  Discard Shipment
+                </button>
+              </div>
               
-              <p className="text-center text-[9px] text-gray-300 font-bold uppercase mt-6 tracking-widest">
-                Secure 256-bit encrypted checkout
-              </p>
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <ShieldCheck size={12} className="text-gray-300" />
+                <p className="text-[9px] text-gray-300 font-bold uppercase tracking-widest">
+                  Secure 256-bit encrypted checkout
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -16,15 +16,24 @@ function App() {
     <div className="flex flex-col min-h-screen bg-white selection:bg-yellow-200">
       <Navbar />
       
-      {/* The main content area where all the magic happens */}
       <main className="flex-grow">
         <Routes>
-          <Route path="/" element={<Navigate to="/orders" />} />
+          {/* 1. PRIMARY LANDING LOGIC */}
+          {/* This ensures that the base URL "/" immediately renders the CreateOrder component */}
+          <Route index element={<Navigate to="/orders/new" replace />} />
+          
+          {/* 2. ORDER ROUTES (Rearranged for priority) */}
+          {/* Define the 'new' subpath BEFORE the generic list path */}
           <Route path="/orders/new" element={<CreateOrder />} />
           <Route path="/orders" element={<MyOrders />} />
           <Route path="/orders/:id" element={<OrderDetails />} />
+          
+          {/* 3. USER ROUTES */}
           <Route path="/profile" element={<UserProfile />} />
-          <Route path="*" element={<Navigate to="/orders" />} />
+          
+          {/* 4. FALLBACK */}
+          {/* If a user enters a wrong URL, send them to Ship Parcel */}
+          <Route path="*" element={<Navigate to="/orders/new" replace />} />
         </Routes>
       </main>
 
