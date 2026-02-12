@@ -18,6 +18,7 @@ import OrderDetails from "./features/orders/OrderDetails";
 import UserProfile from "./features/user/UserProfile";
 
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./features/auth/useAuth";
 
 function App() {
   const { user, loading } = useAuth();
