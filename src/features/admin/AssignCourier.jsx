@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getAdminUsers, assignCourier } from '../../api/admin';
 import '../../styles/AssignCourier.css';
 
 const AssignCourier = ({ order, onClose, onAssignComplete }) => {
@@ -14,13 +15,8 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
 
   const fetchAvailableCouriers = async () => {
     try {
-      const response = await fetch('/api/admin/couriers/available', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setCouriers(data.couriers || []);
+      const data = await getAdminUsers({ role: 'courier', is_active: true });
+      setCouriers(data.users || []);
     } catch (error) {
       console.error('Error fetching couriers:', error);
     } finally {
@@ -36,24 +32,10 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
 
     setAssigning(true);
     try {
-      const response = await fetch(`/api/admin/orders/${order.id}/assign`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ courierId: selectedCourier.id })
-      });
-
-      if (response.ok) {
-        onAssignComplete();
-      } else {
-        const error = await response.json();
-        alert(`Failed to assign courier: ${error.message}`);
-      }
+      await assignCourier(order.id, selectedCourier.id);
+      onAssignComplete();
     } catch (error) {
-      console.error('Error assigning courier:', error);
-      alert('Error assigning courier');
+      alert(`Failed to assign courier: ${error.message}`);
     } finally {
       setAssigning(false);
     }

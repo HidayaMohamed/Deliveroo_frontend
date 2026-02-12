@@ -23,7 +23,7 @@ export default function OrderDetails() {
     const loadData = async () => {
       try {
         const data = await getOrderById(id);
-        setOrder(data);
+        setOrder(data.order || data);
       } catch (err) {
         setOrder({
           id: id || "8842",

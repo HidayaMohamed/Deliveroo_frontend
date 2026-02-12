@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getAdminStats } from '../../api/admin';
 import '../../styles/AdminDashboardComponent.css';
 
 const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
@@ -15,12 +16,7 @@ const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
 
   const fetchChartData = async () => {
     try {
-      const response = await fetch(`/api/admin/analytics?range=${timeRange}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
+      const data = await getAdminStats(timeRange);
       setChartData(data);
     } catch (error) {
       console.error('Error fetching chart data:', error);
