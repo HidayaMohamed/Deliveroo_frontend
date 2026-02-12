@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { getToken, removeToken } from "../utils/token";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000/api";
+
 // Make sure these paths match your actual folder structure!
 import AllOrders from "../features/admin/AllOrders";
 import AssignCourier from "../features/admin/AssignCourier";
@@ -56,7 +58,7 @@ const AdminDashboard = () => {
   const fetchAdminData = async () => {
     try {
       const token = getToken();
-      const response = await fetch("/api/auth/me", {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -86,7 +88,7 @@ const AdminDashboard = () => {
   const fetchDashboardStats = async () => {
     try {
       const token = getToken();
-      const response = await fetch("/api/admin/stats", {
+      const response = await fetch(`${API_BASE_URL}/admin/stats`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
