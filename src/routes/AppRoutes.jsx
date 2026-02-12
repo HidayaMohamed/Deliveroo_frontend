@@ -5,6 +5,9 @@ import Landing from "../pages/Landing";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Unauthorized from "../pages/Unauthorized";
+import AdminDashboard from "../pages/AdminDashboard";
+import CourierDashboard from "../pages/CourierDashboard";
+import RiderProfile from "../pages/RiderProfile";
 
 // Route Guards
 import ProtectedRoute from "../components/ProtectedRoute";
@@ -16,18 +19,16 @@ import MyOrders from "../features/orders/MyOrders";
 import OrderDetails from "../features/orders/OrderDetails";
 import UserProfile from "../features/user/UserProfile";
 
-// Admin
-import AdminDashboard from "../pages/AdminDashboard";
+// Hook
+import { useAuth } from "../features/auth/useAuth";
 
-// Courier Pages
-import RiderProfile from "../pages/RiderProfile";
-import CourierDashboard from "../pages/CourierDashboard";
-
-/**
- * VOLT CORE NAVIGATION ARCHITECTURE
- * Manages Public, User, Admin, and Courier routing layers.
- */
 const AppRoutes = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return null;
+  }
+
   return (
     <Routes>
       {/* ---------------- PUBLIC ROUTES ---------------- */}
@@ -70,6 +71,25 @@ const AppRoutes = () => {
         }
       />
 
+      {/* ---------------- COURIER ROUTES ---------------- */}
+      <Route
+        path="/courier/dashboard"
+        element={
+          <ProtectedRoute role="courier">
+            <CourierDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/courier/profile"
+        element={
+          <ProtectedRoute role="courier">
+            <RiderProfile />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/orders"
         element={
@@ -98,8 +118,6 @@ const AppRoutes = () => {
       />
 
       {/* ---------------- ADMIN ROUTES ---------------- */}
-      <Route path="/admin" element={<Navigate to="/admin/control-center" replace />} />
-
       <Route
         path="/admin/control-center"
         element={
@@ -109,14 +127,31 @@ const AppRoutes = () => {
         }
       />
 
-      {/* ---------------- COURIER ROUTES ---------------- */}
-      <Route path="/courier" element={<Navigate to="/courier/dashboard" replace />} />
+      {/* ---------------- CUSTOMER ROUTES ---------------- */}
+      <Route
+        path="/customer/create-order"
+        element={
+          <ProtectedRoute role="customer">
+            <CreateOrder />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
-        path="/courier/dashboard"
+        path="/customer/orders"
         element={
-          <ProtectedRoute role="courier">
-            <CourierDashboard />
+          <ProtectedRoute role="customer">
+            <MyOrders />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ---------------- FALLBACK ---------------- */}
+      <Route
+        path="/user"
+        element={
+          <ProtectedRoute role="customer">
+            <CreateOrder />
           </ProtectedRoute>
         }
       />
@@ -125,12 +160,11 @@ const AppRoutes = () => {
         path="/rider/profile"
         element={
           <ProtectedRoute role="courier">
-            <RiderProfile />
+            <Navigate to="/courier/dashboard" replace />
           </ProtectedRoute>
         }
       />
 
-      {/* ---------------- FALLBACK ---------------- */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

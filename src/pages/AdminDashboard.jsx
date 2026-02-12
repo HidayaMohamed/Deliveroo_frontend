@@ -1,17 +1,22 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BarChart3, Package, Truck, Users, 
   TrendingUp, Clock, ChevronRight, X, 
-  Layers, Zap, Shield, Globe, Activity
+  Layers, Zap, Shield, Globe, Activity,
+  LogOut
 } from 'lucide-react';
+import { getToken, removeToken } from '../utils/token';
 
 // Make sure these paths match your actual folder structure!
 import AllOrders from '../features/admin/AllOrders';
 import AssignCourier from '../features/admin/AssignCourier';
 import Dashboard from '../features/admin/Dashboard';
+import AllUsers from '../features/admin/AllUsers';
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [view, setView] = useState('overview');
   const [stats, setStats] = useState({
     totalOrders: 0,
@@ -23,22 +28,61 @@ const AdminDashboard = () => {
   });
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [adminUser, setAdminUser] = useState(null);
 
   useEffect(() => {
+    fetchAdminData();
     fetchDashboardStats();
     const interval = setInterval(fetchDashboardStats, 60000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
+
+  const fetchAdminData = async () => {
+    try {
+      const token = getToken();
+      const response = await fetch('/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAdminUser(data);
+        
+        // Redirect if not admin
+        if (data.role !== 'admin') {
+          navigate('/unauthorized');
+        }
+      } else {
+        // Token invalid, redirect to login
+        removeToken();
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+      navigate('/login');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchDashboardStats = async () => {
     try {
+      const token = getToken();
       const response = await fetch('/api/admin/stats', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
-      const data = await response.json();
-      setStats(data);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
     }
@@ -54,6 +98,22 @@ const AdminDashboard = () => {
     setSelectedOrder(null);
     fetchDashboardStats();
   };
+
+  const handleLogout = () => {
+    removeToken();
+    navigate('/login');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EA580C] mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F7F4] text-[#0A0A0A] pb-32 font-sans selection:bg-[#EA580C]/20">
@@ -87,6 +147,9 @@ const AdminDashboard = () => {
             <h1 className="text-[clamp(4rem,12vw,11rem)] font-black tracking-[-0.06em] leading-[0.75] uppercase italic">
               Volt <br /> <span className="text-[#EA580C] not-italic">Core.</span>
             </h1>
+            <p className="text-sm font-medium text-slate-500 mt-4">
+              Welcome, {adminUser?.full_name || 'Admin'}
+            </p>
           </motion.div>
           
           <div className="flex flex-col sm:flex-row gap-6">
@@ -103,6 +166,13 @@ const AdminDashboard = () => {
                 <span className="text-black text-xs font-black uppercase tracking-tighter">Encrypted Node 042</span>
               </div>
             </div>
+            <button 
+              onClick={handleLogout}
+              className="bg-red-50 border-l-4 border-red-500 p-8 rounded-tr-[40px] rounded-br-[40px] shadow-[20px_20px_60px_-15px_rgba(0,0,0,0.05)] flex items-center gap-3 hover:bg-red-100 transition-colors"
+            >
+              <LogOut size={16} className="text-red-500" />
+              <span className="text-black text-xs font-black uppercase tracking-tighter">Logout</span>
+            </button>
           </div>
         </header>
 
@@ -111,6 +181,7 @@ const AdminDashboard = () => {
           {[
             { id: 'overview', icon: <Activity size={16}/>, label: 'Systems' },
             { id: 'orders', icon: <Package size={16}/>, label: 'Logistics' },
+            { id: 'users', icon: <Users size={16}/>, label: 'Users' },
             { id: 'analytics', icon: <TrendingUp size={16}/>, label: 'Analytics' }
           ].map((tab) => (
             <button
@@ -133,8 +204,8 @@ const AdminDashboard = () => {
           <StatCard label="Inbound Orders" value={stats.totalOrders} icon={<Globe size={28}/>} trend="Global" color="white" />
           <StatCard label="In Transit" value={stats.activeDeliveries} icon={<Truck size={28}/>} trend="Active" color="orange" pulse />
           <StatCard label="Active Fleet" value={stats.activeCouriers} total={stats.totalCouriers} icon={<Users size={28}/>} trend="Deployment" color="black" />
-          <StatCard label="Gross Yield" value={`KES ${stats.revenue.toLocaleString()}`} icon={<Zap size={28}/>} trend="Yield" color="white" />
-          <StatCard label="Avg Turnaround" value={`${stats.avgDeliveryTime}m`} icon={<Clock size={28}/>} trend="Velocity" color="orange" />
+          <StatCard label="Gross Yield" value={`KES ${stats.revenue?.toLocaleString() || 0}`} icon={<Zap size={28}/>} trend="Yield" color="white" />
+          <StatCard label="Avg Turnaround" value={`${stats.avgDeliveryTime || 0}m`} icon={<Clock size={28}/>} trend="Velocity" color="orange" />
         </div>
 
         {/* CINEMATIC CONTENT CANVAS */}
@@ -155,6 +226,7 @@ const AdminDashboard = () => {
           >
             {view === 'overview' && <Dashboard stats={stats} />}
             {view === 'orders' && <AllOrders onAssignCourier={handleAssignCourier} />}
+            {view === 'users' && <AllUsers />}
             {view === 'analytics' && <Dashboard stats={stats} showDetailedAnalytics={true} />}
           </motion.div>
         </div>

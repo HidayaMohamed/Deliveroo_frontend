@@ -7,9 +7,9 @@ const PublicRoute = ({ children }) => {
   if (loading) return <p>Loading...</p>;
 
   if (user) {
-    if (user.role === "ADMIN") return <Navigate to="/admin" replace />;
-    if (user.role === "COURIER") return <Navigate to="/courier" replace />;
-    return <Navigate to="/user" replace />;
+    if (user.role === "admin") return <Navigate to="/admin" replace />;
+    if (user.role === "courier") return <Navigate to="/courier" replace />;
+    return <Navigate to="/orders/new" replace />;
   }
 
   return children;

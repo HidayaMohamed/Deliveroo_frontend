@@ -1,9 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { User, LogOut, Package, PlusCircle, Bell, X, BellOff } from "lucide-react"; 
+import { useAuth } from "../features/auth/useAuth";
+
 
 export default function Navbar() {
-  const location = useLocation();
+  const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [initial, setInitial] = useState("S");
