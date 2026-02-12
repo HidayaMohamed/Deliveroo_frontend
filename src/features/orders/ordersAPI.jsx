@@ -1,4 +1,4 @@
-import api from "../../services/api";
+import api from "../../api/axios";
 
 // 1. GET USER PROFILE
 export const getUserProfile = () => api.get("/auth/me");

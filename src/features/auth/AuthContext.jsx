@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { loginUser, registerUser, getMe } from "../../api/auth";
 
-const AuthContext = createContext();
+export const AuthContext = createContext(); // <-- export it here
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
