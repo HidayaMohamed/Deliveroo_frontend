@@ -1,40 +1,15 @@
-import { Routes, Route, Navigate } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
-
-// Global Components
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-
-// Features
-import CreateOrder from "./features/orders/CreateOrder";
-import MyOrders from "./features/orders/MyOrders";
-import OrderDetails from "./features/orders/OrderDetails";
-import UserProfile from "./features/user/UserProfile";
+import AppRoutes from "./routes/AppRoutes"; // make sure this path is correct
 
 function App() {
   return (
     <div className="flex flex-col min-h-screen bg-white selection:bg-yellow-200">
       <Navbar />
-      
+
       <main className="flex-grow">
-        <Routes>
-          {/* 1. PRIMARY LANDING LOGIC */}
-          {/* This ensures that the base URL "/" immediately renders the CreateOrder component */}
-          <Route index element={<Navigate to="/orders/new" replace />} />
-          
-          {/* 2. ORDER ROUTES (Rearranged for priority) */}
-          {/* Define the 'new' subpath BEFORE the generic list path */}
-          <Route path="/orders/new" element={<CreateOrder />} />
-          <Route path="/orders" element={<MyOrders />} />
-          <Route path="/orders/:id" element={<OrderDetails />} />
-          
-          {/* 3. USER ROUTES */}
-          <Route path="/profile" element={<UserProfile />} />
-          
-          {/* 4. FALLBACK */}
-          {/* If a user enters a wrong URL, send them to Ship Parcel */}
-          <Route path="*" element={<Navigate to="/orders/new" replace />} />
-        </Routes>
+        <AppRoutes />
       </main>
 
       <Footer />

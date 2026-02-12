@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import '../../styles/AdminDashboardComponent.css';
+
 
 const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
   const [chartData, setChartData] = useState({

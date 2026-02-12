@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import '../../styles/AssignCourier.css';
+
 
 const AssignCourier = ({ order, onClose, onAssignComplete }) => {
   const [couriers, setCouriers] = useState([]);
