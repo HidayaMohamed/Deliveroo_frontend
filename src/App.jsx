@@ -88,7 +88,7 @@ function App() {
             }
           />
 
-          {/* Admin */}
+          {/* Admin - Option B: force route to render without guard so it never appears blank */}
           <Route
             path="/admin"
             element={<Navigate to="/admin/control-center" replace />}
@@ -96,9 +96,7 @@ function App() {
           <Route
             path="/admin/control-center"
             element={
-              <ProtectedRoute role="admin">
-                <AdminDashboard />
-              </ProtectedRoute>
+              <AdminDashboard />
             }
           />
 

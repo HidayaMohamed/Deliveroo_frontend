@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getToken } from "../../utils/token";
+import { get } from "../../api/fetchWrapper";
 
 // Status mapping from backend to frontend
 const statusMapping = {
@@ -24,37 +25,32 @@ const AllOrders = ({ onAssignCourier }) => {
   const fetchOrders = async () => {
     try {
       const token = getToken();
-      const response = await fetch("/api/admin/orders?limit=100", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const transformedOrders = (data.orders || []).map((order) => ({
-          id: order.tracking_number || order.id,
-          customer: order.customer?.full_name || "Customer",
-          pickup: order.pickup_address || "Pickup Location",
-          destination: order.destination_address || "Delivery Location",
-          weight: order.weight_category || "MEDIUM",
-          price: order.total_price || 0,
-          status: statusMapping[order.status] || order.status || "Pending",
-          time: order.created_at
-            ? new Date(order.created_at).toLocaleString()
-            : "N/A",
-          courier: order.courier?.full_name || null,
-          courier_id: order.courier_id,
-          orderId: order.id,
-          pickup_lat: order.pickup_lat,
-          pickup_lng: order.pickup_lng,
-          destination_lat: order.destination_lat,
-          destination_lng: order.destination_lng,
-        }));
-        setOrders(transformedOrders);
-      } else {
-        throw new Error("Failed to fetch orders");
+      if (!token) {
+        setOrders([]);
+        return;
       }
+
+      const data = await get("/admin/orders?limit=100");
+      const transformedOrders = (data.orders || []).map((order) => ({
+        id: order.tracking_number || order.id,
+        customer: order.customer?.full_name || "Customer",
+        pickup: order.pickup_address || "Pickup Location",
+        destination: order.destination_address || "Delivery Location",
+        weight: order.weight_category || "MEDIUM",
+        price: order.total_price || 0,
+        status: statusMapping[order.status] || order.status || "Pending",
+        time: order.created_at
+          ? new Date(order.created_at).toLocaleString()
+          : "N/A",
+        courier: order.courier?.full_name || null,
+        courier_id: order.courier_id,
+        orderId: order.id,
+        pickup_lat: order.pickup_lat,
+        pickup_lng: order.pickup_lng,
+        destination_lat: order.destination_lat,
+        destination_lng: order.destination_lng,
+      }));
+      setOrders(transformedOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
       // Keep empty array - don't show demo data

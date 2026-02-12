@@ -18,6 +18,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { getToken, removeToken } from "../utils/token";
+import { get } from "../api/fetchWrapper";
 
 // Make sure these paths match your actual folder structure!
 import AllOrders from "../features/admin/AllOrders";
@@ -56,28 +57,19 @@ const AdminDashboard = () => {
   const fetchAdminData = async () => {
     try {
       const token = getToken();
-      const response = await fetch("/api/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setAdminUser(data);
-
-        // Redirect if not admin
-        if (data.role !== "admin") {
-          navigate("/unauthorized");
-        }
-      } else {
-        // Token invalid, redirect to login
-        removeToken();
-        navigate("/login");
+      if (!token) {
+        // Option B: allow UI to render even without backend auth
+        setAdminUser({ full_name: "Admin" });
+        setLoading(false);
+        return;
       }
+
+      // Use shared API wrapper so we hit VITE_API_URL; fall back gracefully on error
+      const data = await get("/auth/me");
+      setAdminUser(data || { full_name: "Admin" });
     } catch (error) {
       console.error("Error fetching admin data:", error);
-      navigate("/login");
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -86,30 +78,26 @@ const AdminDashboard = () => {
   const fetchDashboardStats = async () => {
     try {
       const token = getToken();
-      const response = await fetch("/api/admin/stats", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      if (!token) return;
 
-      if (response.ok) {
-        const data = await response.json();
-        // Transform snake_case to camelCase for frontend compatibility
-        setStats({
-          totalOrders: data.summary?.total_orders || 0,
-          activeDeliveries:
-            (data.orders_by_status?.assigned || 0) +
-            (data.orders_by_status?.in_transit || 0) +
-            (data.orders_by_status?.picked_up || 0),
-          totalCouriers: data.summary?.active_couriers || 0,
-          activeCouriers: data.summary?.active_couriers || 0,
-          revenue: data.summary?.total_revenue || 0,
-          avgDeliveryTime: data.summary?.average_delivery_time_minutes || 0,
-          completedOrders: data.orders_by_status?.delivered || 0,
-          pendingOrders: data.orders_by_status?.pending || 0,
-          cancelledOrders: data.orders_by_status?.cancelled || 0,
-        });
-      }
+      const data = await get("/admin/stats");
+      if (!data) return;
+
+      // Transform snake_case to camelCase for frontend compatibility
+      setStats({
+        totalOrders: data.summary?.total_orders || 0,
+        activeDeliveries:
+          (data.orders_by_status?.assigned || 0) +
+          (data.orders_by_status?.in_transit || 0) +
+          (data.orders_by_status?.picked_up || 0),
+        totalCouriers: data.summary?.active_couriers || 0,
+        activeCouriers: data.summary?.active_couriers || 0,
+        revenue: data.summary?.total_revenue || 0,
+        avgDeliveryTime: data.summary?.average_delivery_time_minutes || 0,
+        completedOrders: data.orders_by_status?.delivered || 0,
+        pendingOrders: data.orders_by_status?.pending || 0,
+        cancelledOrders: data.orders_by_status?.cancelled || 0,
+      });
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
     }

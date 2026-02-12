@@ -1,15 +1,48 @@
-import { useState, useEffect } from 'react';
+import { useState } from "react";
+import { TrendingUp, MapPin, BarChart3, Star, ChevronRight } from "lucide-react";
 
 
 const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
-  const [recentActivity, setRecentActivity] = useState([]);
-  const [performanceData, setPerformanceData] = useState({
+  const [performanceData] = useState({
     deliverySuccess: 98.5,
     customerSatisfaction: 4.8,
     avgResponseTime: 12,
-    peakHours: "12:00 PM - 2:00 PM"
+    peakHours: "12:00 PM - 2:00 PM",
   });
-  const [timeRange, setTimeRange] = useState('daily');
+  const [timeRange, setTimeRange] = useState("daily");
+
+  // Simple static chart data so detailed view always renders without errors
+  const chartData = {
+    daily: [
+      { label: "Mon", value: 12 },
+      { label: "Tue", value: 18 },
+      { label: "Wed", value: 9 },
+      { label: "Thu", value: 20 },
+      { label: "Fri", value: 15 },
+    ],
+    weekly: [
+      { label: "Week 1", value: 120 },
+      { label: "Week 2", value: 180 },
+      { label: "Week 3", value: 160 },
+      { label: "Week 4", value: 210 },
+    ],
+    performance: [
+      {
+        name: "Courier A",
+        deliveries: 45,
+        avgTime: 18,
+        rating: 4.8,
+        isActive: true,
+      },
+      {
+        name: "Courier B",
+        deliveries: 38,
+        avgTime: 22,
+        rating: 4.6,
+        isActive: false,
+      },
+    ],
+  };
 
   const renderSimpleChart = (data, label) => {
     if (!data || data.length === 0) return (

@@ -117,11 +117,11 @@ const AppRoutes = () => {
         }
       />
 
-      {/* ---------------- ADMIN ROUTES ---------------- */}
+      {/* ---------------- ADMIN ROUTES (Option B: any logged-in user) ---------------- */}
       <Route
         path="/admin"
         element={
-          <ProtectedRoute role="admin">
+          <ProtectedRoute>
             <AdminDashboard />
           </ProtectedRoute>
         }

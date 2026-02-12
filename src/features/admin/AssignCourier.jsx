@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getToken } from "../../utils/token";
+import { get, post } from "../../api/fetchWrapper";
 
 const AssignCourier = ({ order, onClose, onAssignComplete }) => {
   const [couriers, setCouriers] = useState([]);
@@ -15,32 +16,26 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
   const fetchAvailableCouriers = async () => {
     try {
       const token = getToken();
-      const response = await fetch(
-        "/api/admin/users?role=courier&is_active=true&limit=100",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        const transformedCouriers = (data.users || []).map((user) => ({
-          id: user.id,
-          name: user.full_name || "Unknown",
-          phone: user.phone || "N/A",
-          rating: user.rating || 4.8,
-          completedDeliveries: user.total_deliveries || 0,
-          currentLocation: user.current_location || "Unknown",
-          distance: user.distance_from_pickup || "0 km",
-          status: user.is_active ? "online" : "offline",
-          vehicle: user.vehicle_type || "Motorcycle",
-        }));
-        setCouriers(transformedCouriers);
-      } else {
-        throw new Error("Failed to fetch couriers");
+      if (!token) {
+        setCouriers([]);
+        return;
       }
+
+      const data = await get(
+        "/admin/users?role=courier&is_active=true&limit=100",
+      );
+      const transformedCouriers = (data.users || []).map((user) => ({
+        id: user.id,
+        name: user.full_name || "Unknown",
+        phone: user.phone || "N/A",
+        rating: user.rating || 4.8,
+        completedDeliveries: user.total_deliveries || 0,
+        currentLocation: user.current_location || "Unknown",
+        distance: user.distance_from_pickup || "0 km",
+        status: user.is_active ? "online" : "offline",
+        vehicle: user.vehicle_type || "Motorcycle",
+      }));
+      setCouriers(transformedCouriers);
     } catch (error) {
       console.error("Error fetching couriers:", error);
       setCouriers([]);
@@ -58,26 +53,17 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
     setIsAssigning(true);
     try {
       const token = getToken();
+      if (!token) {
+        alert("You must be logged in to assign a courier");
+        return;
+      }
       // Use orderId instead of order.id since order may have tracking_number
       const orderId = order.orderId || order.id;
 
-      const response = await fetch(`/api/admin/orders/${orderId}/assign`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          courier_id: selectedCourier.id,
-        }),
+      await post(`/admin/orders/${orderId}/assign`, {
+        courier_id: selectedCourier.id,
       });
-
-      if (response.ok) {
-        onAssignComplete();
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to assign courier");
-      }
+      onAssignComplete();
     } catch (error) {
       alert(`Failed to assign courier: ${error.message}`);
     } finally {

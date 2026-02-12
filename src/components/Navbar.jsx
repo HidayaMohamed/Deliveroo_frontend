@@ -1,11 +1,19 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { User, LogOut, Package, PlusCircle, Bell, X, BellOff } from "lucide-react"; 
+import {
+  User,
+  LogOut,
+  Package,
+  PlusCircle,
+  Bell,
+  X,
+  BellOff,
+} from "lucide-react";
 import { useAuth } from "../features/auth/useAuth";
 
-
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const location = useLocation();
+  const { user } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [initial, setInitial] = useState("S");
@@ -14,11 +22,11 @@ export default function Navbar() {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    const name = localStorage.getItem("userName") || "Sharon"; 
+    const name = localStorage.getItem("userName") || user?.full_name || "User"; 
     setInitial(name[0].toUpperCase());
     setDropdownOpen(false); 
     setNotifOpen(false);
-  }, [location]);
+  }, [location, user]);
 
   return (
     <nav className="sticky top-0 z-[100] bg-white/70 backdrop-blur-md border-b border-gray-100/50 px-[5%] py-3 flex justify-between items-center">
@@ -34,11 +42,30 @@ export default function Navbar() {
         </Link>
 
         {/* 2. MY DELIVERIES */}
-        <Link to="/orders" className={`hidden lg:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all ${location.pathname === '/orders' ? 'text-black' : 'text-gray-400 hover:text-black'}`}>
+        <Link
+          to="/orders"
+          className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all ${
+            location.pathname === "/orders"
+              ? "text-black"
+              : "text-gray-400 hover:text-black"
+          }`}
+        >
           <Package size={14} /> My Deliveries
         </Link>
 
-        {/* 3. FANCY NOTIFICATIONS */}
+        {/* 3. ADMIN CONSOLE (Option B: always visible entry point) */}
+        <Link
+          to="/admin/control-center"
+          className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all ${
+            location.pathname.startsWith("/admin")
+              ? "text-black"
+              : "text-gray-400 hover:text-black"
+          }`}
+        >
+          Admin
+        </Link>
+
+        {/* 4. FANCY NOTIFICATIONS */}
         <div className="relative">
           <button 
             onClick={() => { setNotifOpen(!notifOpen); setDropdownOpen(false); }}
