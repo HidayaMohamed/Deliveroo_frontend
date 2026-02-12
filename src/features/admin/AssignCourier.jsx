@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
-
+import { useState, useEffect } from "react";
+import { getToken } from "../../utils/token";
 
 const AssignCourier = ({ order, onClose, onAssignComplete }) => {
   const [couriers, setCouriers] = useState([]);
   const [selectedCourier, setSelectedCourier] = useState(null);
   const [isAssigning, setIsAssigning] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAvailableCouriers();
@@ -13,59 +14,70 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
 
   const fetchAvailableCouriers = async () => {
     try {
-      const data = await getAdminUsers({ role: 'courier', is_active: true });
-      setCouriers(data.users || []);
+      const token = getToken();
+      const response = await fetch(
+        "/api/admin/users?role=courier&is_active=true&limit=100",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const transformedCouriers = (data.users || []).map((user) => ({
+          id: user.id,
+          name: user.full_name || "Unknown",
+          phone: user.phone || "N/A",
+          rating: user.rating || 4.8,
+          completedDeliveries: user.total_deliveries || 0,
+          currentLocation: user.current_location || "Unknown",
+          distance: user.distance_from_pickup || "0 km",
+          status: user.is_active ? "online" : "offline",
+          vehicle: user.vehicle_type || "Motorcycle",
+        }));
+        setCouriers(transformedCouriers);
+      } else {
+        throw new Error("Failed to fetch couriers");
+      }
     } catch (error) {
-      console.error('Error fetching couriers:', error);
-      // Demo data fallback
-      setCouriers([
-        {
-          id: 'CR001',
-          name: 'Peter Omondi',
-          phone: '254712345678',
-          rating: 4.9,
-          completedDeliveries: 156,
-          currentLocation: 'Westlands',
-          distance: '2.3 km',
-          status: 'online',
-          vehicle: 'Motorcycle'
-        },
-        {
-          id: 'CR002',
-          name: 'James Mwangi',
-          phone: '254723456789',
-          rating: 4.7,
-          completedDeliveries: 142,
-          currentLocation: 'CBD',
-          distance: '4.1 km',
-          status: 'online',
-          vehicle: 'Van'
-        },
-        {
-          id: 'CR003',
-          name: 'Sarah Akinyi',
-          phone: '254734567890',
-          rating: 4.8,
-          completedDeliveries: 178,
-          currentLocation: 'Kilimani',
-          distance: '3.5 km',
-          status: 'online',
-          vehicle: 'Motorcycle'
-        },
-      ]);
+      console.error("Error fetching couriers:", error);
+      setCouriers([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleAssign = async () => {
     if (!selectedCourier) {
-      alert('Please select a courier');
+      alert("Please select a courier");
       return;
     }
 
     setIsAssigning(true);
     try {
-      await assignCourier(order.id, selectedCourier.id);
-      onAssignComplete();
+      const token = getToken();
+      // Use orderId instead of order.id since order may have tracking_number
+      const orderId = order.orderId || order.id;
+
+      const response = await fetch(`/api/admin/orders/${orderId}/assign`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          courier_id: selectedCourier.id,
+        }),
+      });
+
+      if (response.ok) {
+        onAssignComplete();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to assign courier");
+      }
     } catch (error) {
       alert(`Failed to assign courier: ${error.message}`);
     } finally {
@@ -73,10 +85,21 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
     }
   };
 
-  const filteredCouriers = couriers.filter(courier =>
-    courier.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    courier.id.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCouriers = couriers.filter(
+    (courier) =>
+      courier.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      courier.id?.toString().includes(searchQuery.toLowerCase()),
   );
+
+  if (loading) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -87,20 +110,36 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
         </h4>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-1">Order ID</p>
-            <p className="font-black text-lg">{order?.id}</p>
+            <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-1">
+              Order ID
+            </p>
+            <p className="font-black text-lg">
+              {order?.id || order?.tracking_number}
+            </p>
           </div>
           <div>
-            <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-1">Customer</p>
-            <p className="font-black text-lg">{order?.customer}</p>
+            <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-1">
+              Customer
+            </p>
+            <p className="font-black text-lg">
+              {order?.customer || "Customer"}
+            </p>
           </div>
           <div>
-            <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-1">Pickup</p>
-            <p className="font-bold text-sm">📍 {order?.pickup}</p>
+            <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-1">
+              Pickup
+            </p>
+            <p className="font-bold text-sm">
+              📍 {order?.pickup || order?.pickup_address || "N/A"}
+            </p>
           </div>
           <div>
-            <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-1">Destination</p>
-            <p className="font-bold text-sm">📍 {order?.destination}</p>
+            <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest mb-1">
+              Destination
+            </p>
+            <p className="font-bold text-sm">
+              📍 {order?.destination || order?.destination_address || "N/A"}
+            </p>
           </div>
         </div>
       </div>
@@ -127,7 +166,9 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
           </h4>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">Online Now</span>
+            <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">
+              Online Now
+            </span>
           </div>
         </div>
 
@@ -137,24 +178,29 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
               key={courier.id}
               onClick={() => setSelectedCourier(courier)}
               className={`group p-6 rounded-[30px] border-2 cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl
-                ${selectedCourier?.id === courier.id 
-                  ? 'border-yellow-500 bg-yellow-50 shadow-lg' 
-                  : 'border-gray-100 bg-white hover:border-gray-200'
+                ${
+                  selectedCourier?.id === courier.id
+                    ? "border-yellow-500 bg-yellow-50 shadow-lg"
+                    : "border-gray-100 bg-white hover:border-gray-200"
                 }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
                   <div className="relative">
-                    <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-3xl">
-                      👤
+                    <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-3xl font-black">
+                      {courier.name?.[0] || "C"}
                     </div>
-                    <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white ${courier.status === 'online' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                    <div
+                      className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white ${courier.status === "online" ? "bg-green-500" : "bg-gray-400"}`}
+                    ></div>
                   </div>
 
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <h5 className="font-black text-lg mb-1">{courier.name}</h5>
+                        <h5 className="font-black text-lg mb-1">
+                          {courier.name}
+                        </h5>
                         <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">
                           ID: {courier.id}
                         </p>
@@ -174,19 +220,25 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
                         <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">
                           Deliveries
                         </p>
-                        <p className="font-black">{courier.completedDeliveries}</p>
+                        <p className="font-black">
+                          {courier.completedDeliveries || 0}
+                        </p>
                       </div>
                       <div>
                         <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">
                           Location
                         </p>
-                        <p className="font-bold text-sm">📍 {courier.currentLocation}</p>
+                        <p className="font-bold text-sm">
+                          📍 {courier.currentLocation}
+                        </p>
                       </div>
                       <div>
                         <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">
                           Distance
                         </p>
-                        <p className="font-black text-green-600">{courier.distance} away</p>
+                        <p className="font-black text-green-600">
+                          {courier.distance}
+                        </p>
                       </div>
                     </div>
 
@@ -216,7 +268,9 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
         {filteredCouriers.length === 0 && (
           <div className="text-center py-12 bg-gray-50 rounded-[30px]">
             <div className="text-5xl mb-4">🔍</div>
-            <p className="text-lg font-black text-gray-400 mb-2">No Couriers Found</p>
+            <p className="text-lg font-black text-gray-400 mb-2">
+              No Couriers Found
+            </p>
             <p className="text-[9px] font-bold uppercase text-gray-300 tracking-widest">
               Try a different search term
             </p>
@@ -243,7 +297,7 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
               Assigning...
             </span>
           ) : (
-            `Assign ${selectedCourier ? selectedCourier.name : 'Courier'}`
+            `Assign ${selectedCourier ? selectedCourier.name : "Courier"}`
           )}
         </button>
       </div>

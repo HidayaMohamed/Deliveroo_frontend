@@ -1,19 +1,34 @@
 import { useState, useEffect } from "react";
 import { Search, ShieldCheck, Mail, Smartphone, Filter } from "lucide-react";
-import api from "../../api";
+import { getToken } from "../../utils/token";
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
   const [roleFilter, setRoleFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await api.get("/admin/users");
-        setUsers(response.data.users || []);
+        const token = getToken();
+        const response = await fetch("/api/admin/users?limit=100", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUsers(data.users || []);
+        } else {
+          throw new Error("Failed to fetch users");
+        }
       } catch (err) {
         console.error("Registry fetch failed", err);
+        setUsers([]);
+      } finally {
+        setLoading(false);
       }
     };
     fetchUsers();
@@ -26,6 +41,16 @@ const AllUsers = () => {
       user.email?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesRole && matchesSearch;
   });
+
+  if (loading) {
+    return (
+      <div className="space-y-12">
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EA580C]"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-12">
@@ -67,23 +92,36 @@ const AllUsers = () => {
           >
             <div className="flex items-start gap-8 relative z-10">
               <div className="w-20 h-20 bg-black rounded-[30px] flex items-center justify-center text-white text-3xl font-black italic group-hover:bg-[#EA580C] transition-colors">
-                {user.full_name?.[0]}
+                {user.full_name?.[0] || "U"}
               </div>
 
               <div className="flex-1">
-                <span className="px-3 py-1 bg-neutral-100 rounded text-[8px] font-black uppercase tracking-widest text-neutral-500 mb-2 inline-block">
+                <span
+                  className={`px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest mb-2 inline-block ${
+                    user.role === "admin"
+                      ? "bg-red-100 text-red-600"
+                      : user.role === "courier"
+                        ? "bg-blue-100 text-blue-600"
+                        : "bg-green-100 text-green-600"
+                  }`}
+                >
                   {user.role}
                 </span>
                 <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-4">
-                  {user.full_name}
+                  {user.full_name || "Unknown"}
                 </h3>
                 <div className="space-y-2">
                   <p className="flex items-center gap-2 text-xs font-bold text-neutral-400">
-                    <Mail size={12} className="text-[#EA580C]" /> {user.email}
+                    <Mail size={12} className="text-[#EA580C]" />{" "}
+                    {user.email || "N/A"}
                   </p>
                   <p className="flex items-center gap-2 text-xs font-bold text-neutral-400">
                     <Smartphone size={12} className="text-[#EA580C]" />{" "}
                     {user.phone || "No Contact"}
+                  </p>
+                  <p className="flex items-center gap-2 text-xs font-bold text-neutral-400">
+                    <Filter size={12} className="text-[#EA580C]" /> ID:{" "}
+                    {user.id}
                   </p>
                 </div>
               </div>
@@ -91,9 +129,11 @@ const AllUsers = () => {
 
             <div className="mt-8 pt-6 border-t border-neutral-50 flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                <div
+                  className={`w-2 h-2 rounded-full ${user.is_active ? "bg-emerald-500" : "bg-red-500"}`}
+                ></div>
                 <span className="text-[9px] font-black uppercase tracking-widest text-neutral-400">
-                  Operational
+                  {user.is_active ? "Operational" : "Inactive"}
                 </span>
               </div>
               <button className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-300 hover:text-[#EA580C]">
@@ -103,6 +143,18 @@ const AllUsers = () => {
           </div>
         ))}
       </div>
+
+      {filteredUsers.length === 0 && (
+        <div className="text-center py-20">
+          <div className="text-6xl mb-4">👥</div>
+          <p className="text-xl font-black text-gray-400 mb-2">
+            No Users Found
+          </p>
+          <p className="text-[9px] font-bold uppercase text-gray-300 tracking-widest">
+            Try adjusting your filters
+          </p>
+        </div>
+      )}
     </div>
   );
 };

@@ -5,6 +5,9 @@ import Landing from "../pages/Landing";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Unauthorized from "../pages/Unauthorized";
+import AdminDashboard from "../pages/AdminDashboard";
+import CourierDashboard from "../pages/CourierDashboard";
+import RiderProfile from "../pages/RiderProfile";
 
 // Protected/Public Wrappers
 import ProtectedRoute from "../components/ProtectedRoute";
@@ -15,6 +18,9 @@ import CreateOrder from "../features/orders/CreateOrder";
 import MyOrders from "../features/orders/MyOrders";
 import OrderDetails from "../features/orders/OrderDetails";
 import UserProfile from "../features/user/UserProfile";
+
+// Hook
+import { useAuth } from "../features/auth/useAuth";
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
@@ -66,7 +72,23 @@ const AppRoutes = () => {
       />
 
       {/* ---------------- COURIER ROUTES ---------------- */}
-      <Route path="/courier" element={<Navigate to="/courier/dashboard" replace />} />
+      <Route
+        path="/courier/dashboard"
+        element={
+          <ProtectedRoute role="courier">
+            <CourierDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/courier/profile"
+        element={
+          <ProtectedRoute role="courier">
+            <RiderProfile />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/orders"
@@ -95,18 +117,17 @@ const AppRoutes = () => {
         }
       />
 
-      {/* ---------------- ROLE BASED ROUTES ---------------- */}
-      <Route path="/user" element={<Navigate to="/orders/new" replace />} />
-
+      {/* ---------------- ADMIN ROUTES ---------------- */}
       <Route
         path="/admin"
         element={
           <ProtectedRoute role="admin">
-            <h1>Admin Dashboard</h1>
+            <AdminDashboard />
           </ProtectedRoute>
         }
       />
 
+      {/* ---------------- CUSTOMER ROUTES ---------------- */}
       <Route
         path="/customer/create-order"
         element={
@@ -120,40 +141,30 @@ const AppRoutes = () => {
         path="/customer/orders"
         element={
           <ProtectedRoute role="customer">
-            <OrdersList />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/customer/track-order"
-        element={
-          <ProtectedRoute role="customer">
-            <LiveTrackingMap />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/customer/track-order/:id"
-        element={
-          <ProtectedRoute role="customer">
-            <TrackOrder />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Courier routes */}
-      <Route
-        path="/courier"
-        element={
-          <ProtectedRoute role="courier">
-            <h1>Courier Dashboard</h1>
+            <MyOrders />
           </ProtectedRoute>
         }
       />
 
       {/* ---------------- FALLBACK ---------------- */}
+      <Route
+        path="/user"
+        element={
+          <ProtectedRoute role="customer">
+            <CreateOrder />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/courier"
+        element={
+          <ProtectedRoute role="courier">
+            <Navigate to="/courier/dashboard" replace />
+          </ProtectedRoute>
+        }
+      />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
