@@ -1,19 +1,23 @@
-import { Toaster } from "react-hot-toast";
-import { Routes, Route, Navigate } from "react-router-dom";
-import Footer from "./components/Footer";
+import "leaflet/dist/leaflet.css";
 import Navbar from "./components/Navbar";
-// Global Components
-import NotificationToast from "./components/NotificationToast";
+import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
 
-// Import features
+// Pages
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Landing from "./pages/Landing";
+import Unauthorized from "./pages/Unauthorized";
+import AdminDashboard from "./pages/AdminDashboard";
+import CourierDashboard from "./pages/CourierDashboard";
+import RiderProfile from "./pages/RiderProfile";
 import CreateOrder from "./features/orders/CreateOrder";
 import MyOrders from "./features/orders/MyOrders";
 import OrderDetails from "./features/orders/OrderDetails";
 import UserProfile from "./features/user/UserProfile";
 
-// Import auth hook
-import { useAuth } from "./features/auth/useAuth";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
   const { user, loading } = useAuth();
@@ -25,27 +29,40 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen bg-white selection:bg-yellow-200">
       <Navbar />
-
       <main className="flex-grow">
         <Routes>
-          {/* 1. PRIMARY LANDING LOGIC */}
-          {/* Redirect unauthenticated users to login, authenticated users to orders/new */}
+          {/* Public routes */}
           <Route
-            index
+            path="/"
             element={
-              user ? (
-                <Navigate to="/orders/new" replace />
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              <PublicRoute>
+                <Landing />
+              </PublicRoute>
             }
           />
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            }
+          />
+          <Route path="/unauthorized" element={<Unauthorized />} />
 
-          {/* 2. ORDER ROUTES (Protected for customers) */}
+          {/* Orders */}
           <Route
             path="/orders/new"
             element={
-              <ProtectedRoute role="customer">
+              <ProtectedRoute>
                 <CreateOrder />
               </ProtectedRoute>
             }
@@ -53,7 +70,7 @@ function App() {
           <Route
             path="/orders"
             element={
-              <ProtectedRoute role="customer">
+              <ProtectedRoute>
                 <MyOrders />
               </ProtectedRoute>
             }
@@ -61,13 +78,13 @@ function App() {
           <Route
             path="/orders/:id"
             element={
-              <ProtectedRoute role="customer">
+              <ProtectedRoute>
                 <OrderDetails />
               </ProtectedRoute>
             }
           />
 
-          {/* 3. USER ROUTES */}
+          {/* User */}
           <Route
             path="/profile"
             element={
@@ -77,24 +94,47 @@ function App() {
             }
           />
 
-          {/* 4. FALLBACK */}
-          {/* Redirect based on authentication status */}
+          {/* Admin */}
           <Route
-            path="*"
+            path="/admin"
+            element={<Navigate to="/admin/control-center" replace />}
+          />
+          <Route
+            path="/admin/control-center"
             element={
-              user ? (
-                user.role === "admin" ? (
-                  <Navigate to="/admin" replace />
-                ) : user.role === "courier" ? (
-                  <Navigate to="/courier" replace />
-                ) : (
-                  <Navigate to="/orders/new" replace />
-                )
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              <ProtectedRoute role="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
             }
           />
+
+          {/* Courier */}
+          <Route
+            path="/courier"
+            element={<Navigate to="/courier/dashboard" replace />}
+          />
+          <Route
+            path="/courier/dashboard"
+            element={
+              <ProtectedRoute role="courier">
+                <CourierDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/rider/profile"
+            element={
+              <ProtectedRoute role="courier">
+                <RiderProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Legacy */}
+          <Route path="/user" element={<Navigate to="/orders/new" replace />} />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
 

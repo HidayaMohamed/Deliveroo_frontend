@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../features/auth/useAuth";
 
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -7,10 +7,9 @@ const PublicRoute = ({ children }) => {
   if (loading) return <p>Loading...</p>;
 
   if (user) {
-    // Redirect to appropriate dashboard based on role (using lowercase to match User model)
     if (user.role === "admin") return <Navigate to="/admin" replace />;
     if (user.role === "courier") return <Navigate to="/courier" replace />;
-    return <Navigate to="/customer" replace />;
+    return <Navigate to="/orders/new" replace />;
   }
 
   return children;

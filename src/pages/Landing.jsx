@@ -1,185 +1,208 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import Footer from "../components/Footer";
+import { ArrowRight, Package, Shield, MapPin, Zap, Clock, Headphones, Star, ChevronRight, Truck } from "lucide-react";
 
 const Landing = () => {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <div className="bg-white text-slate-900 selection:bg-amber-500 selection:text-white">
-      {/* ================= NAVBAR ================= */}
-      <nav
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-white/80 backdrop-blur-xl py-4 shadow-sm"
-            : "bg-transparent py-8"
-        }`}
-      >
-        <div className="max-w-[1440px] mx-auto px-[6%] flex items-center justify-between">
-          <Link to="/" className="group">
-            <h1 className="font-black text-3xl tracking-tight transition-colors group-hover:text-amber-600">
-              DELIVEROO<span className="text-amber-500">.</span>
-            </h1>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-10 text-[11px] uppercase tracking-[3px] font-black">
-            {["Intelligence", "Process", "Tariffs"].map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="relative after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-amber-500 hover:after:w-full after:transition-all"
-              >
-                {item}
-              </a>
-            ))}
-            <Link to="/login" className="text-slate-400 hover:text-slate-900">
-              Login
-            </Link>
-            <Link
-              to="/register?role=USER"
-              className="rounded-full bg-slate-900 px-8 py-3 text-white transition-all hover:bg-amber-500 hover:-translate-y-0.5 hover:shadow-xl"
-            >
-              Get Started
-            </Link>
-          </div>
-        </div>
-      </nav>
+    <div className="bg-white text-black selection:bg-yellow-200">
 
       {/* ================= HERO ================= */}
-      <section className="relative min-h-screen flex items-center px-[6%] pt-32">
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[140px]" />
+      <section className="min-h-[90vh] flex flex-col justify-center px-[5%] py-32 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-yellow-400 rounded-full blur-[200px] opacity-10 -z-10" />
 
-        <div className="max-w-5xl">
-          <span className="block mb-6 text-xs font-black uppercase tracking-[6px] text-amber-700">
-            Premium Logistics Network
-          </span>
+        <div className="max-w-[1400px] mx-auto w-full">
+          <div className="flex items-center gap-3 mb-8">
+            <span className="w-12 h-[2px] bg-yellow-500" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-600">Premium Logistics</span>
+          </div>
 
-          <h1 className="text-5xl md:text-7xl xl:text-8xl font-black leading-[0.95] tracking-tight mb-8">
-            Global Motion
-            <br />
-            <span className="bg-gradient-to-r from-amber-500 to-amber-700 bg-clip-text text-transparent">
-              Redefined.
-            </span>
+          <h1 className="text-7xl md:text-[120px] font-black tracking-tighter leading-[0.9] mb-8">
+            Your Parcels<span className="text-yellow-500">,</span><br />
+            Delivered <span className="italic">Fast</span><span className="text-yellow-500">.</span>
           </h1>
 
-          <p className="max-w-2xl text-lg md:text-xl text-slate-500 font-medium mb-12">
-            Real-time tracking, elite couriers, and precision logistics built
-            for speed, safety, and scale.
+          <p className="text-lg md:text-xl text-gray-400 font-medium max-w-xl mb-12 leading-relaxed">
+            Send and receive parcels across the city with real-time tracking,
+            professional couriers, and guaranteed delivery times.
           </p>
 
-          <div className="flex flex-wrap gap-6">
-            <Link to="/register?role=customer">
-              <button className="rounded-2xl bg-slate-900 px-12 py-5 font-black uppercase tracking-widest text-white transition-all hover:bg-amber-600 hover:-translate-y-1 hover:shadow-2xl">
-                Create Shipment
-              </button>
+          <div className="flex flex-col sm:flex-row gap-4 mb-20">
+            <Link
+              to="/register?role=customer"
+              className="px-12 py-6 bg-black text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-yellow-500 hover:text-black transition-all active:scale-95 shadow-2xl flex items-center gap-3 group"
+            >
+              Get Started Free
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link to="/register?role=courier">
-              <button className="rounded-2xl border-2 border-slate-200 bg-white px-12 py-5 font-black uppercase tracking-widest transition-all hover:border-amber-500 hover:-translate-y-1">
-                Join the Fleet
-              </button>
+            <Link
+              to="/register?role=courier"
+              className="px-12 py-6 border-2 border-gray-200 text-black rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:border-black transition-all active:scale-95 flex items-center gap-3"
+            >
+              <Truck size={16} /> Become a Courier
             </Link>
           </div>
 
-          {/* STATS */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-24">
-            <Stat value="50K+" label="Dispatches" />
-            <Stat value="10K+" label="Partners" />
-            <Stat value="500+" label="Fleet Units" />
-            <Stat value="4.8★" label="Rating" />
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl">
+            {[
+              { value: "50K+", label: "Deliveries" },
+              { value: "10K+", label: "Active Users" },
+              { value: "500+", label: "Couriers" },
+              { value: "4.8", label: "Rating" },
+            ].map((stat) => (
+              <div key={stat.label} className="bg-gray-50 p-6 rounded-[30px] text-center border border-gray-100">
+                <p className="text-3xl font-black tracking-tighter italic">{stat.value}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-1">{stat.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ================= FEATURES ================= */}
-      <section id="why" className="py-32 px-[6%] bg-slate-50">
+      {/* ================= WHY CHOOSE ================= */}
+      <section id="why" className="py-24 px-[5%] bg-gray-50">
         <div className="max-w-[1400px] mx-auto">
-          <header className="mb-20">
-            <h2 className="text-4xl font-black mb-4">Core Intelligence</h2>
-            <div className="h-1 w-24 bg-amber-500 rounded-full" />
-          </header>
+          <div className="flex items-center gap-3 mb-6">
+            <span className="w-8 h-[2px] bg-yellow-500" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-600">Why Choose Us</span>
+          </div>
+          <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-16">
+            Built for <span className="italic">reliability</span><span className="text-yellow-500">.</span>
+          </h2>
 
-          <div className="grid md:grid-cols-3 gap-10">
-            <Feature
-              title="Priority Velocity"
-              description="Immediate dispatch with optimized express routing."
-            />
-            <Feature
-              title="Secure Custody"
-              description="Insurance-backed, encrypted chain-of-custody handling."
-            />
-            <Feature
-              title="Live Telemetry"
-              description="Minute-by-minute GPS tracking with live courier updates."
-            />
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { icon: <Zap size={24} />, title: "Fast Delivery", desc: "Parcels delivered in hours, not days. Our network ensures the fastest routes." },
+              { icon: <Shield size={24} />, title: "Secure Parcels", desc: "Every package is handled with care, insured, and tracked end-to-end." },
+              { icon: <MapPin size={24} />, title: "Live Tracking", desc: "Real-time GPS tracking so you always know where your parcel is." },
+              { icon: <Package size={24} />, title: "Affordable Pricing", desc: "Transparent pricing — you only pay for what you send. No hidden fees." },
+              { icon: <Star size={24} />, title: "Earn as Courier", desc: "Join our courier network and earn on your schedule. Be your own boss." },
+              { icon: <Headphones size={24} />, title: "24/7 Support", desc: "Our support team is always available to help you, day or night." },
+            ].map((feature) => (
+              <div
+                key={feature.title}
+                className="bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm hover:shadow-xl hover:border-yellow-500 hover:-translate-y-1 transition-all group"
+              >
+                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-yellow-400 transition-colors">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-black tracking-tight mb-2">{feature.title}</h3>
+                <p className="text-sm text-gray-400 font-medium leading-relaxed">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= HOW IT WORKS ================= */}
+      <section id="how" className="py-24 px-[5%]">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="w-8 h-[2px] bg-yellow-500" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-600">The Process</span>
+          </div>
+          <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-16">
+            How it <span className="italic">works</span><span className="text-yellow-500">.</span>
+          </h2>
+
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              { num: "01", title: "Create Order", desc: "Enter pickup & destination locations on the map." },
+              { num: "02", title: "Courier Assigned", desc: "System finds the nearest available courier for you." },
+              { num: "03", title: "Track Live", desc: "Follow your parcel with real-time GPS tracking." },
+              { num: "04", title: "Delivered", desc: "Parcel safely delivered. Rate your experience." },
+            ].map((step) => (
+              <div key={step.num} className="relative">
+                <span className="text-8xl font-black text-gray-100 italic leading-none block mb-4">{step.num}</span>
+                <h3 className="text-xl font-black tracking-tight mb-2">{step.title}</h3>
+                <p className="text-sm text-gray-400 font-medium leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= TESTIMONIALS ================= */}
+      <section id="testimonials" className="py-24 px-[5%] bg-gray-50">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="w-8 h-[2px] bg-yellow-500" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-600">Testimonials</span>
+          </div>
+          <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-16">
+            What users <span className="italic">say</span><span className="text-yellow-500">.</span>
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { text: "Same-day delivery increased my customer satisfaction massively. Will never go back.", name: "Sarah J.", role: "Business Owner" },
+              { text: "I earn on my own schedule. Best courier platform I've used in Nairobi.", name: "Michael C.", role: "Courier Partner" },
+              { text: "Live tracking gives me peace of mind every time I send a parcel across the city.", name: "Grace W.", role: "Regular User" },
+            ].map((t) => (
+              <div key={t.name} className="bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm">
+                <div className="flex gap-1 mb-6">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star key={s} size={14} fill="#eab308" className="text-yellow-500" />
+                  ))}
+                </div>
+                <p className="text-lg font-bold text-gray-700 leading-relaxed mb-8 italic">"{t.text}"</p>
+                <div>
+                  <p className="font-black text-sm">{t.name}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t.role}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ================= PRICING ================= */}
-      <section id="pricing" className="py-32 px-[6%] bg-slate-900 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="text-xs font-bold uppercase tracking-[4px] text-amber-500">
-            Transparent Tariffs
-          </span>
-          <h2 className="text-5xl font-black my-12">Standard Rates</h2>
+      <section id="pricing" className="py-24 px-[5%]">
+        <div className="max-w-[800px] mx-auto">
+          <div className="text-center mb-12">
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-600 mb-4 block">Pricing</span>
+            <h2 className="text-5xl font-black tracking-tighter">
+              Transparent<span className="text-yellow-500">.</span>
+            </h2>
+          </div>
 
-          <div className="rounded-[32px] bg-white/5 border border-white/10 p-12 backdrop-blur">
-            <PriceRow label="Base Fare" value="KSh 150" />
-            <PriceRow label="Per Kilometer" value="KSh 50" />
-            <PriceRow label="Weight Fee" value="KSh 30 / kg" />
-
-            <div className="mt-10 pt-8 border-t border-white/10 flex justify-between items-center">
-              <span className="uppercase tracking-widest text-slate-400 text-sm">
-                Starting From
-              </span>
-              <span className="text-4xl font-black text-amber-500">
-                KSh 150*
-              </span>
-            </div>
+          <div className="bg-gray-50 p-10 rounded-[40px] border border-gray-100">
+            {[
+              { label: "Base Fare", value: "KES 150" },
+              { label: "Per Kilometer", value: "KES 50" },
+              { label: "Per Kilogram", value: "KES 30" },
+            ].map((row, i) => (
+              <div key={row.label} className={`flex justify-between items-center py-6 ${i < 2 ? "border-b border-gray-200" : ""}`}>
+                <span className="text-sm font-bold text-gray-500 uppercase tracking-widest">{row.label}</span>
+                <span className="text-2xl font-black tracking-tighter italic">{row.value}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
-      <Footer />
+      {/* ================= CTA ================= */}
+      <section className="py-24 px-[5%]">
+        <div className="max-w-[1400px] mx-auto bg-black rounded-[60px] p-16 md:p-20 flex flex-col md:flex-row items-center justify-between gap-10 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-yellow-500 rounded-full blur-[150px] opacity-20" />
+
+          <div className="relative z-10">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-white mb-4">
+              Ready to ship<span className="text-yellow-500">?</span>
+            </h2>
+            <p className="text-gray-500 font-bold uppercase text-[11px] tracking-widest">Join thousands of users who trust Deliveroo.</p>
+          </div>
+
+          <Link
+            to="/register"
+            className="relative z-10 px-12 py-7 bg-yellow-500 text-black rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-white transition-all active:scale-95 shadow-2xl flex items-center gap-3 group whitespace-nowrap"
+          >
+            Create Free Account
+            <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
+      </section>
     </div>
   );
 };
-
-/* ================= COMPONENTS ================= */
-
-const Stat = ({ value, label }) => (
-  <div className="rounded-3xl bg-white p-8 border shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
-    <p className="text-3xl font-black mb-1">{value}</p>
-    <p className="text-[10px] uppercase tracking-widest text-slate-400">
-      {label}
-    </p>
-  </div>
-);
-
-const Feature = ({ title, description }) => (
-  <div className="rounded-[32px] bg-white p-10 border transition-all hover:-translate-y-2 hover:shadow-2xl">
-    <div className="mb-6 w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center font-black text-amber-600">
-      ✓
-    </div>
-    <h3 className="font-black text-xl mb-4">{title}</h3>
-    <p className="text-slate-500 font-medium">{description}</p>
-  </div>
-);
-
-const PriceRow = ({ label, value }) => (
-  <div className="flex justify-between py-6 border-b border-white/10">
-    <span className="uppercase tracking-[2px] text-xs text-slate-400">
-      {label}
-    </span>
-    <span className="font-black text-xl">{value}</span>
-  </div>
-);
 
 export default Landing;

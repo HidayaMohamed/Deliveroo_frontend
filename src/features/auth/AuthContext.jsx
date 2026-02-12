@@ -1,28 +1,25 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { loginUser, registerUser, getMe } from "../../api/auth";
+import { createContext, useEffect, useState, useContext } from "react";
+import { get, post } from "../../api/fetchWrapper";
+import { setToken, getToken, removeToken } from "../../utils/token";
 
-export const AuthContext = createContext(); // <-- export it here
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const saveSession = ({ user, access_token, refresh_token }) => {
-    localStorage.setItem("access_token", access_token);
-    localStorage.setItem("refresh_token", refresh_token);
-    setUser(user);
+  const login = async (email, password) => {
+    const data = await post("/auth/login", { email, password });
+    setToken(data.access_token);
+    setUser(data.user);
+    return data.user;
   };
 
-  const login = async (data) => {
-    const res = await loginUser(data);
-    saveSession(res.data);
-    return res.data.user;
-  };
-
-  const register = async (data) => {
-    const res = await registerUser(data);
-    saveSession(res.data);
-    return res.data.user;
+  const register = async (formData) => {
+    const data = await post("/auth/register", formData);
+    setToken(data.access_token);
+    setUser(data.user);
+    return data.user;
   };
 
   const logout = () => {
@@ -31,17 +28,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        const res = await getMe();
-        setUser(res.data);
-      } catch {
-        logout();
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
+    const token = getToken();
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    get("/auth/me")
+      .then((data) => setUser(data))
+      .catch(() => removeToken())
+      .finally(() => setLoading(false));
   }, []);
 
   return (
