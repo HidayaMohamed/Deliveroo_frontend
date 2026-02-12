@@ -103,17 +103,10 @@ export default function MyOrders() {
   }
 
   return (
-<<<<<<< HEAD
-    <div className="max-w-5xl mx-auto px-6 py-12 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-brand-grayDark mb-2">
-          My Orders
-=======
     <div className="max-w-[1100px] mx-auto px-8 py-20 min-h-screen">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-end mb-16">
         <h1 className="text-8xl font-black tracking-tighter italic">
           Fleet<span className="text-yellow-500">.</span>
->>>>>>> main
         </h1>
         <button
           onClick={fetchOrders}

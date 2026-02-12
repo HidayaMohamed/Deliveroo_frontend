@@ -1,6 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { User, LogOut, Package, PlusCircle, Bell, X, BellOff } from "lucide-react"; 
+import { useAuth } from "../features/auth/useAuth";
+
 
 export default function Navbar() {
   const { user, logout } = useAuth();

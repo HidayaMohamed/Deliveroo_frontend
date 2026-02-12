@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { get, post } from "../../api/fetchWrapper";
 import { setToken, getToken, removeToken } from "../../utils/token";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -28,19 +28,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-<<<<<<< HEAD
-    const init = async () => {
-      try {
-        const res = await getMe();
-        setUser(res.data);
-      } catch {
-        logout();
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
-=======
     const token = getToken();
     if (!token) {
       setLoading(false);
@@ -51,7 +38,6 @@ export const AuthProvider = ({ children }) => {
       .then((data) => setUser(data))
       .catch(() => removeToken())
       .finally(() => setLoading(false));
->>>>>>> main
   }, []);
 
   return (

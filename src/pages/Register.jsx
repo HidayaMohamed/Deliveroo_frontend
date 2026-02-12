@@ -20,7 +20,7 @@ const Register = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { register, user } = useAuth();
-  const [error, setError] = useState("");
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;

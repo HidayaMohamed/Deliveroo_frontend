@@ -13,7 +13,7 @@ export default function RiderNavbar() {
           <div className="p-2 bg-yellow-400 rounded-lg">
             <Zap size={18} className="text-black" fill="currentColor" />
           </div>
-          VOLT<span className="text-yellow-400">RIDER</span>
+          <span className="text-yellow-400">RIDER</span>
         </Link>
         <div className="h-6 w-[1px] bg-white/10 hidden md:block" />
         <span className="hidden md:block text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">
