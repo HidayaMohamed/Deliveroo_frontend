@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { TrendingUp, Clock, Star, MapPin, BarChart3, ChevronRight } from 'lucide-react';
 
 const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
