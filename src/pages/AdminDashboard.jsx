@@ -7,6 +7,7 @@ import {
 import AllOrders from '../features/admin/AllOrders';
 import AssignCourier from '../features/admin/AssignCourier';
 import Dashboard from '../features/admin/Dashboard';
+import { getAdminStats } from '../api/admin';
 
 const AdminDashboard = () => {
   const [view, setView] = useState('overview');
@@ -17,21 +18,18 @@ const AdminDashboard = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
 
-  useEffect(() => {
-    fetchDashboardStats();
-    const interval = setInterval(fetchDashboardStats, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchDashboardStats = async () => {
+  const refreshStats = async () => {
     try {
-      const response = await fetch('/api/admin/stats', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      });
-      const data = await response.json();
+      const data = await getAdminStats();
       setStats(data);
     } catch (error) { console.error(error); }
   };
+
+  useEffect(() => {
+    const timeout = setTimeout(refreshStats, 0);
+    const interval = setInterval(refreshStats, 60000);
+    return () => { clearTimeout(timeout); clearInterval(interval); };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] text-stone-900 pb-24 font-sans selection:bg-amber-100">
@@ -148,7 +146,7 @@ const AdminDashboard = () => {
                 </button>
               </div>
               <div className="p-12">
-                <AssignCourier order={selectedOrder} onClose={() => setShowAssignModal(false)} onAssignComplete={() => {setShowAssignModal(false); fetchDashboardStats();}} />
+                <AssignCourier order={selectedOrder} onClose={() => setShowAssignModal(false)} onAssignComplete={() => {setShowAssignModal(false); refreshStats();}} />
               </div>
             </motion.div>
           </div>
