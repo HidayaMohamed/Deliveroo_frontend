@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+<<<<<<< HEAD
 import { useAuth } from "../features/auth/useAuth";
 import {
   User,
@@ -10,6 +11,11 @@ import {
   X,
   BellOff,
 } from "lucide-react";
+=======
+import { User, LogOut, Package, PlusCircle, Bell, X, BellOff } from "lucide-react"; 
+import { useAuth } from "../features/auth/useAuth";
+
+>>>>>>> origin/main
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -30,10 +36,14 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-[100] bg-white/70 backdrop-blur-md border-b border-gray-100/50 px-[5%] py-3 flex justify-between items-center">
       {/* LOGO */}
+<<<<<<< HEAD
       <Link
         to="/"
         className="text-xl font-black tracking-tighter hover:opacity-70 transition-opacity"
       >
+=======
+      <Link to="/" className="text-xl font-black tracking-tighter hover:opacity-70 transition-opacity">
+>>>>>>> origin/main
         DELIVEROO<span className="text-yellow-500">.</span>
       </Link>
 
