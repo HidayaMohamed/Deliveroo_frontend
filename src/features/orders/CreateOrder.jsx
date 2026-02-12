@@ -133,7 +133,7 @@ export default function CreateOrder() {
       <div className="max-w-[1400px] mx-auto px-8 pt-16">
         <header className="mb-20">
           <h1 className="text-6xl font-black tracking-tight mb-4">
-            Create Shipment
+            Are you ready to ship?
           </h1>
           <p className="text-gray-400 text-sm">
             Billing to: {user?.phone || user?.email}
