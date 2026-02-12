@@ -1,4 +1,5 @@
-import { TrendingUp, Clock, Star, MapPin, BarChart3, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
 
 const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
   const [chartData, setChartData] = useState({

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { getAdminUsers, assignCourier } from '../../api/admin';
 
 
 const AssignCourier = ({ order, onClose, onAssignComplete }) => {

@@ -1,27 +1,20 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
-// Public Pages
+// Pages
 import Landing from "../pages/Landing";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Unauthorized from "../pages/Unauthorized";
 
-// Route Guards
+// Protected/Public Wrappers
 import ProtectedRoute from "../components/ProtectedRoute";
 import PublicRoute from "../components/PublicRoute";
 
-// User Features
+// Features (Orders + User)
 import CreateOrder from "../features/orders/CreateOrder";
 import MyOrders from "../features/orders/MyOrders";
 import OrderDetails from "../features/orders/OrderDetails";
 import UserProfile from "../features/user/UserProfile";
-
-// Admin
-import AdminDashboard from "../pages/AdminDashboard";
-
-// Courier Pages
-import RiderProfile from "../pages/RiderProfile";
-import CourierDashboard from "../pages/CourierDashboard";
 
 const AppRoutes = () => {
   return (
@@ -56,20 +49,23 @@ const AppRoutes = () => {
 
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* ---------------- USER PROTECTED ROUTES ---------------- */}
+      {/* ---------------- PROTECTED USER ROUTES ---------------- */}
       <Route
         path="/orders/new"
         element={
-          <ProtectedRoute role="user">
+          <ProtectedRoute>
             <CreateOrder />
           </ProtectedRoute>
         }
       />
 
+      {/* ---------------- COURIER ROUTES ---------------- */}
+      <Route path="/courier" element={<Navigate to="/courier/dashboard" replace />} />
+
       <Route
         path="/orders"
         element={
-          <ProtectedRoute role="user">
+          <ProtectedRoute>
             <MyOrders />
           </ProtectedRoute>
         }
@@ -78,7 +74,7 @@ const AppRoutes = () => {
       <Route
         path="/orders/:id"
         element={
-          <ProtectedRoute role="user">
+          <ProtectedRoute>
             <OrderDetails />
           </ProtectedRoute>
         }
@@ -93,35 +89,23 @@ const AppRoutes = () => {
         }
       />
 
-      {/* ---------------- ADMIN ROUTES ---------------- */}
-      <Route path="/admin" element={<Navigate to="/admin/control-center" replace />} />
+      {/* ---------------- ROLE BASED ROUTES ---------------- */}
+      <Route path="/user" element={<Navigate to="/orders/new" replace />} />
 
       <Route
-        path="/admin/control-center"
+        path="/admin"
         element={
           <ProtectedRoute role="admin">
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* ---------------- COURIER ROUTES ---------------- */}
-      <Route path="/courier" element={<Navigate to="/courier/dashboard" replace />} />
-
-      <Route
-        path="/courier/dashboard"
-        element={
-          <ProtectedRoute role="courier">
-            <CourierDashboard />
+            <h1>Admin Dashboard</h1>
           </ProtectedRoute>
         }
       />
 
       <Route
-        path="/rider/profile"
+        path="/courier"
         element={
           <ProtectedRoute role="courier">
-            <RiderProfile />
+            <h1>Courier Dashboard</h1>
           </ProtectedRoute>
         }
       />

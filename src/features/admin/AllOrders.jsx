@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAdminOrders } from '../../api/admin';
+
 
 const AllOrders = ({ onAssignCourier }) => {
   const [orders, setOrders] = useState([]);
