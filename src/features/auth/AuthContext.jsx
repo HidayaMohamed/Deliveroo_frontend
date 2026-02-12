@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import api from "../../api/axios";
+import { get, post } from "../../api/fetchWrapper";
 import { setToken, getToken, removeToken } from "../../utils/token";
 
 export const AuthContext = createContext(null);
@@ -9,17 +9,17 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const login = async (email, password) => {
-    const res = await api.post("/auth/login", { email, password });
-    setToken(res.data.access_token);
-    setUser(res.data.user);
-    return res.data.user; 
+    const data = await post("/auth/login", { email, password });
+    setToken(data.access_token);
+    setUser(data.user);
+    return data.user;
   };
 
-  const register = async (data) => {
-    const res = await api.post("/auth/register", data);
-    setToken(res.data.access_token);
-    setUser(res.data.user);
-    return res.data.user; 
+  const register = async (formData) => {
+    const data = await post("/auth/register", formData);
+    setToken(data.access_token);
+    setUser(data.user);
+    return data.user;
   };
 
   const logout = () => {
@@ -35,9 +35,8 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    api
-      .get("/auth/me")
-      .then((res) => setUser(res.data))
+    get("/auth/me")
+      .then((data) => setUser(data))
       .catch(() => removeToken())
       .finally(() => setLoading(false));
   }, []);

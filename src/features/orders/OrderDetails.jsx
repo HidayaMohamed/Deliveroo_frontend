@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Polyline, Popup } from "react-leaflet"
 import { motion } from "framer-motion";
 import { Phone, ArrowLeft, ShieldCheck, Navigation, MessageSquare, Share2, Zap, Star } from "lucide-react";
 import L from "leaflet";
-import { getOrderById } from "./ordersAPI";
+import { getOrderById } from "../../api/orders";
 
 // Leaflet Icon Fix
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -22,8 +22,8 @@ export default function OrderDetails() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await getOrderById(id);
-        setOrder(res.data);
+        const data = await getOrderById(id);
+        setOrder(data.order || data);
       } catch (err) {
         setOrder({
           id: id || "8842",

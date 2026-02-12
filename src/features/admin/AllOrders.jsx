@@ -15,12 +15,8 @@ const AllOrders = ({ onAssignCourier }) => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch(`/api/admin/orders?filter=${filter}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
+      const status = filter === 'all' ? undefined : filter;
+      const data = await getAdminOrders({ status });
       setOrders(data.orders || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
