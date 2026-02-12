@@ -155,30 +155,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ================= PRICING ================= */}
-      <section id="pricing" className="py-24 px-[5%]">
-        <div className="max-w-[800px] mx-auto">
-          <div className="text-center mb-12">
-            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-600 mb-4 block">Pricing</span>
-            <h2 className="text-5xl font-black tracking-tighter">
-              Transparent<span className="text-yellow-500">.</span>
-            </h2>
-          </div>
-
-          <div className="bg-gray-50 p-10 rounded-[40px] border border-gray-100">
-            {[
-              { label: "Base Fare", value: "KES 150" },
-              { label: "Per Kilometer", value: "KES 50" },
-              { label: "Per Kilogram", value: "KES 30" },
-            ].map((row, i) => (
-              <div key={row.label} className={`flex justify-between items-center py-6 ${i < 2 ? "border-b border-gray-200" : ""}`}>
-                <span className="text-sm font-bold text-gray-500 uppercase tracking-widest">{row.label}</span>
-                <span className="text-2xl font-black tracking-tighter italic">{row.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ================= CTA ================= */}
       <section className="py-24 px-[5%]">
