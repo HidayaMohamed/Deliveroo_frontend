@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 
 
 const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
-  const [chartData, setChartData] = useState({
-    daily: [],
-    weekly: [],
-    performance: []
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [performanceData, setPerformanceData] = useState({
+    deliverySuccess: 98.5,
+    customerSatisfaction: 4.8,
+    avgResponseTime: 12,
+    peakHours: "12:00 PM - 2:00 PM"
   });
   const [timeRange, setTimeRange] = useState('daily');
 

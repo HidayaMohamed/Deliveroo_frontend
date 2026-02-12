@@ -20,9 +20,14 @@ const Register = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { register, user } = useAuth();
+  
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: name === "role" ? value.toLowerCase() : value,
+    }));
   };
 
   const handleSubmit = async (e) => {

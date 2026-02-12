@@ -1,8 +1,8 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
 import { get, post } from "../../api/fetchWrapper";
 import { setToken, getToken, removeToken } from "../../utils/token";
 
-export const AuthContext = createContext(null);
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -23,9 +23,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    removeToken();
+    localStorage.clear();
     setUser(null);
-    window.location.href = "/";
   };
 
   useEffect(() => {
@@ -42,18 +41,10 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        role: user?.role || null,
-        isAuthenticated: !!user,
-        login,
-        register,
-        logout,
-        loading,
-      }}
-    >
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);
