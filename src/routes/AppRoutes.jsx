@@ -59,6 +59,9 @@ const AppRoutes = () => {
         }
       />
 
+      {/* ---------------- COURIER ROUTES ---------------- */}
+      <Route path="/courier" element={<Navigate to="/courier/dashboard" replace />} />
+
       <Route
         path="/orders"
         element={
