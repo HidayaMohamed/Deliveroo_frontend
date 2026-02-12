@@ -20,6 +20,12 @@ import UserProfile from "./features/user/UserProfile";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-white selection:bg-yellow-200">
       <Navbar />

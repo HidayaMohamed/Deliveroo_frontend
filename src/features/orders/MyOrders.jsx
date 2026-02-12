@@ -142,7 +142,9 @@ export default function MyOrders() {
               <div className="p-10 flex-1 flex flex-col justify-between">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Ref: #DEL-{order.id}</span>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">
+                      Ref: #DEL-{order.id}
+                    </span>
                     <h2 className="text-3xl font-black tracking-tighter uppercase mt-2 italic flex items-center gap-3">
                       {order.pickup_address || order.pickup_location}
                       <ArrowRight size={20} className="text-yellow-500 group-hover:translate-x-2 transition-transform" />
