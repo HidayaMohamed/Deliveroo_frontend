@@ -1,15 +1,32 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
+// Public Pages
 import Landing from "../pages/Landing";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Unauthorized from "../pages/Unauthorized";
+
+// Route Guards
 import ProtectedRoute from "../components/ProtectedRoute";
 import PublicRoute from "../components/PublicRoute";
+
+// User Features
+import CreateOrder from "../features/orders/CreateOrder";
+import MyOrders from "../features/orders/MyOrders";
+import OrderDetails from "../features/orders/OrderDetails";
+import UserProfile from "../features/user/UserProfile";
+
+// Admin
+import AdminDashboard from "../pages/AdminDashboard";
+
+// Courier Pages
+import RiderProfile from "../pages/RiderProfile";
+import CourierDashboard from "../pages/CourierDashboard";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public-only pages */}
+      {/* ---------------- PUBLIC ROUTES ---------------- */}
       <Route
         path="/"
         element={
@@ -39,33 +56,78 @@ const AppRoutes = () => {
 
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* Protected pages */}
+      {/* ---------------- USER PROTECTED ROUTES ---------------- */}
       <Route
-        path="/user"
+        path="/orders/new"
         element={
-          <ProtectedRoute role="USER">
-            <h1>User Dashboard</h1>
+          <ProtectedRoute role="user">
+            <CreateOrder />
           </ProtectedRoute>
         }
       />
 
       <Route
-        path="/courier"
+        path="/orders"
         element={
-          <ProtectedRoute role="COURIER">
-            <h1>Courier Dashboard</h1>
+          <ProtectedRoute role="user">
+            <MyOrders />
           </ProtectedRoute>
         }
       />
 
       <Route
-        path="/admin"
+        path="/orders/:id"
         element={
-          <ProtectedRoute role="ADMIN">
-            <h1>Admin Dashboard</h1>
+          <ProtectedRoute role="user">
+            <OrderDetails />
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <UserProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ---------------- ADMIN ROUTES ---------------- */}
+      <Route path="/admin" element={<Navigate to="/admin/control-center" replace />} />
+
+      <Route
+        path="/admin/control-center"
+        element={
+          <ProtectedRoute role="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ---------------- COURIER ROUTES ---------------- */}
+      <Route path="/courier" element={<Navigate to="/courier/dashboard" replace />} />
+
+      <Route
+        path="/courier/dashboard"
+        element={
+          <ProtectedRoute role="courier">
+            <CourierDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/rider/profile"
+        element={
+          <ProtectedRoute role="courier">
+            <RiderProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ---------------- FALLBACK ---------------- */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

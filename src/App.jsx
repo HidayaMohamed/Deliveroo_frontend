@@ -12,6 +12,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Landing from "./pages/Landing";
 import Unauthorized from "./pages/Unauthorized";
+import AdminDashboard from "./pages/AdminDashboard";
+import CourierDashboard from "./pages/CourierDashboard";
+import RiderProfile from "./pages/RiderProfile";
 
 // Features
 import CreateOrder from "./features/orders/CreateOrder";
@@ -32,7 +35,7 @@ function App() {
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
           <Route path="/unauthorized" element={<Unauthorized />} />
 
-          {/* Protected order routes */}
+          {/* Protected order routes (any authenticated user) */}
           <Route path="/orders/new" element={<ProtectedRoute><CreateOrder /></ProtectedRoute>} />
           <Route path="/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
           <Route path="/orders/:id" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
@@ -40,10 +43,17 @@ function App() {
           {/* Protected user routes */}
           <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
 
-          {/* Role-based dashboards */}
+          {/* Admin routes */}
+          <Route path="/admin" element={<Navigate to="/admin/control-center" replace />} />
+          <Route path="/admin/control-center" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
+
+          {/* Courier routes */}
+          <Route path="/courier" element={<Navigate to="/courier/dashboard" replace />} />
+          <Route path="/courier/dashboard" element={<ProtectedRoute role="courier"><CourierDashboard /></ProtectedRoute>} />
+          <Route path="/rider/profile" element={<ProtectedRoute role="courier"><RiderProfile /></ProtectedRoute>} />
+
+          {/* Legacy redirect */}
           <Route path="/user" element={<Navigate to="/orders/new" replace />} />
-          <Route path="/admin" element={<ProtectedRoute role="admin"><h1>Admin Dashboard</h1></ProtectedRoute>} />
-          <Route path="/courier" element={<ProtectedRoute role="courier"><h1>Courier Dashboard</h1></ProtectedRoute>} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
