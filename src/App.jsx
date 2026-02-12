@@ -22,7 +22,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 function App() {
   return (
     <div className="flex flex-col min-h-screen bg-white selection:bg-yellow-200">
-
+      <Navbar />
       <main className="flex-grow">
         <Routes>
           {/* Public routes */}
