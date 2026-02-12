@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getOrderById } from "./ordersAPI";
+import { MapContainer, TileLayer, Marker, Polyline, Popup } from "react-leaflet";
+import { motion } from "framer-motion";
+import { Phone, ArrowLeft, ShieldCheck, Navigation, MessageSquare, Share2, Zap, Star } from "lucide-react";
+import L from "leaflet";
+import { getOrderById } from "../../api/orders";
 
 // Placeholder for OrderDetails - full Leaflet implementation requires proper imports
 // This is a simplified version that doesn't break
@@ -15,8 +19,8 @@ export default function OrderDetails() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await getOrderById(id);
-        setOrder(res.data.order || res.data);
+        const data = await getOrderById(id);
+        setOrder(data.order || data);
       } catch (err) {
         console.error("Error loading order:", err);
         // Fallback demo data

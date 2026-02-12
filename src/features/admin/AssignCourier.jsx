@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
+
 
 const AssignCourier = ({ order, onClose, onAssignComplete }) => {
   const [couriers, setCouriers] = useState([]);
@@ -12,13 +13,8 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
 
   const fetchAvailableCouriers = async () => {
     try {
-      const response = await fetch('/api/admin/couriers/available', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setCouriers(data);
+      const data = await getAdminUsers({ role: 'courier', is_active: true });
+      setCouriers(data.users || []);
     } catch (error) {
       console.error('Error fetching couriers:', error);
       // Demo data fallback
@@ -68,20 +64,10 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
 
     setIsAssigning(true);
     try {
-      await fetch(`/api/admin/orders/${order.id}/assign`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ courierId: selectedCourier.id })
-      });
-
-      alert(`Courier ${selectedCourier.name} assigned successfully!`);
+      await assignCourier(order.id, selectedCourier.id);
       onAssignComplete();
     } catch (error) {
-      console.error('Error assigning courier:', error);
-      alert('Failed to assign courier. Please try again.');
+      alert(`Failed to assign courier: ${error.message}`);
     } finally {
       setIsAssigning(false);
     }

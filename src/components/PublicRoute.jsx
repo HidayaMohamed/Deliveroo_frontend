@@ -7,10 +7,9 @@ const PublicRoute = ({ children }) => {
   if (loading) return <p>Loading...</p>;
 
   if (user) {
-    // Redirect to appropriate dashboard based on role (using lowercase to match User model)
     if (user.role === "admin") return <Navigate to="/admin" replace />;
     if (user.role === "courier") return <Navigate to="/courier" replace />;
-    return <Navigate to="/customer" replace />;
+    return <Navigate to="/orders/new" replace />;
   }
 
   return children;

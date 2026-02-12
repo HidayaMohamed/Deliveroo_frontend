@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
+
 
 const AllOrders = ({ onAssignCourier }) => {
   const [orders, setOrders] = useState([]);
@@ -11,13 +12,9 @@ const AllOrders = ({ onAssignCourier }) => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('/api/admin/orders', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setOrders(data);
+      const status = filter === 'all' ? undefined : filter;
+      const data = await getAdminOrders({ status });
+      setOrders(data.orders || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
       // Demo data fallback
