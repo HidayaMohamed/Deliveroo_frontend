@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import { TrendingUp, MapPin, BarChart3, ChevronRight, Star } from 'lucide-react';
 
 const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
   const [recentActivity, setRecentActivity] = useState([]);
@@ -10,6 +10,25 @@ const Dashboard = ({ stats, showDetailedAnalytics = false }) => {
     peakHours: "12:00 PM - 2:00 PM"
   });
   const [timeRange, setTimeRange] = useState('daily');
+
+  const chartData = {
+    daily: [
+      { label: 'Mon', value: stats.totalOrders || 12 },
+      { label: 'Tue', value: Math.round((stats.totalOrders || 10) * 1.2) },
+      { label: 'Wed', value: Math.round((stats.totalOrders || 8) * 0.9) },
+      { label: 'Thu', value: Math.round((stats.totalOrders || 15) * 1.1) },
+      { label: 'Fri', value: Math.round((stats.totalOrders || 20) * 1.4) },
+      { label: 'Sat', value: Math.round((stats.totalOrders || 18) * 1.3) },
+      { label: 'Sun', value: Math.round((stats.totalOrders || 10) * 0.8) },
+    ],
+    weekly: [
+      { label: 'W1', value: Math.round((stats.revenue || 5000) * 0.2) },
+      { label: 'W2', value: Math.round((stats.revenue || 5000) * 0.25) },
+      { label: 'W3', value: Math.round((stats.revenue || 5000) * 0.3) },
+      { label: 'W4', value: Math.round((stats.revenue || 5000) * 0.25) },
+    ],
+    performance: [],
+  };
 
   const renderSimpleChart = (data, label) => {
     if (!data || data.length === 0) return (

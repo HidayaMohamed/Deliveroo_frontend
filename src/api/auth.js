@@ -19,7 +19,7 @@ export const loginUser = async (data) => {
 };
 
 export const getMe = async () => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("token");
   const res = await fetch(`${API_BASE_URL}/auth/me`, {
     method: "GET",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -28,7 +28,7 @@ export const getMe = async () => {
 };
 
 export const refreshToken = async () => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("token");
   const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
     method: "POST",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
