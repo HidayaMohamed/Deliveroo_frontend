@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAdminOrders } from '../../api/admin';
-import '../../styles/AllOrders.css';
+
 
 const AllOrders = ({ onAssignCourier }) => {
   const [orders, setOrders] = useState([]);

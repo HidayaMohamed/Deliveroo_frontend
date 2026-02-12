@@ -1,7 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
-
-// Global Components
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
