@@ -15,6 +15,11 @@ export default function Navbar() {
     .charAt(0)
     .toUpperCase();
 
+  const role = user?.role;
+  const isAdmin = role === "admin";
+  const isCourier = role === "courier";
+  const isCustomer = role === "customer";
+
   return (
     <nav className="sticky top-0 z-[100] bg-white/70 backdrop-blur-md border-b border-gray-100/50 px-[5%] py-3 flex justify-between items-center">
       {/* LOGO */}
@@ -25,15 +30,29 @@ export default function Navbar() {
       <div className="flex items-center gap-8">
         {user ? (
           <>
-            {/* 1. SHIP PARCEL */}
-            <Link to="/orders/new" className="flex items-center gap-2 bg-[#111] text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-yellow-500 transition-all active:scale-95 shadow-sm">
-              <PlusCircle size={14} strokeWidth={2.5} /> Ship Parcel
-            </Link>
+            {isCustomer && (
+              <>
+                <Link to="/orders/new" className="flex items-center gap-2 bg-[#111] text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-yellow-500 transition-all active:scale-95 shadow-sm">
+                  <PlusCircle size={14} strokeWidth={2.5} /> Ship Parcel
+                </Link>
 
-            {/* 2. MY DELIVERIES */}
-            <Link to="/orders" className="hidden lg:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all text-gray-400 hover:text-black">
-              <Package size={14} /> My Deliveries
-            </Link>
+                <Link to="/orders" className="hidden lg:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all text-gray-400 hover:text-black">
+                  <Package size={14} /> My Deliveries
+                </Link>
+              </>
+            )}
+
+            {isCourier && (
+              <Link to="/courier/dashboard" className="hidden lg:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all text-gray-400 hover:text-black">
+                <Package size={14} /> Courier Dashboard
+              </Link>
+            )}
+
+            {isAdmin && (
+              <Link to="/admin/control-center" className="hidden lg:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all text-gray-400 hover:text-black">
+                <Package size={14} /> Admin Console
+              </Link>
+            )}
 
             {/* 3. FANCY NOTIFICATIONS */}
             <div className="relative">
@@ -101,6 +120,19 @@ export default function Navbar() {
                   <Link to="/profile" className="flex items-center gap-3 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-black hover:bg-gray-50 transition-all">
                     <User size={15} strokeWidth={2} /> View Profile
                   </Link>
+
+                  {isCourier && (
+                    <Link to="/courier/dashboard" className="flex items-center gap-3 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-black hover:bg-gray-50 transition-all">
+                      <Package size={15} strokeWidth={2} /> Dashboard
+                    </Link>
+                  )}
+
+                  {isAdmin && (
+                    <Link to="/admin/control-center" className="flex items-center gap-3 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-black hover:bg-gray-50 transition-all">
+                      <Package size={15} strokeWidth={2} /> Control Center
+                    </Link>
+                  )}
+
                   <div className="mx-4 border-t border-gray-50" />
                   <button
                     onClick={() => { logout(); window.location.href="/login"; }}
