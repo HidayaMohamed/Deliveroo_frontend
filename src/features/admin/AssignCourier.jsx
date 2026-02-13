@@ -64,7 +64,7 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
       const orderId = order.orderId || order.id;
 
       const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/assign`, {
-        method: "POST",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

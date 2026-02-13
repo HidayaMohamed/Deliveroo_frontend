@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { getToken, removeToken } from "../utils/token";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 // Make sure these paths match your actual folder structure!
 import AllOrders from "../features/admin/AllOrders";
