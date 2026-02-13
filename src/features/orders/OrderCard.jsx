@@ -6,6 +6,16 @@ export default function OrderCard({ order }) {
   const pickup = order.pickup_location || "Not specified";
   const destination = order.destination || "Not specified";
 
+  const pickupPoint =
+    order.pickup_lat != null && order.pickup_lng != null
+      ? [Number(order.pickup_lat), Number(order.pickup_lng)]
+      : undefined;
+
+  const destinationPoint =
+    order.destination_lat != null && order.destination_lng != null
+      ? [Number(order.destination_lat), Number(order.destination_lng)]
+      : undefined;
+
   // Tailwind mapping for status colors
   const statusStyles = {
     "Pending": "bg-amber-100 text-amber-600",
@@ -31,7 +41,11 @@ export default function OrderCard({ order }) {
       
       {/* .card-map-wrapper */}
       <div className="w-full h-[180px] rounded-xl overflow-hidden mb-6 border border-slate-100 relative z-10">
-        <LiveTrackingMap />
+        <LiveTrackingMap
+          orderId={order.id}
+          pickup={pickupPoint}
+          destination={destinationPoint}
+        />
       </div>
 
       {/* .card-middle */}

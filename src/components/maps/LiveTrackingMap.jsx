@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect } from "react";
+import { getOrderTracking } from "../../api/orders";
 
 // Fix for default Leaflet icons not showing up in React
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -21,33 +22,62 @@ const carIcon = new L.Icon({
   iconSize: [35, 35],
 });
 
-export default function LiveTrackingMap() {
-  // 1. Initial Position (Start of the route)
-  const [carPos, setCarPos] = useState([-1.289, 36.788]); 
+export default function LiveTrackingMap({ orderId, pickup, destination }) {
+  const fallbackPickup = pickup || [-1.289, 36.788];
+  const fallbackDestination = destination || [-1.263, 36.804];
 
-  // 2. The Route Path (Mock points from Kilimani to Westlands)
-  const routePath = [
-    [-1.289, 36.788],
-    [-1.285, 36.792],
-    [-1.275, 36.798],
-    [-1.263, 36.804],
-  ];
+  const [carPos, setCarPos] = useState(fallbackPickup);
+  const [routePath, setRoutePath] = useState([fallbackPickup, fallbackDestination]);
 
-  // 3. Simulate Movement (This replaces the backend for now)
   useEffect(() => {
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i < routePath.length) {
-        setCarPos(routePath[i]);
-        i++;
+    if (!orderId) return;
+
+    const normalizePoint = (lat, lng) => {
+      const nLat = Number(lat);
+      const nLng = Number(lng);
+      if (Number.isNaN(nLat) || Number.isNaN(nLng)) return null;
+      return [nLat, nLng];
+    };
+
+    const fetchTracking = async () => {
+      try {
+        const data = await getOrderTracking(orderId);
+        const current = data?.current_location;
+        const currentPoint = current
+          ? normalizePoint(current.latitude, current.longitude)
+          : null;
+
+        if (currentPoint) {
+          setCarPos(currentPoint);
+        }
+
+        const history = Array.isArray(data?.tracking_history)
+          ? data.tracking_history
+          : [];
+
+        const historyPath = history
+          .map((p) => normalizePoint(p.latitude, p.longitude))
+          .filter(Boolean)
+          .reverse();
+
+        if (historyPath.length >= 2) {
+          setRoutePath(historyPath);
+        } else if (currentPoint) {
+          setRoutePath([fallbackPickup, currentPoint, fallbackDestination]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tracking:", error);
       }
-    }, 4000); // Moves every 4 seconds
+    };
+
+    fetchTracking();
+    const interval = setInterval(fetchTracking, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [orderId, fallbackPickup, fallbackDestination]);
 
   return (
     <MapContainer 
-      center={[-1.280, 36.795]} 
+      center={carPos || fallbackPickup} 
       zoom={13} 
       style={{ height: "100%", width: "100%", background: "#1a1a1a" }}
     >
@@ -64,7 +94,7 @@ export default function LiveTrackingMap() {
       <Marker position={carPos} icon={carIcon} />
 
       {/* Destination Marker */}
-      <Marker position={[-1.263, 36.804]} />
+      <Marker position={fallbackDestination} />
     </MapContainer>
   );
 }
