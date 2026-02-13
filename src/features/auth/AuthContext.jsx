@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { get, post } from "../../api/fetchWrapper";
-import { setToken, getToken, removeToken } from "../../utils/token";
+import { setToken, getToken, setRefreshToken, removeToken } from "../../utils/token";
 import { AuthContext } from "./AuthContextBase";
 
 export const AuthProvider = ({ children }) => {
@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
 
     const data = await post("/auth/login", payload);
     setToken(data.access_token);
+    setRefreshToken(data.refresh_token);
     setUser(data.user);
     return data.user;
   };
@@ -22,6 +23,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (formData) => {
     const data = await post("/auth/register", formData);
     setToken(data.access_token);
+    setRefreshToken(data.refresh_token);
     setUser(data.user);
     return data.user;
   };

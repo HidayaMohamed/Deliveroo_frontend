@@ -27,8 +27,8 @@ const Login = () => {
       } else {
         navigate("/orders/new");
       }
-    } catch {
-      setError("Invalid email or password. Please try again.");
+    } catch (err) {
+      setError(err.message || "Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
     }
