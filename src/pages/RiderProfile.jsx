@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
   User,
   Phone,
@@ -26,6 +25,8 @@ import {
 } from "lucide-react";
 import { getToken, removeToken } from "../utils/token";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+
 export default function RiderProfile() {
   const navigate = useNavigate();
   const [riderData, setRiderData] = useState(null);
@@ -35,7 +36,7 @@ export default function RiderProfile() {
     const fetchRiderData = async () => {
       try {
         const token = getToken();
-        const response = await fetch("/api/auth/me", {
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -133,16 +134,12 @@ export default function RiderProfile() {
         {/* HEADER: RIDER IDENTITY */}
         <div className="flex flex-col lg:flex-row items-center justify-between gap-8 mb-12">
           <div className="flex items-center gap-6 w-full">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="w-24 h-24 bg-slate-900 rounded-[32px] flex items-center justify-center text-yellow-400 text-4xl font-black shadow-2xl relative border-4 border-white"
-            >
+            <div className="w-24 h-24 bg-slate-900 rounded-[32px] flex items-center justify-center text-yellow-400 text-4xl font-black shadow-2xl relative border-4 border-white">
               {riderData?.name?.[0] || "R"}
               <div className="absolute -bottom-1 -right-1 bg-yellow-400 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center">
                 <Zap size={14} className="text-black" fill="currentColor" />
               </div>
-            </motion.div>
+            </div>
 
             <div>
               <div className="flex items-center gap-3">
@@ -210,9 +207,8 @@ export default function RiderProfile() {
                   color: "yellow",
                 },
               ].map((stat) => (
-                <motion.div
+                <div
                   key={stat.label}
-                  whileHover={{ y: -5 }}
                   className={`${stat.color === "yellow" ? "bg-white border-slate-100" : "bg-slate-900 border-transparent"} p-8 rounded-[40px] shadow-sm border`}
                 >
                   <div className="flex justify-between items-start mb-4">
@@ -240,7 +236,7 @@ export default function RiderProfile() {
                   >
                     {stat.label}
                   </p>
-                </motion.div>
+                </div>
               ))}
             </div>
 
@@ -374,7 +370,7 @@ export default function RiderProfile() {
             </div>
 
             {/* ACTION BANNER */}
-            <motion.div className="bg-yellow-400 p-10 rounded-[50px] flex flex-col md:flex-row items-center gap-8 justify-between shadow-2xl shadow-yellow-400/20">
+            <div className="bg-yellow-400 p-10 rounded-[50px] flex flex-col md:flex-row items-center gap-8 justify-between shadow-2xl shadow-yellow-400/20">
               <div className="flex items-center gap-6">
                 <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center shadow-2xl">
                   <Map className="text-yellow-400" size={28} />
@@ -388,15 +384,13 @@ export default function RiderProfile() {
                   </p>
                 </div>
               </div>
-              <motion.button
-                whileHover={{ scale: 1.05, backgroundColor: "#fff" }}
-                whileTap={{ scale: 0.95 }}
+              <button
                 onClick={() => navigate("/courier/dashboard")}
                 className="px-10 py-5 bg-black text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all"
               >
                 Go Online
-              </motion.button>
-            </motion.div>
+              </button>
+            </div>
           </div>
 
           {/* SIDEBAR */}

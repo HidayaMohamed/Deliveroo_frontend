@@ -58,6 +58,8 @@ const reverseStatusMapping = {
   "In Transit": "delivered",
 };
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+
 export default function CourierDashboard() {
   const navigate = useNavigate();
   const [riderData, setRiderData] = useState(null);
@@ -69,7 +71,7 @@ export default function CourierDashboard() {
   const fetchRiderData = useCallback(async () => {
     try {
       const token = getToken();
-      const response = await fetch("/api/auth/me", {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -105,7 +107,7 @@ export default function CourierDashboard() {
     try {
       const token = getToken();
       const response = await fetch(
-        "/api/courier/orders?status=assigned&limit=50",
+        `${API_BASE_URL}/courier/orders?status=assigned&limit=50`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -208,7 +210,7 @@ export default function CourierDashboard() {
       const token = getToken();
       const backendStatus = reverseStatusMapping[nextStatus];
       if (backendStatus) {
-        await fetch(`/api/courier/orders/${order.orderId || id}/status`, {
+        await fetch(`${API_BASE_URL}/courier/orders/${order.orderId || id}/status`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -456,7 +458,7 @@ export default function CourierDashboard() {
 
           <AnimatePresence>
             {deliveries.map((order) => (
-              <motion.div
+              <div
                 key={order.id}
                 onClick={() => setSelectedOrder(order)}
                 className={`p-8 rounded-[40px] border-2 cursor-pointer transition-all ${
@@ -498,7 +500,7 @@ export default function CourierDashboard() {
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </AnimatePresence>
         </div>
@@ -595,9 +597,7 @@ export default function CourierDashboard() {
 
           <div className="flex gap-4 w-full md:w-auto">
             {selectedOrder && selectedOrder.status !== "Delivered" ? (
-              <motion.button
-                whileHover={{ scale: 1.02, backgroundColor: "#000" }}
-                whileTap={{ scale: 0.98 }}
+              <button
                 onClick={() =>
                   handleUpdateStatus(selectedOrder.id, selectedOrder.status)
                 }
@@ -614,7 +614,7 @@ export default function CourierDashboard() {
                   className="text-yellow-400"
                   fill="currentColor"
                 />
-              </motion.button>
+              </button>
             ) : selectedOrder ? (
               <div className="flex-1 md:w-80 py-7 bg-emerald-500 text-white rounded-[30px] text-xs font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-xl">
                 <CheckCircle size={20} /> Delivery Successful
