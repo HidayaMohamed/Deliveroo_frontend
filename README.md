@@ -4,11 +4,11 @@ A modern parcel delivery management system built with React, Vite, and Tailwind 
 
 ## Features
 
-- 🚀 **Lightning Fast** - Built with Vite for optimal performance
-- 🎨 **Modern UI** - Beautiful interfaces with Tailwind CSS
-- 🔐 **Secure Authentication** - JWT-based authentication system
-- 📱 **Responsive Design** - Works on all devices
-- 🛡️ **Role-Based Access** - Admin, Courier, and Customer dashboards
+-  **Lightning Fast** - Built with Vite for optimal performance
+-  **Modern UI** - Beautiful interfaces with Tailwind CSS
+-  **Secure Authentication** - JWT-based authentication system
+-  **Responsive Design** - Works on all devices
+-  **Role-Based Access** - Admin, Courier, and Customer dashboards
 
 ## Tech Stack
 
