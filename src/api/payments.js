@@ -14,7 +14,7 @@ export function queryTransaction(checkoutRequestId) {
   return get(`/payments/query/${checkoutRequestId}`);
 }
 
-export function pollPaymentStatus(orderId, maxAttempts = 30) {
+export function pollPaymentStatus(orderId, checkoutRequestId = null, maxAttempts = 60) {
   return new Promise((resolve, reject) => {
     let attempts = 0;
 
@@ -31,17 +31,24 @@ export function pollPaymentStatus(orderId, maxAttempts = 30) {
         } else if (payment?.payment_status === "FAILED" || payment?.payment_status === "CANCELLED") {
           clearInterval(interval);
           reject(new Error("Payment failed or was cancelled"));
+        } else if (checkoutRequestId && attempts % 3 === 0) {
+          // Periodically cross-check with M-Pesa query endpoint to handle delayed callbacks
+          const query = await queryTransaction(checkoutRequestId);
+          if (query?.mpesa_status === "completed") {
+            clearInterval(interval);
+            resolve(query?.payment || payment);
+          }
         } else if (attempts >= maxAttempts) {
           clearInterval(interval);
-          reject(new Error("Payment is processing. Check My Orders in a few minutes"));
+          reject(new Error("Payment is still processing. Keep this page open or check My Orders shortly."));
         }
-      } catch (err) {
+      } catch {
         if (attempts >= maxAttempts) {
           clearInterval(interval);
-          reject(new Error("Payment is processing. Check My Orders in a few minutes"));
+          reject(new Error("Payment is still processing. Keep this page open or check My Orders shortly."));
         }
       }
-    }, 2000);
+    }, 3000);
   });
 }
 

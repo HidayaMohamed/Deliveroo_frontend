@@ -28,6 +28,7 @@ const Register = () => {
       ...prev,
       [name]: name === "role" ? value.toLowerCase() : value,
     }));
+    setError(""); // Clear error on input
   };
 
   const handleSubmit = async (e) => {

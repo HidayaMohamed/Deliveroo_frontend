@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Navigation2, XCircle, ArrowRight, CreditCard, Loader2, RefreshCw } from "lucide-react";
 import { getMyOrders, cancelOrder } from "../../api/orders";
 import { initiatePayment, pollPaymentStatus, validatePhoneNumber } from "../../api/payments";
+import { useAuth } from "../auth/useAuth";
 
 const STATUS_STYLES = {
   PENDING: { bg: "bg-yellow-100", text: "text-yellow-800", dot: "bg-yellow-500", label: "Pending" },
@@ -28,6 +29,7 @@ function StatusBadge({ status }) {
 }
 
 export default function MyOrders() {
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState(null);
@@ -74,10 +76,10 @@ export default function MyOrders() {
     setPayStatus("Initiating payment...");
 
     try {
-      await initiatePayment(orderId, phone);
+      const init = await initiatePayment(orderId, phone);
       setPayStatus("Check your phone for M-Pesa prompt...");
 
-      const result = await pollPaymentStatus(orderId);
+      const result = await pollPaymentStatus(orderId, init?.checkout_request_id);
       setPayStatus(`Payment successful! Receipt: ${result.mpesa_receipt_number || "confirmed"}`);
       setPayingId(null);
       setPayPhone("");
@@ -104,7 +106,7 @@ export default function MyOrders() {
 
   return (
     <div className="max-w-[1100px] mx-auto px-8 py-20 min-h-screen">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-end mb-16">
+      <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-end mb-16">
         <h1 className="text-8xl font-black tracking-tighter italic">
           Fleet<span className="text-yellow-500">.</span>
         </h1>
@@ -114,12 +116,12 @@ export default function MyOrders() {
         >
           <RefreshCw size={12} /> Refresh
         </button>
-      </motion.div>
+      </Motion.div>
 
       <div className="grid gap-10">
         <AnimatePresence mode="popLayout">
           {orders.map((order) => (
-            <motion.div
+            <Motion.div
               key={order.id}
               layout
               initial={{ opacity: 0, scale: 0.9 }}
@@ -142,7 +144,9 @@ export default function MyOrders() {
               <div className="p-10 flex-1 flex flex-col justify-between">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Ref: #DEL-{order.id}</span>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">
+                      Ref: #DEL-{order.id}
+                    </span>
                     <h2 className="text-3xl font-black tracking-tighter uppercase mt-2 italic flex items-center gap-3">
                       {order.pickup_address || order.pickup_location}
                       <ArrowRight size={20} className="text-yellow-500 group-hover:translate-x-2 transition-transform" />
@@ -197,7 +201,7 @@ export default function MyOrders() {
                   )}
 
                   {/* Pay Now button - for pending/unpaid orders */}
-                  {order.status === "PENDING" && payingId !== order.id && (
+                  {user?.role === "customer" && order.status === "PENDING" && payingId !== order.id && (
                     <button
                       onClick={() => { setPayingId(order.id); setPayError(""); setPayStatus(""); }}
                       className="px-10 py-5 bg-[#2fbb1c] text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-black transition-all active:scale-95 shadow-lg flex items-center gap-2"
@@ -217,7 +221,7 @@ export default function MyOrders() {
                   )}
 
                   {/* Cancel button - for pending orders */}
-                  {order.status === "PENDING" && (
+                  {user?.role === "customer" && order.status === "PENDING" && (
                     <button
                       onClick={() => handleCancel(order.id)}
                       disabled={cancellingId === order.id}
@@ -233,7 +237,7 @@ export default function MyOrders() {
                   )}
                 </div>
               </div>
-            </motion.div>
+            </Motion.div>
           ))}
         </AnimatePresence>
 

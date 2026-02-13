@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { getToken } from "../../utils/token";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+
 // Status mapping from backend to frontend
 const statusMapping = {
   PENDING: "Pending",
@@ -24,7 +26,7 @@ const AllOrders = ({ onAssignCourier }) => {
   const fetchOrders = async () => {
     try {
       const token = getToken();
-      const response = await fetch("/api/admin/orders?limit=100", {
+      const response = await fetch(`${API_BASE_URL}/admin/orders?limit=100`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

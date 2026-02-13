@@ -31,6 +31,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { getToken } from "../utils/token";
+import { useAuth } from "../features/auth/useAuth";
 
 // Fix for Leaflet icons - Ensures markers show up in Vite
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -58,8 +59,11 @@ const reverseStatusMapping = {
   "In Transit": "delivered",
 };
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+
 export default function CourierDashboard() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [riderData, setRiderData] = useState(null);
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,7 +73,7 @@ export default function CourierDashboard() {
   const fetchRiderData = useCallback(async () => {
     try {
       const token = getToken();
-      const response = await fetch("/api/auth/me", {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -105,7 +109,7 @@ export default function CourierDashboard() {
     try {
       const token = getToken();
       const response = await fetch(
-        "/api/courier/orders?status=assigned&limit=50",
+        `${API_BASE_URL}/courier/orders?status=assigned&limit=50`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -208,7 +212,7 @@ export default function CourierDashboard() {
       const token = getToken();
       const backendStatus = reverseStatusMapping[nextStatus];
       if (backendStatus) {
-        await fetch(`/api/courier/orders/${order.orderId || id}/status`, {
+        await fetch(`${API_BASE_URL}/courier/orders/${order.orderId || id}/status`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -231,6 +235,11 @@ export default function CourierDashboard() {
       `Support, this is Rider ${riderData?.id || "RIDER"}. I need assistance`,
     );
     window.open(`https://wa.me/254700123456?text=${msg}`, "_blank");
+  };
+
+  const handleSignOut = () => {
+    logout();
+    navigate("/login", { replace: true });
   };
 
   // Loading state
@@ -257,8 +266,9 @@ export default function CourierDashboard() {
             <div className="flex justify-between items-start mb-8">
               <div className="flex items-center gap-5">
                 <div
-                  onClick={() => navigate("/rider/profile")}
+                  onClick={handleSignOut}
                   className="w-20 h-20 bg-slate-900 rounded-[30px] flex items-center justify-center text-yellow-400 font-black text-3xl shadow-xl cursor-pointer hover:scale-105 transition-transform"
+                  title="Sign Out"
                 >
                   {riderData?.name?.[0] || "R"}
                 </div>
@@ -387,8 +397,9 @@ export default function CourierDashboard() {
           <div className="flex justify-between items-start mb-8">
             <div className="flex items-center gap-5">
               <div
-                onClick={() => navigate("/rider/profile")}
+                onClick={handleSignOut}
                 className="w-20 h-20 bg-slate-900 rounded-[30px] flex items-center justify-center text-yellow-400 font-black text-3xl shadow-xl cursor-pointer hover:scale-105 transition-transform"
+                title="Sign Out"
               >
                 {riderData?.name?.[0] || "R"}
               </div>
@@ -456,7 +467,7 @@ export default function CourierDashboard() {
 
           <AnimatePresence>
             {deliveries.map((order) => (
-              <motion.div
+              <div
                 key={order.id}
                 onClick={() => setSelectedOrder(order)}
                 className={`p-8 rounded-[40px] border-2 cursor-pointer transition-all ${
@@ -498,7 +509,7 @@ export default function CourierDashboard() {
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </AnimatePresence>
         </div>
@@ -595,9 +606,7 @@ export default function CourierDashboard() {
 
           <div className="flex gap-4 w-full md:w-auto">
             {selectedOrder && selectedOrder.status !== "Delivered" ? (
-              <motion.button
-                whileHover={{ scale: 1.02, backgroundColor: "#000" }}
-                whileTap={{ scale: 0.98 }}
+              <button
                 onClick={() =>
                   handleUpdateStatus(selectedOrder.id, selectedOrder.status)
                 }
@@ -614,7 +623,7 @@ export default function CourierDashboard() {
                   className="text-yellow-400"
                   fill="currentColor"
                 />
-              </motion.button>
+              </button>
             ) : selectedOrder ? (
               <div className="flex-1 md:w-80 py-7 bg-emerald-500 text-white rounded-[30px] text-xs font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-xl">
                 <CheckCircle size={20} /> Delivery Successful

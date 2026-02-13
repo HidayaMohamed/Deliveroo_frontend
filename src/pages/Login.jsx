@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useAuth } from "../features/auth/useAuth";
-// Added useNavigate to the imports below
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Mail, Lock, ArrowRight, ShieldCheck } from "lucide-react";
 
@@ -18,10 +17,9 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // 1. Wait for login to succeed
-      const loggedInUser = await login(email, password);
+      // ✅ Pass object with email + password
+      const loggedInUser = await login({ email, password });
 
-      // 2. Programmatic navigation based on role
       if (loggedInUser.role === "admin") {
         navigate("/admin");
       } else if (loggedInUser.role === "courier") {
@@ -30,20 +28,18 @@ const Login = () => {
         navigate("/orders/new");
       }
     } catch (err) {
-      setError("Invalid email or password. Please try again.");
+      setError(err.message || "Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Keep this as a safety guard in case they land on /login while already logged in
   if (user) {
     if (user.role === "admin") return <Navigate to="/admin" replace />;
     if (user.role === "courier") return <Navigate to="/courier" replace />;
     return <Navigate to="/orders/new" replace />;
   }
 
-  // ... rest of your JSX remains the same
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-[5%] py-20 bg-white selection:bg-yellow-200">
       <div className="w-full max-w-md">
@@ -126,7 +122,7 @@ const Login = () => {
           </button>
         </form>
 
-        <div className="mt-8 text-center space-y-4">
+        <div className="mt-8 text-center">
           <p className="text-sm font-bold text-gray-400">
             Don't have an account?{" "}
             <Link

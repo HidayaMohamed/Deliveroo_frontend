@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { getToken } from "../../utils/token";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+
 const AssignCourier = ({ order, onClose, onAssignComplete }) => {
   const [couriers, setCouriers] = useState([]);
   const [selectedCourier, setSelectedCourier] = useState(null);
@@ -16,7 +18,7 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
     try {
       const token = getToken();
       const response = await fetch(
-        "/api/admin/users?role=courier&is_active=true&limit=100",
+        `${API_BASE_URL}/admin/users?role=courier&is_active=true&limit=100`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -61,8 +63,8 @@ const AssignCourier = ({ order, onClose, onAssignComplete }) => {
       // Use orderId instead of order.id since order may have tracking_number
       const orderId = order.orderId || order.id;
 
-      const response = await fetch(`/api/admin/orders/${orderId}/assign`, {
-        method: "POST",
+      const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/assign`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

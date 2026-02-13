@@ -1,6 +1,6 @@
 import { getToken, removeToken } from "../utils/token";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 async function fetchWrapper(endpoint, options = {}) {
   const token = getToken();
@@ -26,7 +26,7 @@ async function fetchWrapper(endpoint, options = {}) {
   }
 
   if (!response.ok) {
-    if (response.status === 401) {
+    if (response.status === 401 && getToken()) {
       removeToken();
       window.location.href = "/login";
       throw new Error("Session expired. Please login again");

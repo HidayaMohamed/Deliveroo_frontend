@@ -23,7 +23,7 @@ import UserProfile from "../features/user/UserProfile";
 import { useAuth } from "../features/auth/useAuth";
 
 const AppRoutes = () => {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) {
     return null;

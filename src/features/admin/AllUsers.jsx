@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Search, ShieldCheck, Mail, Smartphone, Filter } from "lucide-react";
 import { getToken } from "../../utils/token";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
   const [roleFilter, setRoleFilter] = useState("all");
@@ -12,7 +14,7 @@ const AllUsers = () => {
     const fetchUsers = async () => {
       try {
         const token = getToken();
-        const response = await fetch("/api/admin/users?limit=100", {
+        const response = await fetch(`${API_BASE_URL}/admin/users?limit=100`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

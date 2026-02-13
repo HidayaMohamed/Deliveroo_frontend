@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
-import api from "../api/axios";
+import { get } from "../api/fetchWrapper";
 import { useAuth } from "../features/auth/useAuth";
 
 const NotificationToast = () => {
@@ -11,14 +11,13 @@ const NotificationToast = () => {
     if (!user || loading) return;
 
     try {
-      const response = await api.get("/notifications", {
-        params: {
-          limit: 10,
-          unread_only: true,
-        },
+      const params = new URLSearchParams({
+        limit: "10",
+        unread_only: "true",
       });
 
-      const { notifications } = response.data;
+      const response = await get(`/notifications?${params.toString()}`);
+      const { notifications } = response || {};
 
       if (notifications && notifications.length > 0) {
         // Show toast for each new notification
