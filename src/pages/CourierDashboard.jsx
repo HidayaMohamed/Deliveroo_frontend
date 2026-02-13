@@ -31,6 +31,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { getToken } from "../utils/token";
+import { useAuth } from "../features/auth/useAuth";
 
 // Fix for Leaflet icons - Ensures markers show up in Vite
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -62,6 +63,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 export default function CourierDashboard() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [riderData, setRiderData] = useState(null);
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -235,6 +237,11 @@ export default function CourierDashboard() {
     window.open(`https://wa.me/254700123456?text=${msg}`, "_blank");
   };
 
+  const handleSignOut = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -259,8 +266,9 @@ export default function CourierDashboard() {
             <div className="flex justify-between items-start mb-8">
               <div className="flex items-center gap-5">
                 <div
-                  onClick={() => navigate("/rider/profile")}
+                  onClick={handleSignOut}
                   className="w-20 h-20 bg-slate-900 rounded-[30px] flex items-center justify-center text-yellow-400 font-black text-3xl shadow-xl cursor-pointer hover:scale-105 transition-transform"
+                  title="Sign Out"
                 >
                   {riderData?.name?.[0] || "R"}
                 </div>
@@ -389,8 +397,9 @@ export default function CourierDashboard() {
           <div className="flex justify-between items-start mb-8">
             <div className="flex items-center gap-5">
               <div
-                onClick={() => navigate("/rider/profile")}
+                onClick={handleSignOut}
                 className="w-20 h-20 bg-slate-900 rounded-[30px] flex items-center justify-center text-yellow-400 font-black text-3xl shadow-xl cursor-pointer hover:scale-105 transition-transform"
+                title="Sign Out"
               >
                 {riderData?.name?.[0] || "R"}
               </div>
