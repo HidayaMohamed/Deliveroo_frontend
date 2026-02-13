@@ -29,7 +29,7 @@ const Login = () => {
       } else {
         navigate("/orders/new");
       }
-    } catch (err) {
+    } catch {
       setError("Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
