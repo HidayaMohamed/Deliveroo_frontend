@@ -1,9 +1,16 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Zap, User, Bell, LogOut } from "lucide-react";
+import { useAuth } from "../features/auth/useAuth";
 
 export default function RiderNavbar() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleSignOut = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <nav className="w-full bg-slate-900 text-white px-[5%] py-4 flex items-center justify-between sticky top-0 z-[2000] border-b border-white/10 shadow-2xl">
@@ -43,11 +50,11 @@ export default function RiderNavbar() {
           </div>
         </Link>
 
-        {/* System Exit (Demo purposes) */}
+        {/* Sign out */}
         <button 
-          onClick={() => navigate("/orders/new")}
+          onClick={handleSignOut}
           className="p-3 text-slate-500 hover:text-red-400 transition-colors"
-          title="Exit Rider Mode"
+          title="Sign Out"
         >
           <LogOut size={18} />
         </button>
