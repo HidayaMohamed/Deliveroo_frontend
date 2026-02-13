@@ -1,25 +1,19 @@
-import { Link, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useState } from "react";
 import { User, LogOut, Package, PlusCircle, Bell, X, BellOff } from "lucide-react"; 
 import { useAuth } from "../features/auth/useAuth";
 
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [initial, setInitial] = useState("S");
+  const notifications = [];
 
-  // State is now empty to reflect "no current notifications"
-  const [notifications, setNotifications] = useState([]);
-
-  useEffect(() => {
-    const name = localStorage.getItem("userName") || "Sharon"; 
-    setInitial(name[0].toUpperCase());
-    setDropdownOpen(false); 
-    setNotifOpen(false);
-  }, [location]);
+  const initial = (user?.full_name || user?.email || "U")
+    .trim()
+    .charAt(0)
+    .toUpperCase();
 
   return (
     <nav className="sticky top-0 z-[100] bg-white/70 backdrop-blur-md border-b border-gray-100/50 px-[5%] py-3 flex justify-between items-center">
@@ -37,7 +31,7 @@ export default function Navbar() {
             </Link>
 
             {/* 2. MY DELIVERIES */}
-            <Link to="/orders" className={`hidden lg:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all ${location.pathname === '/orders' ? 'text-black' : 'text-gray-400 hover:text-black'}`}>
+            <Link to="/orders" className="hidden lg:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all text-gray-400 hover:text-black">
               <Package size={14} /> My Deliveries
             </Link>
 
@@ -109,7 +103,7 @@ export default function Navbar() {
                   </Link>
                   <div className="mx-4 border-t border-gray-50" />
                   <button
-                    onClick={() => { localStorage.clear(); window.location.href="/login"; }}
+                    onClick={() => { logout(); window.location.href="/login"; }}
                     className="w-full flex items-center gap-3 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-red-400 hover:text-red-500 hover:bg-red-50/50 transition-all"
                   >
                     <LogOut size={15} strokeWidth={2} /> Sign Out
@@ -120,7 +114,7 @@ export default function Navbar() {
           </>
         ) : (
           <div className="flex items-center gap-4">
-            <Link to="/login" className={`text-[10px] font-bold uppercase tracking-widest transition-all ${location.pathname === '/login' ? 'text-black' : 'text-gray-400 hover:text-black'}`}>
+            <Link to="/login" className="text-[10px] font-bold uppercase tracking-widest transition-all text-gray-400 hover:text-black">
               Sign In
             </Link>
             <Link to="/register" className="flex items-center gap-2 bg-[#111] text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-yellow-500 transition-all active:scale-95 shadow-sm">
