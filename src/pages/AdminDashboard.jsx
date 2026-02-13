@@ -2,29 +2,32 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  BarChart3,
   Package,
   Truck,
   Users,
   TrendingUp,
   Clock,
-  ChevronRight,
   X,
-  Layers,
-  Zap,
   Shield,
-  Globe,
   Activity,
   LogOut,
+  Bell,
+  ChevronRight,
 } from "lucide-react";
 import { getToken, removeToken } from "../utils/token";
 import { get } from "../api/fetchWrapper";
 
-// Make sure these paths match your actual folder structure!
 import AllOrders from "../features/admin/AllOrders";
 import AssignCourier from "../features/admin/AssignCourier";
 import Dashboard from "../features/admin/Dashboard";
 import AllUsers from "../features/admin/AllUsers";
+
+const NAV_TABS = [
+  { id: "overview",  icon: <Activity size={16} />,   label: "Overview"  },
+  { id: "orders",    icon: <Package size={16} />,    label: "Orders"    },
+  { id: "users",     icon: <Users size={16} />,      label: "Users"     },
+  { id: "analytics", icon: <TrendingUp size={16} />, label: "Analytics" },
+];
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -49,27 +52,21 @@ const AdminDashboard = () => {
     fetchAdminData();
     fetchDashboardStats();
     const interval = setInterval(fetchDashboardStats, 60000);
-    return () => {
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   const fetchAdminData = async () => {
     try {
       const token = getToken();
       if (!token) {
-        // Option B: allow UI to render even without backend auth
         setAdminUser({ full_name: "Admin" });
         setLoading(false);
         return;
       }
-
-      // Use shared API wrapper so we hit VITE_API_URL; fall back gracefully on error
       const data = await get("/auth/me");
       setAdminUser(data || { full_name: "Admin" });
     } catch (error) {
       console.error("Error fetching admin data:", error);
-      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -79,24 +76,20 @@ const AdminDashboard = () => {
     try {
       const token = getToken();
       if (!token) return;
-
       const data = await get("/admin/stats");
       if (!data) return;
-
-      // Transform snake_case to camelCase for frontend compatibility
       setStats({
-        totalOrders: data.summary?.total_orders || 0,
-        activeDeliveries:
-          (data.orders_by_status?.assigned || 0) +
-          (data.orders_by_status?.in_transit || 0) +
-          (data.orders_by_status?.picked_up || 0),
-        totalCouriers: data.summary?.active_couriers || 0,
-        activeCouriers: data.summary?.active_couriers || 0,
-        revenue: data.summary?.total_revenue || 0,
-        avgDeliveryTime: data.summary?.average_delivery_time_minutes || 0,
-        completedOrders: data.orders_by_status?.delivered || 0,
-        pendingOrders: data.orders_by_status?.pending || 0,
-        cancelledOrders: data.orders_by_status?.cancelled || 0,
+        totalOrders:      data.summary?.total_orders || 0,
+        activeDeliveries: (data.orders_by_status?.assigned   || 0) +
+                          (data.orders_by_status?.in_transit || 0) +
+                          (data.orders_by_status?.picked_up  || 0),
+        totalCouriers:    data.summary?.active_couriers || 0,
+        activeCouriers:   data.summary?.active_couriers || 0,
+        revenue:          data.summary?.total_revenue   || 0,
+        avgDeliveryTime:  data.summary?.average_delivery_time_minutes || 0,
+        completedOrders:  data.orders_by_status?.delivered || 0,
+        pendingOrders:    data.orders_by_status?.pending    || 0,
+        cancelledOrders:  data.orders_by_status?.cancelled  || 0,
       });
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
@@ -121,184 +114,184 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center">
+      <div className="flex items-center justify-center py-32 bg-slate-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EA580C] mx-auto mb-4"></div>
-          <p className="text-slate-600 font-medium">
-            Loading admin dashboard...
-          </p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4" />
+          <p className="text-slate-600 font-medium">Loading admin dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] text-[#0A0A0A] pb-32 font-sans selection:bg-[#EA580C]/20">
-      {/* Precision Progress Indicator */}
-      <div className="w-full h-[3px] bg-neutral-200 sticky top-0 z-[100] overflow-hidden">
-        <motion.div
-          initial={{ x: "-100%" }}
-          animate={{ x: "0%" }}
-          transition={{ duration: 1.5, ease: "circOut" }}
-          className="h-full bg-black shadow-[0_0_15px_rgba(234,88,12,0.5)]"
-        />
-      </div>
+    <div className="flex-1 bg-slate-50 flex flex-col lg:flex-row text-slate-900 font-sans selection:bg-yellow-100 overflow-hidden">
 
-      <div className="max-w-[1700px] mx-auto px-8 md:px-16 pt-24">
-        {/* EXECUTIVE HEADER */}
-        <header className="mb-28 flex flex-col xl:flex-row xl:items-end justify-between gap-12">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            <div className="flex items-center gap-4 mb-8">
-              <div className="flex -space-x-1">
-                <div className="w-2 h-2 rounded-full bg-black"></div>
-                <div className="w-2 h-2 rounded-full bg-[#EA580C]"></div>
+      {/* ── LEFT SIDEBAR ── */}
+      <div className="w-full lg:w-[480px] bg-white border-r border-slate-200 flex flex-col overflow-hidden shadow-2xl z-20">
+
+        {/* Profile header */}
+        <div className="p-10 border-b border-slate-100 bg-gradient-to-br from-white to-slate-50">
+          <div className="flex justify-between items-start mb-8">
+            <div className="flex items-center gap-5">
+              <div className="w-20 h-20 bg-slate-900 rounded-[30px] flex items-center justify-center text-yellow-400 font-black text-3xl shadow-xl">
+                {adminUser?.full_name?.[0]?.toUpperCase() || "A"}
               </div>
-              <span className="text-black font-black uppercase tracking-[0.8em] text-[10px]">
-                Global Operations Terminal
+              <div>
+                <h2 className="text-2xl font-black tracking-tighter">
+                  {adminUser?.full_name || "Admin"}
+                </h2>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="px-2 py-0.5 bg-yellow-400 text-[8px] font-black uppercase rounded-md tracking-widest">
+                    Admin
+                  </span>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Control Center
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 text-emerald-600 rounded-2xl">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                <Shield size={14} />
+              </div>
+              <button className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-yellow-500 transition-colors">
+                <Bell size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Top stat cards */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-slate-900 p-6 rounded-[30px] text-white">
+              <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">
+                Total Orders
+              </p>
+              <span className="text-2xl font-black tracking-tighter">
+                {stats.totalOrders}
               </span>
             </div>
-            <h1 className="text-[clamp(4rem,12vw,11rem)] font-black tracking-[-0.06em] leading-[0.75] uppercase italic">
-              Volt <br />{" "}
-              <span className="text-[#EA580C] not-italic">Core.</span>
-            </h1>
-            <p className="text-sm font-medium text-slate-500 mt-4">
-              Welcome, {adminUser?.full_name || "Admin"}
-            </p>
-          </motion.div>
-
-          <div className="flex flex-col sm:flex-row gap-6">
-            <div className="bg-white border-l-4 border-black p-8 rounded-tr-[40px] rounded-br-[40px] shadow-[20px_20px_60px_-15px_rgba(0,0,0,0.05)] min-w-[300px]">
-              <div className="flex justify-between items-start mb-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
-                  Security Status
-                </p>
-                <Shield size={14} className="text-[#EA580C]" />
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <div className="w-3 h-3 bg-emerald-500 rounded-full" />
-                  <div className="absolute inset-0 w-3 h-3 bg-emerald-500 rounded-full animate-ping opacity-75" />
-                </div>
-                <span className="text-black text-xs font-black uppercase tracking-tighter">
-                  Encrypted Node 042
+            <div className="bg-yellow-400 p-6 rounded-[30px] text-black">
+              <p className="text-[9px] font-black uppercase tracking-widest text-black/50 mb-1">
+                Revenue
+              </p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-[10px] font-bold">KES</span>
+                <span className="text-2xl font-black tracking-tighter">
+                  {stats.revenue?.toLocaleString() || "0"}
                 </span>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="bg-red-50 border-l-4 border-red-500 p-8 rounded-tr-[40px] rounded-br-[40px] shadow-[20px_20px_60px_-15px_rgba(0,0,0,0.05)] flex items-center gap-3 hover:bg-red-100 transition-colors"
-            >
-              <LogOut size={16} className="text-red-500" />
-              <span className="text-black text-xs font-black uppercase tracking-tighter">
-                Logout
-              </span>
-            </button>
           </div>
-        </header>
+        </div>
 
-        {/* BRUTALIST NAVIGATION */}
-        <nav className="flex gap-2 mb-20 p-2 bg-neutral-200/50 backdrop-blur-md rounded-full w-fit mx-auto border border-neutral-200">
-          {[
-            { id: "overview", icon: <Activity size={16} />, label: "Systems" },
-            { id: "orders", icon: <Package size={16} />, label: "Logistics" },
-            { id: "users", icon: <Users size={16} />, label: "Users" },
-            {
-              id: "analytics",
-              icon: <TrendingUp size={16} />,
-              label: "Analytics",
-            },
-          ].map((tab) => (
+        {/* Nav + live stats */}
+        <div className="flex-1 overflow-y-auto p-10 space-y-3">
+          <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-300 mb-6">
+            Navigation
+          </h3>
+
+          {NAV_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setView(tab.id)}
-              className={`flex items-center gap-3 px-10 py-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px] transition-all duration-500
-                ${
-                  view === tab.id
-                    ? "bg-black text-white shadow-2xl translate-y-[-2px]"
-                    : "text-neutral-500 hover:text-black hover:bg-white/50"
-                }`}
+              className={`w-full flex items-center justify-between p-5 rounded-[24px] border-2 transition-all ${
+                view === tab.id
+                  ? "border-slate-900 bg-white shadow-lg"
+                  : "border-slate-50 bg-slate-50/50 text-slate-400 hover:text-slate-900 hover:bg-white"
+              }`}
             >
-              {tab.icon}
-              <span className={view === tab.id ? "block" : "hidden md:block"}>
-                {tab.label}
-              </span>
+              <div className="flex items-center gap-4">
+                <div
+                  className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
+                    view === tab.id
+                      ? "bg-slate-900 text-yellow-400"
+                      : "bg-slate-100 text-slate-400"
+                  }`}
+                >
+                  {tab.icon}
+                </div>
+                <span className="text-sm font-black uppercase tracking-widest">
+                  {tab.label}
+                </span>
+              </div>
+              <ChevronRight
+                size={16}
+                className={`transition-transform ${
+                  view === tab.id ? "translate-x-1 text-slate-900" : "text-slate-300"
+                }`}
+              />
             </button>
           ))}
-        </nav>
 
-        {/* THE "COMMAND" STATS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-24">
-          <StatCard
-            label="Inbound Orders"
-            value={stats.totalOrders}
-            icon={<Globe size={28} />}
-            trend="Global"
-            color="white"
-          />
-          <StatCard
-            label="In Transit"
-            value={stats.activeDeliveries}
-            icon={<Truck size={28} />}
-            trend="Active"
-            color="orange"
-            pulse
-          />
-          <StatCard
-            label="Active Fleet"
-            value={stats.activeCouriers}
-            total={stats.totalCouriers}
-            icon={<Users size={28} />}
-            trend="Deployment"
-            color="black"
-          />
-          <StatCard
-            label="Gross Yield"
-            value={`KES ${stats.revenue?.toLocaleString() || 0}`}
-            icon={<Zap size={28} />}
-            trend="Yield"
-            color="white"
-          />
-          <StatCard
-            label="Avg Turnaround"
-            value={`${stats.avgDeliveryTime || 0}m`}
-            icon={<Clock size={28} />}
-            trend="Velocity"
-            color="orange"
-          />
+          <div className="pt-6 space-y-3">
+            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-300 pb-2">
+              Live Stats
+            </h3>
+            <StatRow icon={<Truck size={16} />}   label="In Transit"      value={stats.activeDeliveries} />
+            <StatRow icon={<Users size={16} />}   label="Active Couriers" value={stats.activeCouriers}  />
+            <StatRow icon={<Clock size={16} />}   label="Avg Delivery"    value={`${stats.avgDeliveryTime}m`} />
+            <StatRow icon={<Package size={16} />} label="Pending"         value={stats.pendingOrders}   />
+          </div>
         </div>
 
-        {/* CINEMATIC CONTENT CANVAS */}
-        <div className="relative group">
-          <div className="absolute -top-10 left-0 flex items-center gap-4">
-            <div className="h-[1px] w-20 bg-black/10"></div>
-            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-neutral-400">
-              {view} execution window
-            </span>
-          </div>
+        {/* Logout */}
+        <div className="p-6 border-t border-slate-100">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-between p-4 bg-red-50 text-red-500 rounded-3xl hover:bg-red-100 transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <LogOut size={18} />
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                Logout
+              </span>
+            </div>
+            <ChevronRight
+              size={16}
+              className="group-hover:translate-x-1 transition-transform"
+            />
+          </button>
+        </div>
+      </div>
 
+      {/* ── RIGHT CONTENT AREA ── */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+
+        {/* Top bar */}
+        <div className="bg-white border-b border-slate-100 px-10 py-6 flex items-center justify-between shadow-sm z-10">
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400">
+              Viewing
+            </p>
+            <h3 className="text-xl font-black tracking-tight capitalize">
+              {NAV_TABS.find((t) => t.id === view)?.label}
+            </h3>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-widest">
+            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+            Live
+          </div>
+        </div>
+
+        {/* Content panel */}
+        <div className="flex-1 overflow-y-auto p-10">
           <motion.div
             key={view}
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: "circOut" }}
-            className="bg-white rounded-[80px] p-12 md:p-20 shadow-[0_100px_150px_-50px_rgba(0,0,0,0.08)] border border-neutral-100"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="bg-white rounded-[40px] p-10 shadow-sm border border-slate-100 min-h-full"
           >
-            {view === "overview" && <Dashboard stats={stats} />}
-            {view === "orders" && (
-              <AllOrders onAssignCourier={handleAssignCourier} />
-            )}
-            {view === "users" && <AllUsers />}
-            {view === "analytics" && (
-              <Dashboard stats={stats} showDetailedAnalytics={true} />
-            )}
+            {view === "overview"  && <Dashboard stats={stats} />}
+            {view === "orders"    && <AllOrders onAssignCourier={handleAssignCourier} />}
+            {view === "users"     && <AllUsers />}
+            {view === "analytics" && <Dashboard stats={stats} showDetailedAnalytics={true} />}
           </motion.div>
         </div>
       </div>
 
-      {/* OVERLAY: ASSIGN PROTOCOL */}
+      {/* ── ASSIGN MODAL ── */}
       <AnimatePresence>
         {showAssignModal && (
           <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
@@ -307,46 +300,36 @@ const AdminDashboard = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowAssignModal(false)}
-              className="absolute inset-0 bg-black/95 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
-
             <motion.div
-              initial={{ opacity: 0, y: 100, rotateX: 15 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0 }}
-              exit={{ opacity: 0, y: 100, rotateX: 15 }}
-              className="bg-white rounded-[60px] p-12 lg:p-24 max-w-5xl w-full shadow-2xl relative z-10 overflow-hidden border border-neutral-200"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 40 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="bg-white rounded-[40px] p-10 lg:p-16 max-w-3xl w-full shadow-2xl relative z-10 border border-slate-100"
             >
-              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#EA580C]/5 rounded-full blur-[120px] -mr-64 -mt-64" />
-
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-20 relative gap-8">
+              <div className="flex justify-between items-center mb-10">
                 <div>
-                  <span className="text-[#EA580C] font-black uppercase tracking-[1em] text-[10px] block mb-4">
-                    Protocol Alpha
-                  </span>
-                  <h3 className="text-7xl font-black tracking-tighter uppercase italic leading-none">
-                    Assign <br />
-                    <span className="text-[#EA580C] not-italic">Operator.</span>
+                  <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 mb-1">
+                    Assignment
+                  </p>
+                  <h3 className="text-3xl font-black tracking-tight">
+                    Assign Courier
                   </h3>
                 </div>
                 <button
                   onClick={() => setShowAssignModal(false)}
-                  className="group flex items-center gap-4 bg-neutral-100 px-8 py-4 rounded-full font-black uppercase text-[10px] tracking-widest hover:bg-black hover:text-white transition-all"
+                  className="flex items-center gap-3 bg-slate-100 px-5 py-3 rounded-full font-black uppercase text-[10px] tracking-widest hover:bg-slate-900 hover:text-white transition-all"
                 >
-                  Close{" "}
-                  <X
-                    size={16}
-                    className="group-hover:rotate-90 transition-transform"
-                  />
+                  Close <X size={14} />
                 </button>
               </div>
-
-              <div className="relative">
-                <AssignCourier
-                  order={selectedOrder}
-                  onClose={() => setShowAssignModal(false)}
-                  onAssignComplete={handleAssignComplete}
-                />
-              </div>
+              <AssignCourier
+                order={selectedOrder}
+                onClose={() => setShowAssignModal(false)}
+                onAssignComplete={handleAssignComplete}
+              />
             </motion.div>
           </div>
         )}
@@ -355,66 +338,17 @@ const AdminDashboard = () => {
   );
 };
 
-/* REUSABLE STAT CARD */
-const StatCard = ({ label, value, icon, trend, color, pulse, total }) => {
-  const themes = {
-    black: "bg-[#0A0A0A] text-white shadow-[0_40px_60px_-15px_rgba(0,0,0,0.3)]",
-    orange:
-      "bg-[#EA580C] text-white shadow-[0_40px_60px_-15px_rgba(234,88,12,0.3)]",
-    white:
-      "bg-white text-black border border-neutral-100 shadow-[20px_20px_60px_-15px_rgba(0,0,0,0.03)]",
-  };
-
-  return (
-    <motion.div
-      whileHover={{ y: -12, scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 300 }}
-      className={`${themes[color]} p-12 rounded-[50px] relative overflow-hidden group h-[300px] flex flex-col justify-between`}
-    >
-      <div
-        className={`absolute -right-6 -top-6 opacity-10 group-hover:opacity-20 transition-all duration-700 group-hover:scale-125`}
-      >
+/* Sidebar stat row */
+const StatRow = ({ icon, label, value }) => (
+  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-[20px]">
+    <div className="flex items-center gap-3 text-slate-500">
+      <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm">
         {icon}
       </div>
+      <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
+    </div>
+    <span className="text-sm font-black text-slate-900">{value}</span>
+  </div>
+);
 
-      <div className="relative z-10">
-        <div className="flex items-center gap-3 mb-10">
-          <span
-            className={`w-8 h-[1px] ${color === "white" ? "bg-[#EA580C]" : "bg-white/40"}`}
-          ></span>
-          <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-60">
-            {label}
-          </span>
-        </div>
-        <h3 className="text-6xl font-black tracking-tighter italic uppercase leading-none">
-          {value}
-        </h3>
-      </div>
-
-      <div className="flex items-center justify-between mt-8 relative z-10">
-        <div className="flex items-center gap-3">
-          {pulse ? (
-            <div className="flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full">
-              <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-              <span className="text-[9px] font-black uppercase tracking-widest">
-                Live
-              </span>
-            </div>
-          ) : (
-            <span className="text-[9px] font-black uppercase tracking-[0.3em] opacity-40">
-              {trend}
-            </span>
-          )}
-        </div>
-        {total && (
-          <span className="text-[9px] font-black uppercase bg-white/10 px-3 py-1 rounded-md">
-            Deploy: {total}
-          </span>
-        )}
-      </div>
-    </motion.div>
-  );
-};
-
-// THIS IS THE LINE THAT FIXES YOUR ERROR
 export default AdminDashboard;
