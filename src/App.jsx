@@ -1,138 +1,162 @@
-import "leaflet/dist/leaflet.css";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import ProtectedRoute from "./components/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute";
-
-// Pages
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Landing from "./pages/Landing";
-import Unauthorized from "./pages/Unauthorized";
-import AdminDashboard from "./pages/AdminDashboard";
+import VerifyEmail from "./pages/VerifyEmail";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import CreateOrder from "./pages/CreateOrder";
+import OrdersList from "./pages/OrdersList";
+import OrderDetail from "./pages/OrderDetail";
+import CourierOrders from "./pages/CourierOrders";
 import CourierDashboard from "./pages/CourierDashboard";
-import RiderProfile from "./pages/RiderProfile";
-import CreateOrder from "./features/orders/CreateOrder";
-import MyOrders from "./features/orders/MyOrders";
-import OrderDetails from "./features/orders/OrderDetails";
-import UserProfile from "./features/user/UserProfile";
+import AdminDashboard from "./pages/AdminDashboard";
+import Profile from "./pages/Profile";
+import AdminLayout from "./layouts/AdminLayout";
+import CourierLayout from "./layouts/CourierLayout";
+import AdminUsers from "./pages/AdminUsers";
+import AdminReports from "./pages/AdminReports";
+import AdminOrders from "./pages/AdminOrders";
 
-import { Routes, Route, Navigate } from "react-router-dom";
+const ProtectedRoute = ({ children, roles }) => {
+  const { isAuthenticated, user, loading } = useAuth();
 
-function App() {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (roles && !roles.includes(user?.role)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+// Component to handle root redirect based on role
+const HomeRedirect = () => {
+    const { user, isAuthenticated, loading } = useAuth();
+    
+    if (loading) return null;
+
+    if (isAuthenticated) {
+        if (user?.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
+        if (user?.role === 'courier') return <Navigate to="/courier/dashboard" replace />;
+    }
+    
+    return <Home />;
+};
+
+const App = () => {
+  const { loading, user } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
+  // Helper to check if we should show main navbar
+  const showNavbar = !user || user.role === 'customer';
+
   return (
-    <div className="flex flex-col min-h-screen bg-white selection:bg-yellow-200">
-      <Navbar />
-      <main className="flex-grow">
-        <Routes>
-          {/* Public routes */}
-          <Route
-            path="/"
-            element={
-              <PublicRoute>
-                <Landing />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <PublicRoute>
-                <Register />
-              </PublicRoute>
-            }
-          />
-          <Route path="/unauthorized" element={<Unauthorized />} />
+    <div className="min-h-screen bg-gray-100">
+      {showNavbar && <Navbar />}
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<HomeRedirect />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* Orders */}
-          <Route
-            path="/orders/new"
-            element={
-              <ProtectedRoute>
-                <CreateOrder />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/orders"
-            element={
-              <ProtectedRoute>
-                <MyOrders />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/orders/:id"
-            element={
-              <ProtectedRoute>
-                <OrderDetails />
-              </ProtectedRoute>
-            }
-          />
+        {/* Customer Routes */}
+        <Route
+          path="/create-order"
+          element={
+            <ProtectedRoute roles={["customer"]}>
+              <CreateOrder />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute roles={["customer"]}>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
 
-          {/* User */}
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <UserProfile />
-              </ProtectedRoute>
-            }
-          />
+        {/* Shared Order Routes (Customer view) */}
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute roles={["customer"]}>
+              <OrdersList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders/:id"
+          element={
+            <ProtectedRoute roles={["customer", "courier", "admin"]}>
+              <OrderDetail />
+            </ProtectedRoute>
+          }
+        />
 
-          {/* Admin - Option B: force route to render without guard so it never appears blank */}
-          <Route
-            path="/admin"
-            element={<Navigate to="/admin/control-center" replace />}
-          />
-          <Route
-            path="/admin/control-center"
-            element={
-              <AdminDashboard />
-            }
-          />
+        {/* Courier Routes */}
+        <Route
+          path="/courier"
+          element={
+            <ProtectedRoute roles={["courier"]}>
+              <CourierLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<CourierDashboard />} />
+          <Route path="orders" element={<CourierOrders />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
 
-          {/* Courier */}
-          <Route
-            path="/courier"
-            element={<Navigate to="/courier/dashboard" replace />}
-          />
-          <Route
-            path="/courier/dashboard"
-            element={
-              <ProtectedRoute role="courier">
-                <CourierDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/rider/profile"
-            element={
-              <ProtectedRoute role="courier">
-                <RiderProfile />
-              </ProtectedRoute>
-            }
-          />
+        {/* Admin Routes */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute roles={["admin"]}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="orders/:id" element={<OrderDetail />} />
+          <Route path="reports" element={<AdminReports />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
 
-          {/* Legacy */}
-          <Route path="/user" element={<Navigate to="/orders/new" replace />} />
-
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-
-      <Footer />
+        {/* Catch all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </div>
   );
-}
+};
 
 export default App;

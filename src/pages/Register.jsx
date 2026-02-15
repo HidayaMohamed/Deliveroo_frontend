@@ -1,222 +1,235 @@
 import { useState } from "react";
-import { useAuth } from "../features/auth/useAuth";
-import { Link, useSearchParams, Navigate } from "react-router-dom";
-import { User, Mail, Phone, Lock, Truck, ArrowRight, ShieldCheck } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Register = () => {
-  const [searchParams] = useSearchParams();
-  const defaultRole = searchParams.get("role") || "customer";
-
-  const [form, setForm] = useState({
+  const [formData, setFormData] = useState({
     full_name: "",
     email: "",
     phone: "",
     password: "",
-    role: defaultRole,
+    confirmPassword: "",
+    role: "customer",
     vehicle_type: "",
     plate_number: "",
   });
-
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { register, user } = useAuth();
-  
+  const [successMode, setSuccessMode] = useState(false);
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: name === "role" ? value.toLowerCase() : value,
-    }));
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+
+    if (formData.password !== formData.confirmPassword) {
+      return;
+    }
+
+    const data = {
+      full_name: formData.full_name,
+      email: formData.email,
+      phone: formData.phone,
+      password: formData.password,
+      role: formData.role,
+    };
+
+    if (formData.role === "courier") {
+      data.vehicle_type = formData.vehicle_type;
+      data.plate_number = formData.plate_number;
+    }
+
     setLoading(true);
-    try {
-      await register(form);
-    } catch (err) {
-      setError(err.message || "Registration failed. Please try again.");
-    } finally {
-      setLoading(false);
+    const result = await register(data);
+    setLoading(false);
+    
+    if (result.success) {
+      // Don't navigate, show success message
+      setSuccessMode(true);
     }
   };
 
-  if (user) {
-    if (user.role === "admin") return <Navigate to="/admin" replace />;
-    if (user.role === "courier") return <Navigate to="/courier" replace />;
-    return <Navigate to="/orders/new" replace />;
+  if (successMode) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Registration Successful!</h2>
+          <p className="text-gray-600 mb-6">
+            Please check your email to verify your account. You won't be able to log in until you verify your email address.
+          </p>
+          <Link 
+            to="/login"
+            className="inline-block bg-orange-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-600 transition-colors"
+          >
+            Go to Login
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-[5%] py-20 bg-white selection:bg-yellow-200">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="mb-12">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="w-8 h-[2px] bg-yellow-500" />
-            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-600">Join The Fleet</span>
-          </div>
-          <h1 className="text-5xl font-black tracking-tighter">
-            Create <span className="italic">account</span><span className="text-yellow-500">.</span>
-          </h1>
-        </div>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4">
+      <div className="max-w-md w-full">
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
+            Create Account
+          </h2>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-[20px] p-5 mb-8 flex items-start gap-3">
-            <div className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />
-            <p className="text-red-800 text-sm font-bold">{error}</p>
-          </div>
-        )}
-
-        {/* Role Selector */}
-        <div className="mb-8">
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 block">I want to</label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setForm({ ...form, role: "customer" })}
-              className={`p-5 rounded-[25px] border-2 text-left transition-all ${
-                form.role === "customer"
-                  ? "border-black bg-black text-white shadow-xl"
-                  : "border-gray-100 bg-gray-50 hover:border-gray-300"
-              }`}
-            >
-              <User size={20} className={form.role === "customer" ? "text-yellow-400 mb-2" : "text-gray-400 mb-2"} />
-              <p className="text-xs font-black uppercase tracking-widest">Send Parcels</p>
-            </button>
-            <button
-              type="button"
-              onClick={() => setForm({ ...form, role: "courier" })}
-              className={`p-5 rounded-[25px] border-2 text-left transition-all ${
-                form.role === "courier"
-                  ? "border-black bg-black text-white shadow-xl"
-                  : "border-gray-100 bg-gray-50 hover:border-gray-300"
-              }`}
-            >
-              <Truck size={20} className={form.role === "courier" ? "text-yellow-400 mb-2" : "text-gray-400 mb-2"} />
-              <p className="text-xs font-black uppercase tracking-widest">Deliver Parcels</p>
-            </button>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="relative group">
-            <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-yellow-500 rounded-full opacity-0 group-focus-within:opacity-100 transition-all" />
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">Full Name</label>
-            <div className="relative">
-              <User size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Full Name
+              </label>
               <input
+                type="text"
                 name="full_name"
+                value={formData.full_name}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 placeholder="John Doe"
-                value={form.full_name}
-                onChange={handleChange}
-                className="w-full bg-gray-50 p-6 pl-14 rounded-[25px] outline-none font-bold text-sm shadow-sm focus:shadow-xl focus:bg-white transition-all placeholder:text-gray-300 border border-transparent focus:border-yellow-500"
                 required
               />
             </div>
-          </div>
 
-          <div className="relative group">
-            <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-yellow-500 rounded-full opacity-0 group-focus-within:opacity-100 transition-all" />
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">Email Address</label>
-            <div className="relative">
-              <Mail size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
               <input
-                name="email"
                 type="email"
-                placeholder="you@example.com"
-                value={form.email}
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
-                className="w-full bg-gray-50 p-6 pl-14 rounded-[25px] outline-none font-bold text-sm shadow-sm focus:shadow-xl focus:bg-white transition-all placeholder:text-gray-300 border border-transparent focus:border-yellow-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="your@email.com"
                 required
               />
             </div>
-          </div>
 
-          <div className="relative group">
-            <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-yellow-500 rounded-full opacity-0 group-focus-within:opacity-100 transition-all" />
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">Phone Number</label>
-            <div className="relative">
-              <Phone size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone (with country code)
+              </label>
               <input
+                type="tel"
                 name="phone"
-                placeholder="+254712345678"
-                value={form.phone}
+                value={formData.phone}
                 onChange={handleChange}
-                className="w-full bg-gray-50 p-6 pl-14 rounded-[25px] outline-none font-bold text-sm shadow-sm focus:shadow-xl focus:bg-white transition-all placeholder:text-gray-300 border border-transparent focus:border-yellow-500"
-                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="+254700000000"
               />
             </div>
-          </div>
 
-          <div className="relative group">
-            <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-yellow-500 rounded-full opacity-0 group-focus-within:opacity-100 transition-all" />
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">Password</label>
-            <div className="relative">
-              <Lock size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                I want to be a
+              </label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              >
+                <option value="customer">Customer</option>
+                <option value="courier">Courier</option>
+              </select>
+            </div>
+
+            {formData.role === "courier" && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Vehicle Type
+                  </label>
+                  <select
+                    name="vehicle_type"
+                    value={formData.vehicle_type}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    required={formData.role === "courier"}
+                  >
+                    <option value="">Select vehicle type</option>
+                    <option value="Motorcycle">Motorcycle</option>
+                    <option value="Bicycle">Bicycle</option>
+                    <option value="Car">Car</option>
+                    <option value="Van">Van</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Plate Number
+                  </label>
+                  <input
+                    type="text"
+                    name="plate_number"
+                    value={formData.plate_number}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    placeholder="ABC123DE"
+                    required={formData.role === "courier"}
+                  />
+                </div>
+              </>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
               <input
                 type="password"
                 name="password"
-                placeholder="Create a strong password"
-                value={form.password}
+                value={formData.password}
                 onChange={handleChange}
-                className="w-full bg-gray-50 p-6 pl-14 rounded-[25px] outline-none font-bold text-sm shadow-sm focus:shadow-xl focus:bg-white transition-all placeholder:text-gray-300 border border-transparent focus:border-yellow-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="••••••••"
                 required
               />
             </div>
-          </div>
 
-          {/* Courier-specific fields */}
-          {form.role === "courier" && (
-            <div className="bg-gray-50 p-6 rounded-[30px] border border-gray-100 space-y-5">
-              <p className="text-[10px] font-black text-yellow-600 uppercase tracking-[0.2em]">Courier Details</p>
-              <div className="relative group">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">Vehicle Type</label>
-                <input
-                  name="vehicle_type"
-                  placeholder="e.g. Motorcycle, Bicycle, Van"
-                  value={form.vehicle_type}
-                  onChange={handleChange}
-                  className="w-full bg-white p-5 rounded-[20px] outline-none font-bold text-sm shadow-sm focus:shadow-xl transition-all placeholder:text-gray-300 border border-transparent focus:border-yellow-500"
-                />
-              </div>
-              <div className="relative group">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">Plate Number</label>
-                <input
-                  name="plate_number"
-                  placeholder="e.g. KDM 442X"
-                  value={form.plate_number}
-                  onChange={handleChange}
-                  className="w-full bg-white p-5 rounded-[20px] outline-none font-bold text-sm shadow-sm focus:shadow-xl transition-all placeholder:text-gray-300 border border-transparent focus:border-yellow-500"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="••••••••"
+                required
+              />
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-6 bg-black text-white rounded-[30px] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-3 hover:bg-yellow-500 hover:text-black transition-all active:scale-95 shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed group"
-          >
-            {loading ? "Creating account..." : "Create Account"}
-            {!loading && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600 disabled:bg-orange-300"
+            >
+              {loading ? "Creating account..." : "Create Account"}
+            </button>
+          </form>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm font-bold text-gray-400">
+          <p className="mt-4 text-center text-gray-600">
             Already have an account?{" "}
-            <Link to="/login" className="text-black font-black hover:text-yellow-600 transition-colors underline decoration-yellow-500 decoration-2 underline-offset-4">
-              Sign in
+            <Link to="/login" className="text-orange-500 hover:text-orange-600">
+              Login
             </Link>
           </p>
-        </div>
-
-        <div className="flex items-center justify-center gap-2 mt-10">
-          <ShieldCheck size={12} className="text-gray-300" />
-          <p className="text-[9px] text-gray-300 font-bold uppercase tracking-widest">Secure 256-bit encrypted registration</p>
         </div>
       </div>
     </div>
