@@ -25,52 +25,69 @@ const ForgotPassword = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Check your email</h2>
-            <p className="text-gray-600 mb-6">
-                If an account exists for <strong>{email}</strong>, we have sent password reset instructions.
-            </p>
-            <Link 
-              to="/login"
-              className="text-orange-500 hover:text-orange-600 font-medium"
+      <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
+        <div className="max-w-md w-full bg-white rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] border border-gray-100 p-10 text-center">
+          <div className="w-20 h-20 bg-yellow-400/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <svg
+              className="w-10 h-10 text-yellow-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              Back to Login
-            </Link>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-3xl font-black text-black uppercase tracking-tighter mb-4">
+            Check your email
+          </h2>
+          <p className="text-gray-500 mb-8 font-medium leading-relaxed">
+            If an account exists for{" "}
+            <strong className="text-black">{email}</strong>, we have sent
+            password reset instructions.
+          </p>
+          <Link
+            to="/login"
+            className="text-yellow-500 hover:text-yellow-400 font-black uppercase text-xs tracking-widest"
+          >
+            Back to Login
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Reset Password</h2>
-        <p className="text-gray-600 text-center mb-6">
-          Enter your email address and we'll send you a link to reset your password.
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
+      <div className="max-w-md w-full bg-white rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] border border-gray-100 p-10">
+        <h2 className="text-3xl font-black text-center text-black uppercase tracking-tighter mb-6">
+          Reset Password
+        </h2>
+        <p className="text-gray-500 text-center mb-8 font-medium">
+          Enter your email address and we'll send you a link to reset your
+          password.
         </p>
 
         {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
-                {error}
-            </div>
+          <div className="bg-red-50 text-red-500 p-4 rounded-2xl mb-6 text-sm font-medium">
+            {error}
+          </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-3 ml-1">
               Email Address
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold"
               required
             />
           </div>
@@ -78,14 +95,17 @@ const ForgotPassword = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600 disabled:bg-orange-300 transition-colors"
+            className="w-full bg-yellow-400 text-black py-4 rounded-full font-black text-xs uppercase tracking-[0.2em] hover:bg-yellow-300 disabled:bg-gray-200 transition-all shadow-lg shadow-yellow-400/20"
           >
             {loading ? "Sending..." : "Send Reset Link"}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-gray-600">
-          <Link to="/login" className="text-orange-500 hover:text-orange-600">
+        <p className="mt-6 text-center text-gray-500">
+          <Link
+            to="/login"
+            className="text-yellow-500 hover:text-yellow-400 font-black uppercase text-xs tracking-widest"
+          >
             Back to Login
           </Link>
         </p>

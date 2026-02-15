@@ -1,143 +1,156 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState, useRef, useEffect } from "react";
-import { User, LogOut, Package, ChevronDown, UserCircle } from "lucide-react";
-
+import {
+  User,
+  LogOut,
+  Package,
+  ChevronDown,
+  UserCircle,
+  Zap,
+} from "lucide-react";
 
 const Navbar = () => {
- const { user, isCustomer, isCourier, isAdmin, logout } = useAuth();
- const navigate = useNavigate();
- const [isDropdownOpen, setIsDropdownOpen] = useState(false);
- const dropdownRef = useRef(null);
+  const { user, isCustomer, isCourier, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
- const handleLogout = () => {
-   logout();
-   navigate("/login");
- };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
+  if (isAdmin) return null;
 
- // Close dropdown when clicking outside
- useEffect(() => {
-   const handleClickOutside = (event) => {
-     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-       setIsDropdownOpen(false);
-     }
-   };
-   document.addEventListener("mousedown", handleClickOutside);
-   return () => {
-     document.removeEventListener("mousedown", handleClickOutside);
-   };
- }, []);
+  return (
+    <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
+      <div className="container mx-auto px-6">
+        <div className="flex justify-between items-center py-5">
+          {/* Logo - Minimalist Yellow & Black */}
+          <Link
+            to="/"
+            className="text-xl font-black text-black flex items-center gap-2 tracking-tighter uppercase"
+          >
+            <div className="bg-yellow-400 p-1.5 rounded-lg text-black">
+              <Zap size={20} fill="currentColor" />
+            </div>
+            Deliveroo
+          </Link>
 
+          <div className="flex items-center gap-8">
+            {user ? (
+              <>
+                <div className="hidden md:flex items-center gap-6">
+                  {isCustomer && (
+                    <Link
+                      to="/create-order"
+                      className="bg-black text-white px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-all flex items-center gap-2 shadow-lg shadow-black/5"
+                    >
+                      <Package size={14} /> New Order
+                    </Link>
+                  )}
 
- if (isAdmin) return null;
-
-
- return (
-   <nav className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
-     <div className="container mx-auto px-4">
-       <div className="flex justify-between items-center py-4">
-         <Link to="/" className="text-2xl font-bold text-orange-600 flex items-center gap-2">
-           🚗 Deliveroo
-         </Link>
-
-
-         <div className="flex items-center gap-6">
-           {user ? (
-             <>
-                <div className="hidden md:flex items-center gap-4">
-                   {isCustomer && (
-                     <Link
-                       to="/create-order"
-                       className="bg-orange-500 text-white px-5 py-2.5 rounded-full font-medium hover:bg-orange-600 transition shadow-md shadow-orange-500/20 flex items-center gap-2"
-                     >
-                        <Package size={18} /> New Order
-                     </Link>
-                   )}
-
-
-                   {isCourier && (
-                     <Link
-                       to="/courier/orders"
-                       className="bg-orange-500 text-white px-5 py-2.5 rounded-full font-medium hover:bg-orange-600 transition shadow-md shadow-orange-500/20"
-                     >
-                       Scanner Dashboard
-                     </Link>
-                   )}
+                  {isCourier && (
+                    <Link
+                      to="/courier/orders"
+                      className="bg-yellow-400 text-black px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/10"
+                    >
+                      Scanner Dashboard
+                    </Link>
+                  )}
                 </div>
 
+                {/* User Dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex items-center gap-3 hover:bg-gray-50 px-3 py-2 rounded-xl transition-all border border-transparent hover:border-gray-100"
+                  >
+                    <div className="w-9 h-9 bg-black text-yellow-400 rounded-full flex items-center justify-center font-black text-sm border-2 border-yellow-400/20">
+                      {user.full_name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="font-bold text-black text-sm hidden sm:block uppercase tracking-tight">
+                      {user.full_name}
+                    </span>
+                    <ChevronDown
+                      size={14}
+                      className={`text-gray-400 transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
 
-               {/* User Dropdown */}
-               <div className="relative" ref={dropdownRef}>
-                 <button
-                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                   className="flex items-center gap-2 hover:bg-gray-50 p-2 rounded-lg transition-colors"
-                 >
-                   <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold">
-                       {user.full_name.charAt(0).toUpperCase()}
-                   </div>
-                   <span className="font-medium text-gray-700 hidden sm:block">{user.full_name}</span>
-                   <ChevronDown size={16} className={`text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                 </button>
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 py-3 animate-in fade-in zoom-in-95 duration-200">
+                      <div className="px-5 py-3 border-b border-gray-50 mb-2">
+                        <p className="text-xs font-black text-black uppercase tracking-widest">
+                          {user.full_name}
+                        </p>
+                        <p className="text-[10px] text-yellow-500 font-bold uppercase tracking-[0.2em] mt-1 italic">
+                          {user.role}
+                        </p>
+                      </div>
 
+                      <Link
+                        to="/profile"
+                        className="flex items-center gap-3 px-5 py-2.5 text-gray-600 hover:bg-yellow-400/10 hover:text-black font-bold text-xs uppercase tracking-widest transition-colors"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <UserCircle size={16} /> Profile
+                      </Link>
 
-                 {isDropdownOpen && (
-                   <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 animate-in fade-in slide-in-from-top-2">
-                       <div className="px-4 py-2 border-b border-gray-100 mb-2">
-                            <p className="text-sm font-bold text-gray-800">{user.full_name}</p>
-                            <p className="text-xs text-gray-500 capitalize">{user.role}</p>
-                       </div>
+                      <Link
+                        to="/orders"
+                        className="flex items-center gap-3 px-5 py-2.5 text-gray-600 hover:bg-yellow-400/10 hover:text-black font-bold text-xs uppercase tracking-widest transition-colors"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <Package size={16} /> My Orders
+                      </Link>
 
+                      <div className="border-t border-gray-50 my-2"></div>
 
-                       <Link
-                           to="/profile"
-                           className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                           onClick={() => setIsDropdownOpen(false)}
-                       >
-                           <UserCircle size={18} /> Profile
-                       </Link>
-                      
-                       <Link
-                           to="/orders"
-                           className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                           onClick={() => setIsDropdownOpen(false)}
-                       >
-                           <Package size={18} /> My Orders
-                       </Link>
-
-
-                       <div className="border-t border-gray-100 my-2"></div>
-                      
-                       <button
-                           onClick={handleLogout}
-                           className="w-full text-left flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
-                       >
-                           <LogOut size={18} /> Logout
-                       </button>
-                   </div>
-                 )}
-               </div>
-             </>
-           ) : (
-             <div className="flex items-center gap-4">
-               <Link to="/login" className="text-gray-600 hover:text-orange-600 font-medium transition-colors">
-                 Login
-               </Link>
-               <Link
-                 to="/register"
-                 className="bg-orange-500 text-white px-6 py-2.5 rounded-full font-bold hover:bg-orange-600 transition shadow-lg shadow-orange-500/20"
-               >
-                 Sign Up
-               </Link>
-             </div>
-           )}
-         </div>
-       </div>
-     </div>
-   </nav>
- );
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left flex items-center gap-3 px-5 py-2.5 text-red-500 hover:bg-red-50 font-bold text-xs uppercase tracking-widest transition-colors"
+                      >
+                        <LogOut size={16} /> Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center gap-6">
+                <Link
+                  to="/login"
+                  className="text-black hover:text-yellow-500 text-xs font-black uppercase tracking-[0.2em] transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-yellow-400 text-black px-8 py-3 rounded-full text-xs font-black uppercase tracking-[0.2em] hover:bg-yellow-300 transition-all shadow-xl shadow-yellow-400/10"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
 };
-
 
 export default Navbar;
