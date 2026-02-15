@@ -1,20 +1,11 @@
-import { useState } from "react";
-import { Link, useLocation, Navigate, Outlet } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Users,
-  Package,
-  BarChart3,
-  Menu,
-  X,
-  LogOut,
-  User,
-} from "lucide-react";
+import { useState } from 'react';
+import { Link, useLocation, Navigate, Outlet } from 'react-router-dom';
+import { LayoutDashboard, Users, Package, BarChart3, Menu, X, LogOut, User } from 'lucide-react';
 
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
-  const token = sessionStorage.getItem("accessToken");
+  const token = sessionStorage.getItem('accessToken');
   // Simple role check - in a real app decode token or use context
   // Assuming if they are here, route protection handled it, but good to be safe
 
@@ -23,45 +14,42 @@ const AdminLayout = () => {
   }
 
   const navItems = [
-    { path: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { path: "/admin/orders", icon: Package, label: "Orders" },
-    { path: "/admin/users", icon: Users, label: "Users" },
-    { path: "/admin/reports", icon: BarChart3, label: "Reports" },
-    { path: "/admin/profile", icon: User, label: "Profile" },
+    { path: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/admin/orders', icon: Package, label: 'Orders' },
+    { path: '/admin/users', icon: Users, label: 'Users' },
+    { path: '/admin/reports', icon: BarChart3, label: 'Reports' },
+    { path: '/admin/profile', icon: User, label: 'Profile' },
   ];
 
   const handleLogout = () => {
-    sessionStorage.removeItem("accessToken");
-    sessionStorage.removeItem("refreshToken");
-    window.location.href = "/login";
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('refreshToken');
+    window.location.href = '/login';
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
-        <div
+        <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside
+      <aside 
         className={`fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         <div className="h-full flex flex-col">
           {/* Logo */}
           <div className="h-16 flex items-center justify-between px-6 border-b flex-shrink-0">
-            <Link
-              to="/admin/dashboard"
-              className="text-xl font-bold text-orange-600"
-            >
+            <Link to="/admin/dashboard" className="text-xl font-bold text-orange-600">
               Deliveroo Admin
             </Link>
-            <button
+            <button 
               onClick={() => setIsSidebarOpen(false)}
               className="lg:hidden text-gray-500"
             >
@@ -80,9 +68,9 @@ const AdminLayout = () => {
                   to={item.path}
                   onClick={() => setIsSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-orange-50 text-orange-600"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    isActive 
+                      ? 'bg-orange-50 text-orange-600' 
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   <Icon size={20} />
@@ -109,15 +97,14 @@ const AdminLayout = () => {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden lg:ml-64 transition-all duration-300">
         {/* Mobile Header */}
         <header className="lg:hidden bg-white shadow-sm h-16 flex items-center px-4 flex-shrink-0 sticky top-0 z-10">
-          <button
+          <button 
             onClick={() => setIsSidebarOpen(true)}
             className="text-gray-600 hover:text-gray-900"
           >
             <Menu size={24} />
           </button>
           <span className="ml-4 font-semibold text-gray-800">
-            {navItems.find((i) => i.path === location.pathname)?.label ||
-              "Admin"}
+            {navItems.find(i => i.path === location.pathname)?.label || 'Admin'}
           </span>
         </header>
 
