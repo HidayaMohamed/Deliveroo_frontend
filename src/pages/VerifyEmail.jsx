@@ -21,7 +21,10 @@ const VerifyEmail = () => {
         setStatus("success");
       } catch (error) {
         setStatus("error");
-        setMessage(error.response?.data?.error || "Verification failed. The link may be invalid or expired.");
+        setMessage(
+          error.response?.data?.error ||
+            "Verification failed. The link may be invalid or expired.",
+        );
       }
     };
 
@@ -29,29 +32,43 @@ const VerifyEmail = () => {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
+      <div className="max-w-md w-full bg-white rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] border border-gray-100 p-10 text-center">
         {status === "verifying" && (
           <div>
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold text-gray-800">Verifying your email...</h2>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-6"></div>
+            <h2 className="text-xl font-black text-black uppercase tracking-tight">
+              Verifying your email...
+            </h2>
           </div>
         )}
 
         {status === "success" && (
           <div>
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            <div className="w-20 h-20 bg-yellow-400/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <svg
+                className="w-10 h-10 text-yellow-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Email Verified!</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-3xl font-black text-black uppercase tracking-tighter mb-4">
+              Email Verified!
+            </h2>
+            <p className="text-gray-500 mb-8 font-medium leading-relaxed">
               Your account has been successfully verified. You can now log in.
             </p>
-            <Link 
+            <Link
               to="/login"
-              className="inline-block bg-orange-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-600 transition-colors"
+              className="inline-block bg-yellow-400 text-black px-8 py-4 rounded-full font-black text-xs uppercase tracking-[0.2em] hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20"
             >
               Go to Login
             </Link>
@@ -60,16 +77,28 @@ const VerifyEmail = () => {
 
         {status === "error" && (
           <div>
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <svg
+                className="w-10 h-10 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Verification Failed</h2>
-            <p className="text-gray-600 mb-6">{message}</p>
-            <Link 
+            <h2 className="text-3xl font-black text-black uppercase tracking-tighter mb-4">
+              Verification Failed
+            </h2>
+            <p className="text-gray-500 mb-8 font-medium">{message}</p>
+            <Link
               to="/login"
-              className="text-orange-500 hover:text-orange-600 font-medium"
+              className="text-yellow-500 hover:text-yellow-400 font-black uppercase text-xs tracking-widest"
             >
               Back to Login
             </Link>

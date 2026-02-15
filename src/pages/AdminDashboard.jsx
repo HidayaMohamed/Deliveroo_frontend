@@ -85,10 +85,10 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 py-8">
+      <div className="min-h-screen bg-white py-8">
         <div className="container mx-auto px-4">
           <div className="text-center py-12">
-            <p className="text-gray-500">Loading dashboard...</p>
+            <p className="text-gray-500 font-medium">Loading dashboard...</p>
           </div>
         </div>
       </div>
@@ -96,113 +96,139 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
+    <div className="space-y-8">
+      <h1 className="text-3xl font-black text-black tracking-tighter uppercase">
+        Dashboard Overview
+      </h1>
 
       {/* Stats Grid */}
       {stats && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-            <p className="text-3xl font-bold text-orange-500">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white rounded-[24px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] p-6 border border-gray-100 hover:-translate-y-2 transition-all duration-500">
+            <p className="text-4xl font-black text-black tracking-tighter">
               {stats.total_users}
             </p>
-            <p className="text-gray-600 text-sm">Total Users</p>
-            <p className="text-xs text-gray-400 mt-1">
-              {stats.total_customers} customers, {stats.total_couriers}{" "}
-              couriers
+            <p className="text-gray-500 text-sm font-medium mt-2">
+              Total Users
+            </p>
+            <p className="text-xs text-gray-400 mt-1 font-medium">
+              {stats.total_customers} customers, {stats.total_couriers} couriers
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-            <p className="text-3xl font-bold text-blue-500">
+          <div className="bg-white rounded-[24px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] p-6 border border-gray-100 hover:-translate-y-2 transition-all duration-500">
+            <p className="text-4xl font-black text-black tracking-tighter">
               {stats.total_orders}
             </p>
-            <p className="text-gray-600 text-sm">Total Orders</p>
+            <p className="text-gray-500 text-sm font-medium mt-2">
+              Total Orders
+            </p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-            <p className="text-3xl font-bold text-green-500">
+          <div className="bg-white rounded-[24px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] p-6 border border-gray-100 hover:-translate-y-2 transition-all duration-500">
+            <p className="text-4xl font-black text-black tracking-tighter">
               {stats.delivered_orders}
             </p>
-            <p className="text-gray-600 text-sm">Delivered</p>
+            <p className="text-gray-500 text-sm font-medium mt-2">Delivered</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-            <p className="text-3xl font-bold text-purple-500">
+          <div className="bg-white rounded-[24px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] p-6 border border-gray-100 hover:-translate-y-2 transition-all duration-500">
+            <p className="text-4xl font-black text-yellow-400 tracking-tighter">
               KES {stats.total_revenue}
             </p>
-            <p className="text-gray-600 text-sm">Revenue</p>
+            <p className="text-gray-500 text-sm font-medium mt-2">Revenue</p>
           </div>
         </div>
       )}
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-8">
         {/* Recent Orders */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-             <h2 className="text-lg font-semibold text-gray-800">Recent Orders</h2>
-             <Link to="/admin/orders" className="text-sm text-orange-600 hover:text-orange-700">View All</Link>
+        <div className="lg:col-span-2 bg-white rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+            <h2 className="text-xl font-black text-black uppercase tracking-tight">
+              Recent Orders
+            </h2>
+            <Link
+              to="/admin/orders"
+              className="text-xs font-black uppercase tracking-widest text-yellow-500 hover:text-yellow-400 transition-colors"
+            >
+              View All
+            </Link>
           </div>
 
           {recentOrders.length === 0 ? (
-            <p className="p-8 text-center text-gray-500">No orders yet</p>
+            <p className="p-8 text-center text-gray-500 font-medium">
+              No orders yet
+            </p>
           ) : (
             <div className="divide-y divide-gray-100">
               {recentOrders.map((order) => (
-                <div key={order.id} className="p-4 hover:bg-gray-50 transition-colors">
+                <div
+                  key={order.id}
+                  className="p-6 hover:bg-gray-50 transition-all duration-300"
+                >
                   <div className="flex gap-4">
                     {/* Image Thumbnail */}
-                    <div className="flex-shrink-0 h-16 w-16 bg-gray-200 rounded-lg overflow-hidden border border-gray-200">
-                        {order.parcel_image_url ? (
-                            <img src={order.parcel_image_url} alt="Parcel" className="h-full w-full object-cover" />
-                        ) : (
-                            <div className="h-full w-full flex items-center justify-center text-gray-400 text-xs text-center p-1">No Image</div>
-                        )}
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <p className="font-medium text-gray-900 truncate">
-                                #{order.id} - {order.parcel_name}
-                                </p>
-                                <p className="text-sm text-gray-500 flex items-center gap-2 mt-1">
-                                    <span>👤 {order.customer_name || "Unknown"}</span>
-                                    <span>•</span>
-                                    <span>KES {order.price}</span>
-                                </p>
-                            </div>
-                            <span
-                                className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}
-                            >
-                                {order.status}
-                            </span>
+                    <div className="flex-shrink-0 h-16 w-16 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+                      {order.parcel_image_url ? (
+                        <img
+                          src={order.parcel_image_url}
+                          alt="Parcel"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-gray-400 text-xs text-center p-1">
+                          No Image
                         </div>
-                        
-                        <div className="mt-3 flex flex-wrap gap-2">
-                                            <Link 
-                                                to={`/admin/orders/${order.id}`}
-                                                className="text-xs border border-gray-200 text-gray-600 px-2 py-1 rounded hover:bg-gray-50"
-                                            >
-                                                Details
-                                            </Link>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-black text-black truncate uppercase text-sm tracking-tight">
+                            #{order.id} - {order.parcel_name}
+                          </p>
+                          <p className="text-sm text-gray-500 flex items-center gap-2 mt-1 font-medium">
+                            <span>{order.customer_name || "Unknown"}</span>
+                            <span>•</span>
+                            <span>KES {order.price}</span>
+                          </p>
+                        </div>
+                        <span
+                          className={`px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider ${getStatusColor(order.status)}`}
+                        >
+                          {order.status}
+                        </span>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <Link
+                          to={`/admin/orders/${order.id}`}
+                          className="text-xs border border-gray-200 text-gray-500 px-3 py-1.5 rounded-full font-bold hover:bg-black hover:text-white hover:border-black transition-all"
+                        >
+                          Details
+                        </Link>
                         {order.status === "pending" && (
-                            <button
+                          <button
                             onClick={() => {
-                                setAssignForm({ ...assignForm, orderId: order.id });
-                                setShowAssignModal(true);
+                              setAssignForm({
+                                ...assignForm,
+                                orderId: order.id,
+                              });
+                              setShowAssignModal(true);
                             }}
-                            className="text-xs border border-green-200 text-green-600 px-2 py-1 rounded hover:bg-green-50"
-                            >
+                            className="text-xs border border-yellow-200 text-yellow-600 px-3 py-1.5 rounded-full font-bold hover:bg-yellow-400 hover:text-black transition-all"
+                          >
                             Assign Courier
-                            </button>
+                          </button>
                         )}
                         <button
-                            onClick={() =>
+                          onClick={() =>
                             handleUpdateStatus(order.id, "cancelled")
-                            }
-                            className="text-xs border border-red-200 text-red-600 px-2 py-1 rounded hover:bg-red-50"
+                          }
+                          className="text-xs border border-red-200 text-red-500 px-3 py-1.5 rounded-full font-bold hover:bg-red-50 transition-all"
                         >
-                            Cancel
+                          Cancel
                         </button>
-                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -212,60 +238,77 @@ const AdminDashboard = () => {
         </div>
 
         {/* Selected Order Map (Sidebar) */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden h-fit">
-            <div className="p-4 border-b border-gray-100">
-                 <h2 className="text-lg font-semibold text-gray-800">
-                    {selectedOrder ? `Order #${selectedOrder.id} Map` : 'Select Order'}
-                 </h2>
-            </div>
-            <div className="p-4">
-                 {selectedOrder ? (
-                     <div className="space-y-4">
-                         <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                            <OrderMap order={selectedOrder} />
-                         </div>
-                         <button
-                            onClick={() => setSelectedOrder(null)}
-                            className="w-full text-center text-sm text-gray-500 hover:text-gray-700 mt-2"
-                        >
-                            Clear Selection
-                        </button>
-                     </div>
-                 ) : (
-                     <div className="h-48 flex items-center justify-center text-gray-400 text-sm bg-gray-50 rounded-lg">
-                         Select an order to view map
-                     </div>
-                 )}
-            </div>
-            
-            {/* Quick Links */}
-            <div className="p-4 border-t border-gray-100">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Quick Actions</h3>
-                <div className="space-y-2">
-                    <Link to="/admin/users" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded">Manage Users</Link>
-                    <Link to="/admin/reports" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded">View Reports</Link>
+        <div className="bg-white rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden h-fit">
+          <div className="p-6 border-b border-gray-100">
+            <h2 className="text-lg font-black text-black uppercase tracking-tight">
+              {selectedOrder
+                ? `Order #${selectedOrder.id} Map`
+                : "Select Order"}
+            </h2>
+          </div>
+          <div className="p-6">
+            {selectedOrder ? (
+              <div className="space-y-4">
+                <div className="aspect-video bg-gray-50 rounded-2xl overflow-hidden">
+                  <OrderMap order={selectedOrder} />
                 </div>
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="w-full text-center text-sm text-gray-500 hover:text-black font-bold mt-2 transition-colors"
+                >
+                  Clear Selection
+                </button>
+              </div>
+            ) : (
+              <div className="h-48 flex items-center justify-center text-gray-400 text-sm bg-gray-50 rounded-2xl font-medium">
+                Select an order to view map
+              </div>
+            )}
+          </div>
+
+          {/* Quick Links */}
+          <div className="p-6 border-t border-gray-100">
+            <h3 className="text-sm font-black text-black uppercase tracking-wider mb-3">
+              Quick Actions
+            </h3>
+            <div className="space-y-2">
+              <Link
+                to="/admin/users"
+                className="block w-full text-left px-4 py-3 text-sm text-gray-500 hover:bg-gray-50 hover:text-black rounded-xl font-medium transition-all"
+              >
+                Manage Users
+              </Link>
+              <Link
+                to="/admin/reports"
+                className="block w-full text-left px-4 py-3 text-sm text-gray-500 hover:bg-gray-50 hover:text-black rounded-xl font-medium transition-all"
+              >
+                View Reports
+              </Link>
             </div>
+          </div>
         </div>
       </div>
 
       {/* Assign Courier Modal */}
       {showAssignModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-[24px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] p-8 max-w-md w-full mx-4">
+            <h2 className="text-2xl font-black text-black uppercase tracking-tight mb-6">
               Assign Courier
             </h2>
 
             <form onSubmit={handleAssignCourier}>
-              <div className="mb-4">
-                <p className="text-gray-600 mb-2">
-                  Order ID: {assignForm.orderId}
+              <div className="mb-6">
+                <p className="text-gray-500 font-medium mb-2">
+                  Order ID:{" "}
+                  <span className="text-black font-black">
+                    #{assignForm.orderId}
+                  </span>
                 </p>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="mb-6">
+                <label className="block text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-3 ml-1">
                   Select Courier
                 </label>
                 <select
@@ -276,7 +319,7 @@ const AdminDashboard = () => {
                       courierId: e.target.value,
                     })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+                  className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 outline-none transition-all text-sm font-bold"
                   required
                 >
                   <option value="">Select courier...</option>
@@ -290,10 +333,10 @@ const AdminDashboard = () => {
                 </select>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <button
                   type="submit"
-                  className="flex-1 bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                  className="flex-1 bg-yellow-400 text-black py-4 rounded-full font-black text-xs uppercase tracking-[0.2em] hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20"
                 >
                   Assign
                 </button>
@@ -303,7 +346,7 @@ const AdminDashboard = () => {
                     setShowAssignModal(false);
                     setAssignForm({ orderId: "", courierId: "" });
                   }}
-                  className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex-1 bg-gray-100 text-gray-600 py-4 rounded-full font-bold text-xs uppercase tracking-wider hover:bg-gray-200 transition-all"
                 >
                   Cancel
                 </button>
