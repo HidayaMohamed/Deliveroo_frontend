@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState, useContext } from "react";
 import { get, post } from "../../api/fetchWrapper";
-import { setToken, getToken, removeToken } from "../../utils/token";
+import { setToken, getToken, removeToken } from "../utils/token";
 
 export const AuthContext = createContext();
 

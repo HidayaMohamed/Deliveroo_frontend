@@ -24,7 +24,7 @@ import {
   LogOut,
   Truck,
 } from "lucide-react";
-import { getToken, removeToken } from "../utils/token";
+import { getToken, removeToken } from "../services/api";
 
 export default function RiderProfile() {
   const navigate = useNavigate();
