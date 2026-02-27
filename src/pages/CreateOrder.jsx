@@ -62,13 +62,13 @@ const CreateOrder = () => {
     
      if (type === 'pickup') {
          if (pickupMarker.current) pickupMarker.current.remove();
-         pickupMarker.current = new mapboxgl.Marker({ color: "#ea580c" }) // Orange-600
+         pickupMarker.current = new mapboxgl.Marker({ color: "#eab308" }) // Yellow-500
              .setLngLat([lng, lat])
              .setPopup(new mapboxgl.Popup().setText("Pickup"))
              .addTo(map.current);
      } else {
          if (destinationMarker.current) destinationMarker.current.remove();
-         destinationMarker.current = new mapboxgl.Marker({ color: "#2563eb" }) // Blue-600
+         destinationMarker.current = new mapboxgl.Marker({ color: "#000000" }) // Black
              .setLngLat([lng, lat])
              .setPopup(new mapboxgl.Popup().setText("Destination"))
              .addTo(map.current);
@@ -198,7 +198,7 @@ const CreateOrder = () => {
                                'line-cap': 'round'
                            },
                            paint: {
-                               'line-color': '#f97316', // Orange
+                               'line-color': '#eab308', // Yellow
                                'line-width': 5,
                                'line-opacity': 0.75
                            }
@@ -307,7 +307,7 @@ const CreateOrder = () => {
                  name="parcel_name"
                  value={formData.parcel_name}
                  onChange={handleChange}
-                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold"
+                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold"
                  placeholder="e.g., Documents, Electronics"
                  required
                />
@@ -321,7 +321,7 @@ const CreateOrder = () => {
                  name="description"
                  value={formData.description}
                  onChange={handleChange}
-                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold resize-none"
+                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold resize-none"
                  rows="3"
                />
              </div>
@@ -334,7 +334,7 @@ const CreateOrder = () => {
                  type="file"
                  accept="image/*"
                  onChange={handleImageChange}
-                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-black file:uppercase file:tracking-wider file:bg-orange-500 file:text-white hover:file:bg-orange-600 cursor-pointer"
+                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-black file:uppercase file:tracking-wider file:bg-black file:text-yellow-400 hover:file:bg-gray-800 cursor-pointer"
                  required
                />
                <p className="text-xs text-gray-400 font-medium ml-1">Upload an image to help the courier identify your parcel.</p>
@@ -360,7 +360,7 @@ const CreateOrder = () => {
                  onChange={handleChange}
                  step="0.1"
                  min="0.1"
-                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold"
+                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold"
                  required
                />
              </div>
@@ -396,18 +396,18 @@ const CreateOrder = () => {
              </div>
 
              {distance && (
-               <div className="bg-orange-50 border border-orange-100 p-6 rounded-2xl flex justify-between items-center">
+              <div className="bg-yellow-50 border border-yellow-100 p-6 rounded-2xl flex justify-between items-center">
                  <div>
-                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-400 mb-1">Distance</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-500 mb-1">Distance</p>
                    <p className="text-lg font-black text-black">{distance}</p>
                  </div>
                  <div>
-                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-400 mb-1">Est. Time</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-500 mb-1">Est. Time</p>
                    <p className="text-lg font-black text-black">{duration}</p>
                  </div>
                  <div className="text-right">
-                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-400 mb-1">Price</p>
-                   <p className="text-2xl font-black text-orange-500">KSH {price}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-500 mb-1">Price</p>
+                  <p className="text-2xl font-black text-black">KSH {price}</p>
                  </div>
                </div>
              )}
@@ -415,7 +415,7 @@ const CreateOrder = () => {
              <button
                type="submit"
                disabled={loading}
-               className="w-full bg-orange-500 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20 flex items-center justify-center gap-3 disabled:bg-gray-300 disabled:shadow-none mt-2"
+              className="w-full bg-black text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-gray-800 transition-all shadow-xl shadow-black/10 flex items-center justify-center gap-3 disabled:bg-gray-300 disabled:shadow-none mt-2"
              >
                {loading ? "Creating Order..." : "Create Order"}
              </button>
@@ -437,7 +437,7 @@ const CreateOrder = () => {
              onClick={() => setActiveField('pickup')}
              className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${
                activeField === 'pickup'
-                 ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20'
+                 ? 'bg-black text-yellow-400 shadow-xl shadow-black/10'
                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
              }`}
            >
@@ -447,7 +447,7 @@ const CreateOrder = () => {
              onClick={() => setActiveField('destination')}
              className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${
                activeField === 'destination'
-                 ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20'
+                 ? 'bg-black text-yellow-400 shadow-xl shadow-black/10'
                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
              }`}
            >

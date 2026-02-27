@@ -80,7 +80,7 @@ const LocationAutocomplete = ({ placeholder, onSelect, initialValue = "" }) => {
              setShowSuggestions(true);
            }}
            onFocus={() => setShowSuggestions(true)}
-           className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold pr-10"
+           className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold pr-10"
            placeholder={placeholder}
            required
          />

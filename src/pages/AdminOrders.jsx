@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { adminAPI } from "../services/api";
 import toast from "react-hot-toast";
-import { Search, Filter, MapPin, Package, User } from "lucide-react";
+import { Search, MapPin, Package, User } from "lucide-react";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -31,7 +31,7 @@ const AdminOrders = () => {
       const response = await adminAPI.getOrders(params);
       setOrders(response.data.orders);
       setTotalPages(response.data.pages);
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch orders");
     } finally {
       setLoading(false);
@@ -90,14 +90,14 @@ const AdminOrders = () => {
                         placeholder="Search orders..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+                        className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none"
                     />
                 </div>
                 
                 <select
                     value={statusFilter}
                     onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-                    className="border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-orange-500"
+                    className="border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-yellow-400"
                 >
                     <option value="">All Statuses</option>
                     <option value="pending">Pending</option>
@@ -183,7 +183,7 @@ const AdminOrders = () => {
                                                         setAssignForm({ orderId: order.id, courierId: "" });
                                                         setShowAssignModal(true);
                                                     }}
-                                                    className="text-sm px-3 py-1 bg-orange-50 border border-orange-200 rounded hover:bg-orange-100 text-orange-700"
+                                                    className="text-sm px-3 py-1 bg-yellow-50 border border-yellow-200 rounded hover:bg-yellow-100 text-black"
                                                 >
                                                     Assign Courier
                                                 </button>
@@ -230,7 +230,7 @@ const AdminOrders = () => {
                             <select
                                 value={assignForm.courierId}
                                 onChange={(e) => setAssignForm({ ...assignForm, courierId: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-yellow-400"
                                 required
                             >
                                 <option value="">Select courier...</option>
@@ -242,7 +242,7 @@ const AdminOrders = () => {
                             </select>
                         </div>
                         <div className="flex gap-2">
-                            <button type="submit" className="flex-1 bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600">Assign</button>
+                            <button type="submit" className="flex-1 bg-black text-yellow-400 py-2 rounded-lg hover:bg-gray-800">Assign</button>
                             <button type="button" onClick={() => setShowAssignModal(false)} className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200">Cancel</button>
                         </div>
                     </form>

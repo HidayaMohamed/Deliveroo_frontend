@@ -74,7 +74,7 @@ const AdminUsers = () => {
             placeholder="Search users..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold"
+            className="w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold"
           />
         </div>
       </div>
@@ -87,7 +87,7 @@ const AdminUsers = () => {
             onClick={() => { setFilter(tab); setPage(1); }}
             className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${
               filter === tab
-                ? "border-orange-500 text-orange-600"
+                ? "border-yellow-400 text-black"
                 : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
@@ -160,7 +160,7 @@ const AdminUsers = () => {
                            {/* Role Change Dropdown or Logic */}
                            {user.role !== 'admin' && (
                              <select
-                                className="text-xs px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all font-black uppercase tracking-[0.12em] text-gray-700 appearance-none cursor-pointer"
+                                className="text-xs px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all font-black uppercase tracking-[0.12em] text-gray-700 appearance-none cursor-pointer"
                                 value={user.role}
                                 onChange={(e) => handleChangeRole(user.id, e.target.value)}
                              >
