@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 
@@ -6,16 +6,28 @@ const LocationAutocomplete = ({ placeholder, onSelect, initialValue = "" }) => {
  const [query, setQuery] = useState(initialValue);
  const [suggestions, setSuggestions] = useState([]);
  const [showSuggestions, setShowSuggestions] = useState(false);
+ const wrapperRef = useRef(null);
 
 
  useEffect(() => {
    setQuery(initialValue);
  }, [initialValue]);
 
+ useEffect(() => {
+   const handleClickOutside = (event) => {
+     if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+       setShowSuggestions(false);
+     }
+   };
+
+   document.addEventListener("mousedown", handleClickOutside);
+   return () => document.removeEventListener("mousedown", handleClickOutside);
+ }, []);
+
 
  useEffect(() => {
    const fetchSuggestions = async () => {
-     if (query.length < 3) {
+     if (query.trim().length < 3) {
        setSuggestions([]);
        return;
      }
@@ -23,8 +35,13 @@ const LocationAutocomplete = ({ placeholder, onSelect, initialValue = "" }) => {
 
      try {
        const token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+       if (!token) {
+         setSuggestions([]);
+         return;
+       }
+
        const response = await axios.get(
-         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`,
+         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query.trim())}.json`,
          {
            params: {
              access_token: token,
@@ -70,7 +87,7 @@ const LocationAutocomplete = ({ placeholder, onSelect, initialValue = "" }) => {
 
 
  return (
-   <div className="relative">
+   <div className="relative" ref={wrapperRef}>
      <div className="relative">
          <input
            type="text"
@@ -105,7 +122,7 @@ const LocationAutocomplete = ({ placeholder, onSelect, initialValue = "" }) => {
          {suggestions.map((suggestion) => (
            <li
              key={suggestion.id}
-             onClick={() => handleSelect(suggestion)}
+             onMouseDown={() => handleSelect(suggestion)}
             className="px-4 py-3 hover:bg-gray-50 cursor-pointer text-sm font-medium text-gray-700"
            >
              {suggestion.place_name}

@@ -59,6 +59,18 @@ const CreateOrder = () => {
 
  const updateMarker = (lngLat, type) => {
      const { lng, lat } = lngLat;
+
+     if (lng == null || lat == null || !map.current) {
+         if (type === 'pickup' && pickupMarker.current) {
+             pickupMarker.current.remove();
+             pickupMarker.current = null;
+         }
+         if (type === 'destination' && destinationMarker.current) {
+             destinationMarker.current.remove();
+             destinationMarker.current = null;
+         }
+         return;
+     }
     
      if (type === 'pickup') {
          if (pickupMarker.current) pickupMarker.current.remove();
@@ -131,6 +143,14 @@ const CreateOrder = () => {
    });
 
 
+   return () => {
+       if (map.current) {
+           map.current.remove();
+           map.current = null;
+       }
+   };
+
+
  }, []);
 
 
@@ -153,73 +173,105 @@ const CreateOrder = () => {
 
  // Calculate Distance
  useEffect(() => {
+   const removeRouteLayer = () => {
+       if (!map.current) return;
+       if (map.current.getLayer('route')) {
+           map.current.removeLayer('route');
+       }
+       if (map.current.getSource('route')) {
+           map.current.removeSource('route');
+       }
+   };
+
+   const addOrUpdateRouteLayer = (geometry) => {
+       if (!map.current) return;
+
+       const geojson = {
+           type: 'Feature',
+           properties: {},
+           geometry,
+       };
+
+       if (map.current.getSource('route')) {
+           map.current.getSource('route').setData(geojson);
+           return;
+       }
+
+       const addLayer = () => {
+           if (!map.current || map.current.getLayer('route')) return;
+           map.current.addLayer({
+               id: 'route',
+               type: 'line',
+               source: {
+                   type: 'geojson',
+                   data: geojson,
+               },
+               layout: {
+                   'line-join': 'round',
+                   'line-cap': 'round',
+               },
+               paint: {
+                   'line-color': '#eab308',
+                   'line-width': 5,
+                   'line-opacity': 0.75,
+               },
+           });
+       };
+
+       if (map.current.isStyleLoaded()) {
+           addLayer();
+       } else {
+           map.current.once('style.load', addLayer);
+       }
+   };
+
    const calculateRoute = async () => {
-       if (formData.pickup_lat && formData.destination_lat) {
-           try {
-               const query = await axios.get(
-                   `https://api.mapbox.com/directions/v5/mapbox/driving/${formData.pickup_lng},${formData.pickup_lat};${formData.destination_lng},${formData.destination_lat}`,
-                   {
-                       params: {
-                           access_token: mapboxgl.accessToken,
-                           geometries: 'geojson',
-                           overview: 'full'
-                       }
+       if (!(formData.pickup_lat && formData.pickup_lng && formData.destination_lat && formData.destination_lng)) {
+           setDistance(null);
+           setDuration(null);
+           setPrice(null);
+           removeRouteLayer();
+           return;
+       }
+
+       try {
+           const query = await axios.get(
+               `https://api.mapbox.com/directions/v5/mapbox/driving/${formData.pickup_lng},${formData.pickup_lat};${formData.destination_lng},${formData.destination_lat}`,
+               {
+                   params: {
+                       access_token: mapboxgl.accessToken,
+                       geometries: 'geojson',
+                       overview: 'full'
                    }
-               );
-
-
-               if (query.data.routes && query.data.routes.length > 0) {
-                   const route = query.data.routes[0];
-                   const distKm = route.distance / 1000;
-                   const durMins = Math.round(route.duration / 60);
-                  
-                   setDistance(`${distKm.toFixed(1)} km`);
-                   setDuration(durMins > 60 ? `${Math.floor(durMins/60)} hrs ${durMins%60} mins` : `${durMins} mins`);
-                   setPrice(Math.max(distKm * 1, 10).toFixed(2)); // Min 10 KSH
-
-
-                   // Draw route on map
-                   if (map.current.getSource('route')) {
-                       map.current.getSource('route').setData(route.geometry);
-                   } else {
-                       map.current.addLayer({
-                           id: 'route',
-                           type: 'line',
-                           source: {
-                               type: 'geojson',
-                               data: {
-                                   type: 'Feature',
-                                   properties: {},
-                                   geometry: route.geometry
-                               }
-                           },
-                           layout: {
-                               'line-join': 'round',
-                               'line-cap': 'round'
-                           },
-                           paint: {
-                               'line-color': '#eab308', // Yellow
-                               'line-width': 5,
-                               'line-opacity': 0.75
-                           }
-                       });
-                   }
-                  
-                   // Fit bounds
-                   const bounds = new mapboxgl.LngLatBounds();
-                   bounds.extend([formData.pickup_lng, formData.pickup_lat]);
-                   bounds.extend([formData.destination_lng, formData.destination_lat]);
-                   map.current.fitBounds(bounds, { padding: 50 });
                }
-           } catch (error) {
-               console.error("Error calculating route:", error);
+           );
+
+
+           if (query.data.routes && query.data.routes.length > 0) {
+               const route = query.data.routes[0];
+               const distKm = route.distance / 1000;
+               const durMins = Math.round(route.duration / 60);
+              
+               setDistance(`${distKm.toFixed(1)} km`);
+               setDuration(durMins > 60 ? `${Math.floor(durMins/60)} hrs ${durMins%60} mins` : `${durMins} mins`);
+               setPrice(Math.max(distKm * 1, 10).toFixed(2)); // Min 10 KSH
+
+               addOrUpdateRouteLayer(route.geometry);
+              
+               // Fit bounds
+               const bounds = new mapboxgl.LngLatBounds();
+               bounds.extend([formData.pickup_lng, formData.pickup_lat]);
+               bounds.extend([formData.destination_lng, formData.destination_lat]);
+               map.current.fitBounds(bounds, { padding: 50 });
            }
+       } catch (error) {
+           console.error("Error calculating route:", error);
        }
    };
 
 
    calculateRoute();
- }, [formData.pickup_lat, formData.destination_lat]);
+ }, [formData.pickup_lat, formData.pickup_lng, formData.destination_lat, formData.destination_lng]);
 
 
 
