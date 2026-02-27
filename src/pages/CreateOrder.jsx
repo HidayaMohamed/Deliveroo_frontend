@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -57,28 +57,6 @@ const CreateOrder = () => {
  }, [activeField]);
 
 
- // Initialize Map
- useEffect(() => {
-   if (map.current) return; // initialize map only once
-  
-   map.current = new mapboxgl.Map({
-     container: mapContainer.current,
-     style: 'mapbox://styles/mapbox/streets-v12',
-     center: defaultCenter,
-     zoom: 12
-   });
-
-
-   map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-  
-   map.current.on('click', (e) => {
-       handleMapClick(e.lngLat);
-   });
-
-
- }, []);
-
-
  const updateMarker = (lngLat, type) => {
      const { lng, lat } = lngLat;
     
@@ -98,24 +76,7 @@ const CreateOrder = () => {
  };
 
 
- const handleLocationSelect = (data, type) => {
-     const { lat, lng, address } = data;
-     setFormData(prev => ({
-         ...prev,
-         [`${type}_address`]: address,
-         [`${type}_lat`]: lat,
-         [`${type}_lng`]: lng,
-     }));
-    
-     updateMarker({ lng, lat }, type);
-    
-     if (map.current) {
-         map.current.flyTo({ center: [lng, lat], zoom: 14 });
-     }
- };
-
-
- const handleMapClick = async (lngLat) => {
+ async function handleMapClick(lngLat) {
      const { lng, lat } = lngLat;
      const currentActiveField = activeFieldRef.current;
     
@@ -148,6 +109,45 @@ const CreateOrder = () => {
 
 
      updateMarker({ lng, lat }, currentActiveField);
+ }
+
+
+ // Initialize Map
+ useEffect(() => {
+   if (map.current) return; // initialize map only once
+  
+   map.current = new mapboxgl.Map({
+     container: mapContainer.current,
+     style: 'mapbox://styles/mapbox/streets-v12',
+     center: defaultCenter,
+     zoom: 12
+   });
+
+
+   map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+  
+   map.current.on('click', (e) => {
+       handleMapClick(e.lngLat);
+   });
+
+
+ }, []);
+
+
+ const handleLocationSelect = (data, type) => {
+     const { lat, lng, address } = data;
+     setFormData(prev => ({
+         ...prev,
+         [`${type}_address`]: address,
+         [`${type}_lat`]: lat,
+         [`${type}_lng`]: lng,
+     }));
+    
+     updateMarker({ lng, lat }, type);
+    
+     if (map.current) {
+         map.current.flyTo({ center: [lng, lat], zoom: 14 });
+     }
  };
 
 
@@ -283,18 +283,23 @@ const CreateOrder = () => {
 
 
  return (
-   <div className="min-h-screen bg-gray-100 py-8">
+   <div className="min-h-screen bg-white py-12">
      <div className="container mx-auto px-4">
        <div className="max-w-2xl mx-auto">
-         <h1 className="text-3xl font-bold text-gray-800 mb-8">
-           Create New Order
-         </h1>
+         <div className="mb-10">
+           <h1 className="text-3xl font-black text-black tracking-tighter uppercase">
+             New{" "}
+             <span className="italic font-light text-gray-400 normal-case">
+               Order
+             </span>
+           </h1>
+           <p className="text-gray-500 font-medium mt-2 text-sm">Fill in the details below to create your delivery.</p>
+         </div>
 
-
-         <div className="bg-white rounded-lg shadow-lg p-6">
+         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] p-10">
            <form onSubmit={handleSubmit} className="space-y-6">
-             <div>
-               <label className="block text-sm font-medium text-gray-700 mb-1">
+             <div className="space-y-1.5">
+               <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
                  Parcel Name *
                </label>
                <input
@@ -302,54 +307,50 @@ const CreateOrder = () => {
                  name="parcel_name"
                  value={formData.parcel_name}
                  onChange={handleChange}
-                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold"
                  placeholder="e.g., Documents, Electronics"
                  required
                />
              </div>
 
-
-             <div>
-               <label className="block text-sm font-medium text-gray-700 mb-1">
+             <div className="space-y-1.5">
+               <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
                  Description
                </label>
                <textarea
                  name="description"
                  value={formData.description}
                  onChange={handleChange}
-                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold resize-none"
                  rows="3"
                />
              </div>
 
-
-             <div>
-               <label className="block text-sm font-medium text-gray-700 mb-1">
+             <div className="space-y-1.5">
+               <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
                  Parcel Image *
                </label>
                <input
                  type="file"
                  accept="image/*"
                  onChange={handleImageChange}
-                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-black file:uppercase file:tracking-wider file:bg-orange-500 file:text-white hover:file:bg-orange-600 cursor-pointer"
                  required
                />
-               <p className="text-xs text-gray-500 mt-1">Upload an image to help the courier identify your parcel.</p>
+               <p className="text-xs text-gray-400 font-medium ml-1">Upload an image to help the courier identify your parcel.</p>
                {parcelImagePreview && (
-                 <div className="mt-2">
-                   <p className="text-sm font-medium text-gray-700 mb-1">Preview:</p>
+                 <div className="mt-3">
                    <img
                      src={parcelImagePreview}
                      alt="Parcel Preview"
-                     className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                     className="w-full h-48 object-cover rounded-2xl border border-gray-100"
                    />
                  </div>
                )}
              </div>
 
-
-             <div>
-               <label className="block text-sm font-medium text-gray-700 mb-1">
+             <div className="space-y-1.5">
+               <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
                  Weight (kg) *
                </label>
                <input
@@ -359,15 +360,14 @@ const CreateOrder = () => {
                  onChange={handleChange}
                  step="0.1"
                  min="0.1"
-                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                 className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold"
                  required
                />
              </div>
 
-
-             <div className="grid md:grid-cols-2 gap-4">
-               <div>
-                 <label className="block text-sm font-medium text-gray-700 mb-1">
+             <div className="grid md:grid-cols-2 gap-5">
+               <div className="space-y-1.5">
+                 <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
                    Pickup Address *
                  </label>
                  <LocationAutocomplete
@@ -375,12 +375,13 @@ const CreateOrder = () => {
                    onSelect={(data) => handleLocationSelect(data, 'pickup')}
                    initialValue={formData.pickup_address}
                  />
-                 {formData.pickup_lat && <p className="text-xs text-green-600 mt-1">Location selected</p>}
+                 {formData.pickup_lat && (
+                   <p className="text-[10px] font-black uppercase tracking-[0.1em] text-green-600 ml-1">Location set</p>
+                 )}
                </div>
 
-
-               <div>
-                 <label className="block text-sm font-medium text-gray-700 mb-1">
+               <div className="space-y-1.5">
+                 <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
                    Destination Address *
                  </label>
                  <LocationAutocomplete
@@ -388,33 +389,33 @@ const CreateOrder = () => {
                    onSelect={(data) => handleLocationSelect(data, 'destination')}
                    initialValue={formData.destination_address}
                  />
-                 {formData.destination_lat && <p className="text-xs text-green-600 mt-1">Location selected</p>}
+                 {formData.destination_lat && (
+                   <p className="text-[10px] font-black uppercase tracking-[0.1em] text-green-600 ml-1">Location set</p>
+                 )}
                </div>
              </div>
 
-
              {distance && (
-               <div className="bg-blue-50 p-4 rounded-lg flex justify-between items-center text-blue-800">
-                   <div>
-                       <p className="text-sm font-bold">Estimated Distance</p>
-                       <p className="text-lg">{distance}</p>
-                   </div>
-                   <div>
-                       <p className="text-sm font-bold">Estimated Time</p>
-                       <p className="text-lg">{duration}</p>
-                   </div>
-                   <div className="text-right">
-                       <p className="text-sm font-bold">Estimated Price</p>
-                       <p className="text-xl font-bold">KSH {price}</p>
-                   </div>
+               <div className="bg-orange-50 border border-orange-100 p-6 rounded-2xl flex justify-between items-center">
+                 <div>
+                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-400 mb-1">Distance</p>
+                   <p className="text-lg font-black text-black">{distance}</p>
+                 </div>
+                 <div>
+                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-400 mb-1">Est. Time</p>
+                   <p className="text-lg font-black text-black">{duration}</p>
+                 </div>
+                 <div className="text-right">
+                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-400 mb-1">Price</p>
+                   <p className="text-2xl font-black text-orange-500">KSH {price}</p>
+                 </div>
                </div>
              )}
-
 
              <button
                type="submit"
                disabled={loading}
-               className="w-full bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600 disabled:bg-orange-300 transition-colors"
+               className="w-full bg-orange-500 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20 flex items-center justify-center gap-3 disabled:bg-gray-300 disabled:shadow-none mt-2"
              >
                {loading ? "Creating Order..." : "Create Order"}
              </button>
@@ -423,33 +424,41 @@ const CreateOrder = () => {
        </div>
      </div>
 
-
      {/* Map Section for Pinning */}
      <div className="container mx-auto px-4 mt-8">
-       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-           <h2 className="text-xl font-bold mb-4">Select Location on Map</h2>
-           <p className="text-gray-600 mb-4">Click on the map to set a location. Select which field to update below.</p>
-          
-           <div className="mb-4 flex gap-4">
-               <button
-                   onClick={() => setActiveField('pickup')}
-                   className={`px-4 py-2 rounded-lg ${activeField === 'pickup' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-               >
-                   Set Pickup
-               </button>
-               <button
-                   onClick={() => setActiveField('destination')}
-                   className={`px-4 py-2 rounded-lg ${activeField === 'destination' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-               >
-                   Set Destination
-               </button>
-           </div>
+       <div className="max-w-4xl mx-auto bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] p-10">
+         <h2 className="text-xl font-black text-black uppercase tracking-tight mb-1">
+           Pin on Map
+         </h2>
+         <p className="text-sm text-gray-400 font-medium mb-6">Click anywhere on the map to set a location.</p>
 
+         <div className="mb-6 flex gap-3">
+           <button
+             onClick={() => setActiveField('pickup')}
+             className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${
+               activeField === 'pickup'
+                 ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20'
+                 : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+             }`}
+           >
+             Set Pickup
+           </button>
+           <button
+             onClick={() => setActiveField('destination')}
+             className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${
+               activeField === 'destination'
+                 ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/20'
+                 : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+             }`}
+           >
+             Set Destination
+           </button>
+         </div>
 
-           <div
-               ref={mapContainer}
-               className="w-full h-[400px] rounded-lg"
-           />
+         <div
+           ref={mapContainer}
+           className="w-full h-[400px] rounded-2xl overflow-hidden"
+         />
        </div>
      </div>
    </div>

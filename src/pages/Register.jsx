@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Zap, CheckCircle2, ArrowRight } from "lucide-react";
 
@@ -17,7 +17,6 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [successMode, setSuccessMode] = useState(false);
   const { register } = useAuth();
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -143,7 +142,7 @@ const Register = () => {
                   name="role"
                   value={formData.role}
                   onChange={handleChange}
-                  className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 outline-none transition-all text-sm font-bold appearance-none cursor-pointer"
+                  className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold appearance-none cursor-pointer"
                 >
                   <option value="customer">Customer</option>
                   <option value="courier">Courier</option>
@@ -160,7 +159,7 @@ const Register = () => {
                       name="vehicle_type"
                       value={formData.vehicle_type}
                       onChange={handleChange}
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 outline-none transition-all text-sm font-bold appearance-none cursor-pointer"
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold appearance-none cursor-pointer"
                       required={formData.role === "courier"}
                     >
                       <option value="">Select type</option>

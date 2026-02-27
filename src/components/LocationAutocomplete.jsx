@@ -80,7 +80,7 @@ const LocationAutocomplete = ({ placeholder, onSelect, initialValue = "" }) => {
              setShowSuggestions(true);
            }}
            onFocus={() => setShowSuggestions(true)}
-           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 pr-10"
+           className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold pr-10"
            placeholder={placeholder}
            required
          />
@@ -101,12 +101,12 @@ const LocationAutocomplete = ({ placeholder, onSelect, initialValue = "" }) => {
      </div>
     
      {showSuggestions && suggestions.length > 0 && (
-       <ul className="absolute z-50 w-full bg-white border border-gray-300 rounded-b-lg shadow-lg mt-1 max-h-60 overflow-y-auto">
+      <ul className="absolute z-50 w-full bg-white border border-gray-100 rounded-2xl shadow-xl shadow-black/10 mt-2 max-h-60 overflow-y-auto">
          {suggestions.map((suggestion) => (
            <li
              key={suggestion.id}
              onClick={() => handleSelect(suggestion)}
-             className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+            className="px-4 py-3 hover:bg-gray-50 cursor-pointer text-sm font-medium text-gray-700"
            >
              {suggestion.place_name}
            </li>

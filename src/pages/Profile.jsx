@@ -197,7 +197,7 @@ const Profile = () => {
               <form onSubmit={handleUpdateProfile}>
                 <div className="space-y-5">
                   <div>
-                    <label className="block text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-3 ml-1">
+                    <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-3 ml-1">
                       Full Name
                     </label>
                     <input
@@ -206,12 +206,12 @@ const Profile = () => {
                       onChange={(e) =>
                         setEditForm({ ...editForm, full_name: e.target.value })
                       }
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 outline-none transition-all text-sm font-bold"
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-3 ml-1">
+                    <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-3 ml-1">
                       Phone Number
                     </label>
                     <input
@@ -220,13 +220,13 @@ const Profile = () => {
                       onChange={(e) =>
                         setEditForm({ ...editForm, phone: e.target.value })
                       }
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 outline-none transition-all text-sm font-bold"
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold"
                     />
                   </div>
                   {user.role === "courier" && (
                     <>
                       <div>
-                        <label className="block text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-3 ml-1">
+                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-3 ml-1">
                           Vehicle Type
                         </label>
                         <select
@@ -237,7 +237,7 @@ const Profile = () => {
                               vehicle_type: e.target.value,
                             })
                           }
-                          className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 outline-none transition-all text-sm font-bold"
+                          className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold appearance-none cursor-pointer"
                         >
                           <option value="motorbike">Motorbike</option>
                           <option value="car">Car</option>
@@ -246,7 +246,7 @@ const Profile = () => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-3 ml-1">
+                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-3 ml-1">
                           Plate Number
                         </label>
                         <input
@@ -258,7 +258,7 @@ const Profile = () => {
                               plate_number: e.target.value,
                             })
                           }
-                          className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 outline-none transition-all text-sm font-bold"
+                          className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 focus:bg-white outline-none transition-all text-sm font-bold"
                         />
                       </div>
                     </>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { adminAPI } from "../services/api";
 import toast from "react-hot-toast";
-import { Search, UserCheck, UserX, UserCog, Mail, Phone, Truck } from "lucide-react";
+import { Search, UserCheck, UserX, Mail, Phone } from "lucide-react";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -26,7 +26,7 @@ const AdminUsers = () => {
       const response = await adminAPI.getUsers(params);
       setUsers(response.data.users);
       setTotalPages(response.data.pages);
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch users");
     } finally {
       setLoading(false);
@@ -38,7 +38,7 @@ const AdminUsers = () => {
       await adminAPI.toggleUserActive(userId);
       toast.success("User status updated");
       fetchUsers();
-    } catch (error) {
+    } catch {
       toast.error("Failed to update status");
     }
   };
@@ -74,7 +74,7 @@ const AdminUsers = () => {
             placeholder="Search users..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+            className="w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all text-sm font-bold"
           />
         </div>
       </div>
@@ -160,7 +160,7 @@ const AdminUsers = () => {
                            {/* Role Change Dropdown or Logic */}
                            {user.role !== 'admin' && (
                              <select
-                                className="text-xs border border-gray-300 rounded px-2 py-1 bg-white text-gray-700"
+                                className="text-xs px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white outline-none transition-all font-black uppercase tracking-[0.12em] text-gray-700 appearance-none cursor-pointer"
                                 value={user.role}
                                 onChange={(e) => handleChangeRole(user.id, e.target.value)}
                              >
